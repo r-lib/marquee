@@ -24,7 +24,7 @@ Suggests:
     ggplot2,
     patchwork
 Remotes: 
-    r-lib/systemfonts
+    r-lib/systemfonts,
     r-lib/textshaping#40
 URL: https://github.com/thomasp85/marquee
 BugReports: https://github.com/thomasp85/marquee/issues
