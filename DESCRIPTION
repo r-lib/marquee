@@ -1,9 +1,12 @@
 Package: marquee
 Title: Markdown Parser and Renderer for R Graphics
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R: c(
     person("Thomas Lin", "Pedersen", , "thomasp85@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-5147-4711"))
+           comment = c(ORCID = "0000-0002-5147-4711")),
+    person("Martin", "Mitáš", role = "aut",
+           comment = "Author of MD4C")
+  )
 Description: Provides the mean to parse and render markdown text with grid along
     with facilities to define the styling of the text.
 License: MIT + file LICENSE

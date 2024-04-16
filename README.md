@@ -49,7 +49,7 @@ fancy_style <- classic_style(
     colours = c("lightblue", "white"),
     x1 = 0, y1 = 1, x2 = 0, y2 = 0
   ))
-grob <- marquee_grob(readme, style = fancy_style, width = unit(30, "cm"))
+grob <- marquee_grob(readme, style = fancy_style)
 grid.draw(grob)
 ```
 
