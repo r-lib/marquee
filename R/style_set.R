@@ -12,7 +12,8 @@
 #' is a marquee style it will overwrite the tag and subsequent arguments are
 #' ignored
 #' @param style_set A style set to modify
-#' @param tag The name of a tag to modify or remove
+#' @param tag The name of a tag to modify or remove. Tags are internally all
+#' lowercase and `tag` will be converted to lowercase before matching
 #'
 #' @return A style set object
 #'
@@ -40,6 +41,7 @@ style_set <- function(...) {
   if (any(vapply(styles$body, is.null, logical(1)))) {
     cli::cli_abort("The body style must be a complete style specification")
   }
+  names(styles) <- tolower(names(styles))
   class(styles) <- "marquee_style_set"
   styles
 }
@@ -65,6 +67,7 @@ print.marquee_style_set <- function(x, ...) {
 #' @rdname style_set
 #' @export
 modify_style <- function(style_set, tag, ...) {
+  tag <- tolower(tag)
   if (!is_style_set(style_set)) {
     stop_input_type(style_set, "a style set object")
   }
@@ -91,6 +94,7 @@ modify_style <- function(style_set, tag, ...) {
 #' @rdname style_set
 #' @export
 remove_style <- function(style_set, tag) {
+  tag <- tolower(tag)
   if (!is_style_set(style_set)) {
     stop_input_type(style_set, "a style set object")
   }

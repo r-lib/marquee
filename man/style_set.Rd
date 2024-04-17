@@ -20,7 +20,8 @@ ignored}
 
 \item{style_set}{A style set to modify}
 
-\item{tag}{The name of a tag to modify or remove}
+\item{tag}{The name of a tag to modify or remove. Tags are internally all
+lowercase and \code{tag} will be converted to lowercase before matching}
 }
 \value{
 A style set object
