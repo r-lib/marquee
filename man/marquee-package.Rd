@@ -4,12 +4,25 @@
 \name{marquee-package}
 \alias{marquee}
 \alias{marquee-package}
-\title{marquee: What the Package Does (One Line, Title Case)}
+\title{marquee: Markdown Parser and Renderer for R Graphics}
 \description{
-What the package does (one paragraph).
+Provides the mean to parse and render markdown text with grid along with facilities to define the styling of the text.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/thomasp85/marquee}
+  \item Report bugs at \url{https://github.com/thomasp85/marquee/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Thomas Lin Pedersen \email{thomasp85@gmail.com} (\href{https://orcid.org/0000-0002-5147-4711}{ORCID})
+
+Authors:
+\itemize{
+  \item Martin Mitáš (Author of MD4C)
+}
 
 }
 \keyword{internal}

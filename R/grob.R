@@ -242,8 +242,16 @@ makeContext.marquee <- function(x) {
     ## Start with width
     if (is.null(vp) || unitType(absolute.size(vp$width)) == "null") {
       if (images$inline[i]) {
-        ### No absolute size + inline. set width to 0.65em
-        width <- x$text$size[images$index[i]] * 0.65
+        ### No absolute size + inline. set width to 1.2em
+        width <- x$text$size[images$index[i]] * 1.2
+        # if raster or svg we cap at height instead of width and let aspect ratio determine width
+        if (inherits(images$grobs[[i]], "rastergrob")) {
+          asp <- ncol(images$grobs[[i]]$raster) / nrow(images$grobs[[i]]$raster)
+          width <- width * asp
+        } else if (inherits(images$grobs[[i]], "svg_grob")) {
+          asp <- images$grob[[i]]$asp
+          width <- width * asp
+        }
       } else {
         ### Not inline. Use block width
         width <- widths[x$text$block[images$index[i]]]
@@ -259,6 +267,9 @@ makeContext.marquee <- function(x) {
       if (inherits(images$grobs[[i]], "rastergrob")) {
         ### No size and rastergrob. Use aspect ratio of raster
         asp <- ncol(images$grobs[[i]]$raster) / nrow(images$grobs[[i]]$raster)
+        height <- width / asp
+      } else if (inherits(images$grobs[[i]], "svg_grob")) {
+        asp <- images$grob[[i]]$asp
         height <- width / asp
       } else if (images$inline[i]) {
         ### Inline. We set a square size
@@ -584,10 +595,15 @@ makeContext.marquee <- function(x) {
   # Place images
   image_grobs <- lapply(seq_along(images$grobs), function(i) {
     ## Use the null-glyph to set left-bottom position of image
-    glyph <- x$shape$string_id == images$index[i]
+    glyph <- which(x$shape$string_id == images$index[i])
     grob <- images$grobs[[i]]
     grob$vp$x <- unit(x$shape$x_offset[glyph], "bigpts")
-    grob$vp$y <- unit(x$shape$y_offset[glyph], "bigpts")
+    descend <- 0
+    if (images$inline[i]) {
+      ## If inline we move baseline down to lowest descender of the line
+      descend <- min(x$shape$descender[x$shape$y_offset == x$shape$y_offset[glyph]])
+    }
+    grob$vp$y <- unit(x$shape$y_offset[glyph] + descend, "bigpts")
     grob
   })
   ## Remove the null-glyphs from the shape

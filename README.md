@@ -64,7 +64,7 @@ I would be remiss to not mention
 [ggtext](https://github.com/wilkelab/ggtext), both by Claus Wilke. These
 packages aims to solve much the same as marquee, but work in a different
 way and doesn’t have the same powerful textshaping backend as marquee.
-Most notably from a user persepctive is perhaps that gridtext
+Most notably from a user perspective is perhaps that gridtext
 understands HTML to some degree, whereas marquee is oblivious to both
 HTML and CSS. Instead it supports the full CommonMark spec with the plan
 to add support for custom span elements as well.

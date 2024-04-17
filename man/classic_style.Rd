@@ -57,7 +57,8 @@ element.}
     \item{\code{margin}}{The margin around the element, given as a call to \code{\link[=box]{box()}}}
     \item{\code{padding}}{The padding around the element, given as a call to \code{\link[=box]{box()}}}
     \item{\code{background}}{The color of the background fill. The background includes
-the padding but not the margin}
+the padding but not the margin. Can be a solid color or a gradient or pattern
+made with \code{\link[grid:patterns]{grid::linearGradient()}}/\code{\link[grid:patterns]{grid::radialGradient()}}/\code{\link[grid:patterns]{grid::pattern()}}}
     \item{\code{border}}{The color of the background stroke. The background includes
 the padding but not the margin}
     \item{\code{border_size}}{The line width of the background stroke, given as a call

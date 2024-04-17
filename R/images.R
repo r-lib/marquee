@@ -1,7 +1,7 @@
 images_as_grobs <- function(paths, env = caller_env()) {
-  is_file <- file.exists(paths)
-  is_png <- is_file & grepl("\\w\\.png$", paths)
-  is_jpeg <- is_file & grepl("\\w\\.jpe?g$", paths)
+  is_png <- grepl("\\w\\.png$", paths)
+  is_jpeg <- grepl("\\w\\.jpe?g$", paths)
+  is_svg <- grepl("\\w\\.svg$", paths)
   lapply(seq_along(paths), function(i) {
     obj <- NULL
     if (is_png[i]) {
@@ -14,6 +14,16 @@ images_as_grobs <- function(paths, env = caller_env()) {
         rasterGrob(jpeg::readJPEG(paths[i], native = TRUE)),
         error = function(...) NULL
       )
+    } else if (is_svg[i]) {
+      check_installed("rsvg")
+      svg <- charToRaw(paste0(trimws(readLines(paths[i])), collapse = ""))
+      obj <- try_fetch(
+        rsvg::rsvg_nativeraster(svg, width = 500),
+        error = function(...) NULL
+      )
+      if (!is.null(obj)) {
+        obj <- svg_grob(svg, ncol(obj) / nrow(obj))
+      }
     }
     if (is.null(obj)) {
       obj <- get0(paths[i], envir = env)
@@ -49,3 +59,18 @@ missing_grob <- function() {
     cl = "missing_grob"
   )
 }
+
+svg_grob <- function(path, asp = NULL, x = unit(0.5, "npc"), y = unit(0.5, "npc"),
+                     just = "centre", hjust = NULL, vjust = NULL,
+                     default.units = "npc", name = NULL, gp = gpar(), vp = NULL) {
+  gTree(path = path, asp = asp, x = x, y = y, just = just, hjust = hjust, vjust = vjust,
+        default.units = default.units, name = name, gp = gp, vp = vp, cl = "svg_grob")
+}
+
+#' @export
+makeContent.svg_grob <- function(x) {
+  width <- convertWidth(unit(1, "npc"), "inches", TRUE) * 300
+  raster <- rsvg::rsvg_nativeraster(x$path, width = width)
+  setChildren(x, gList(rasterGrob(raster, width = unit(1, "npc"))))
+}
+
