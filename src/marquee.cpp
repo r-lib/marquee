@@ -22,6 +22,7 @@ using namespace std::string_literals;
 struct MARQUEE_DATA {
   std::stack<cpp11::list> style_stack;
   std::stack<std::string> type_stack;
+  std::vector<size_t> index_stack;
   std::stack<int> offset_stack;
   std::stack<bool> tight_stack;
   cpp11::list_of<cpp11::list> defined_styles;
@@ -33,6 +34,7 @@ struct MARQUEE_DATA {
   cpp11::writable::integers indent;
   cpp11::writable::integers ol_index;
   cpp11::writable::logicals tight;
+  cpp11::writable::integers until;
   R_xlen_t current_id;
   unsigned current_block;
   unsigned current_indent;
@@ -41,6 +43,7 @@ struct MARQUEE_DATA {
   MARQUEE_DATA(cpp11::list_of<cpp11::list> styles) :
     style_stack(),
     type_stack({""}),
+    index_stack(),
     offset_stack({0}),
     tight_stack({false}),
     defined_styles(styles),
@@ -52,6 +55,7 @@ struct MARQUEE_DATA {
     indent(),
     ol_index(),
     tight(),
+    until(),
     current_id(0),
     current_block(0),
     current_indent(0),
@@ -151,6 +155,7 @@ inline cpp11::writable::list combine_styles(cpp11::list parent, cpp11::list def)
 
 inline void push_info(MARQUEE_DATA* userdata, std::string type, bool block = false, bool tight = false, int offset = 1) {
   userdata->type_stack.push(type);
+  userdata->index_stack.push_back(userdata->until.size());
   cpp11::list style(userdata->defined_styles[type]);
   if (userdata->style_stack.empty()) {
     userdata->style_stack.push(style);
@@ -179,6 +184,7 @@ inline void init_text(MARQUEE_DATA* userdata) {
   userdata->indent.push_back(userdata->current_indent);
   userdata->ol_index.push_back(userdata->offset_stack.top());
   userdata->tight.push_back(userdata->tight_stack.top());
+  userdata->until.push_back(userdata->until.size() + 1);
 }
 
 inline void pop_info(MARQUEE_DATA* userdata, std::string type, bool block = false) {
@@ -186,6 +192,11 @@ inline void pop_info(MARQUEE_DATA* userdata, std::string type, bool block = fals
     userdata->style_stack.pop();
   }
   userdata->type_stack.pop();
+  size_t cur_line = userdata->until.size();
+  for (size_t i = 0; i < userdata->index_stack.size(); ++i) {
+    userdata->until[userdata->index_stack[i]] = cur_line;
+  }
+  userdata->index_stack.pop_back();
   if (block) {
     userdata->current_indent--;
     if (type != "li") {
@@ -364,9 +375,10 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
     userdata.type,
     userdata.indent,
     userdata.ol_index,
-    userdata.tight
+    userdata.tight,
+    userdata.until
   };
-  cpp11::writable::strings res_names = {"text", "id", "block", "type", "indentation", "ol_index", "tight"};
+  cpp11::writable::strings res_names = {"text", "id", "block", "type", "indentation", "ol_index", "tight", "ends"};
 
   cpp11::list doc_style(userdata.style[0]);
   double rem_size = REAL(doc_style[0])[0];

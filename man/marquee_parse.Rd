@@ -113,15 +113,13 @@ some additional information useful for rendering the output in the expected
 way. The \code{id} column refers the tokens back to the original input text, the
 \code{block} relates tokens together into blocks. Block elements increment the
 block count when they are entered, and decrement it when they are excited.
-Note the output doesn't specify when a block or span is excited. Spans cannot
-have children (they are closed when a new span starts), so they are excited
-right away. Blocks are excited when a new tag with the same indentation is
-encountered. The \code{type} column provides the type of the block. The
-\code{indentation} column provides the node level in the tree. A child block will
-increase the indentation for as long as it is active. \code{ol_index} provides the
-number associated with the ordered list element. \code{tight} indicates whether
-the list is tight (i.e. it was provided with no empty lines between
-list elements).
+The \code{type} column provides the type of the block. The \code{indentation} column
+provides the node level in the tree. A child block will increase the
+indentation for as long as it is active. \code{ol_index} provides the number
+associated with the ordered list element. \code{tight} indicates whether the list
+is tight (i.e. it was provided with no empty lines between list elements).
+The \code{ends} column indicate until which row in the output the tag is active
+(i.e. the tag is closed after the row indicated by the value in this column).
 }
 
 \examples{

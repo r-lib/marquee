@@ -104,15 +104,13 @@
 #' way. The `id` column refers the tokens back to the original input text, the
 #' `block` relates tokens together into blocks. Block elements increment the
 #' block count when they are entered, and decrement it when they are excited.
-#' Note the output doesn't specify when a block or span is excited. Spans cannot
-#' have children (they are closed when a new span starts), so they are excited
-#' right away. Blocks are excited when a new tag with the same indentation is
-#' encountered. The `type` column provides the type of the block. The
-#' `indentation` column provides the node level in the tree. A child block will
-#' increase the indentation for as long as it is active. `ol_index` provides the
-#' number associated with the ordered list element. `tight` indicates whether
-#' the list is tight (i.e. it was provided with no empty lines between
-#' list elements).
+#' The `type` column provides the type of the block. The `indentation` column
+#' provides the node level in the tree. A child block will increase the
+#' indentation for as long as it is active. `ol_index` provides the number
+#' associated with the ordered list element. `tight` indicates whether the list
+#' is tight (i.e. it was provided with no empty lines between list elements).
+#' The `ends` column indicate until which row in the output the tag is active
+#' (i.e. the tag is closed after the row indicated by the value in this column).
 #'
 #' @export
 #'
