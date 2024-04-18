@@ -108,7 +108,7 @@ element.}
 
 \item{background}{The color of the background fill. The background includes
 the padding but not the margin. Can be a solid color or a gradient or pattern
-made with \code{\link[grid:patterns]{grid::linearGradient()}}/\code{\link[grid:patterns]{grid::radialGradient()}}/\code{\link[grid:patterns]{grid::pattern()}}}
+made with \code{grid::linearGradient()}/\code{grid::radialGradient()}/\code{grid::pattern()}}
 
 \item{border}{The color of the background stroke. The background includes
 the padding but not the margin}

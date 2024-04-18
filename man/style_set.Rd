@@ -35,9 +35,19 @@ for all tags and all style options. It can often be easier to derive a new
 style set from an existing one rather than building one from scratch.
 }
 \examples{
-style_set(body = body_style(), p = style(indent = em(2))) |>
-  modify_style("p", size = 16) |>
-  modify_style("str", style(weight = "bold")) |>
-  remove_style("p")
+# Create a style
+s_set <- style_set(body = body_style(), p = style(indent = em(2)))
+
+# Modify an existing tag
+modify_style(s_set, "p", size = 16)
+
+# Add a new tag, supplying a full style object
+modify_style(s_set, "str", style(weight = "bold"))
+
+# Same as above, but style object created implicitly
+modify_style(s_set, "str", weight = "bold")
+
+# Remove a tag style
+remove_style(s_set, "p")
 
 }

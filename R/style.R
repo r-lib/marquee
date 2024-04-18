@@ -44,7 +44,7 @@
 #' @param padding The padding around the element, given as a call to [box()]
 #' @param background The color of the background fill. The background includes
 #' the padding but not the margin. Can be a solid color or a gradient or pattern
-#' made with [grid::linearGradient()]/[grid::radialGradient()]/[grid::pattern()]
+#' made with `grid::linearGradient()`/`grid::radialGradient()`/`grid::pattern()`
 #' @param border The color of the background stroke. The background includes
 #' the padding but not the margin
 #' @param border_size The line width of the background stroke, given as a call
