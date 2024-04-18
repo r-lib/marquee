@@ -630,8 +630,8 @@ makeContent.marquee <- function(x) {
   font_id <- paste0(x$shape$font_path, "&", x$shape$font_index)
   font_match <- match(font_id, unique(font_id))
   unique_font <- !duplicated(font_id)
-  fonts <- Map(grDevices::glyphFont, x$shape$font_path[unique_font], x$shape$font_index[unique_font], "", 0, "")
-  fonts <- inject(grDevices::glyphFontList(!!!fonts))
+  fonts <- Map(glyphFont, x$shape$font_path[unique_font], x$shape$font_index[unique_font], "", 0, "")
+  fonts <- inject(glyphFontList(!!!fonts))
 
   # We need to make a grob for each markdown text
   indices <- split(seq_len(nrow(x$shape)), x$shape$id)
@@ -639,7 +639,7 @@ makeContent.marquee <- function(x) {
   grobs <- lapply(seq_along(indices), function(grob) {
     ## Construct glyph grob
     i <- indices[[grob]]
-    glyphs <- grDevices::glyphInfo(
+    glyphs <- glyphInfo(
       id = x$shape$index[i],
       x = x$shape$x_offset[i],
       y = x$shape$y_offset[i],
@@ -648,8 +648,8 @@ makeContent.marquee <- function(x) {
       fontList = fonts,
       width = x$widths[grob],
       height = -x$heights[grob],
-      hAnchor = grDevices::glyphAnchor(0, "left"),
-      vAnchor = grDevices::glyphAnchor(0, "bottom"),
+      hAnchor = glyphAnchor(0, "left"),
+      vAnchor = glyphAnchor(0, "bottom"),
       col = x$shape$col[i]
     )
     glyphs <- glyphGrob(
