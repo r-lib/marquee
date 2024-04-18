@@ -325,8 +325,8 @@ makeContext.marquee <- function(x) {
     space_after = 0
   )
   # Inherit color and id from parsed text
-  shape$shape$col <- x$text$color[block_starts[shape$shape$metric_id]]
-  shape$shape$id <- x$text$id[block_starts[shape$shape$metric_id]]
+  shape$shape$col <- x$text$color[shape$shape$string_id]
+  shape$shape$id <- x$text$id[shape$shape$string_id]
   bshape <- x$bullets$shape
 
   # Init height structures
@@ -350,7 +350,8 @@ makeContext.marquee <- function(x) {
   # Init bullet info
   bullet_blocks <- x$text$block[x$bullets$placement]
   y_adjustment <- rep(0, length(block_id))
-  bullet_adjustment <- rep(0, length(bullet_blocks))
+  y_bullet_adjustment <- rep(0, length(bullet_blocks))
+  x_bullet_adjustment <- rep(0, length(bullet_blocks))
 
   # Position blocks underneath each other, calculate justification info, and position bullets
   for (i in seq_along(block_id)) {
@@ -362,15 +363,17 @@ makeContext.marquee <- function(x) {
     bullet_ind <- which(i == bullet_blocks)
     if (length(bullet_ind) != 0) {
       ### Determine if bullet is higher than text at first line
-      added_height <- shape$shape$y_offset[match(i, shape$shape$metric_id)] - bshape$shape$y_offset[match(bullet_ind, bshape$shape$metric_id)]
+      first <- match(i, shape$shape$metric_id)
+      added_height <- shape$shape$y_offset[first] - bshape$shape$y_offset[match(bullet_ind, bshape$shape$metric_id)]
       if (added_height > 0) {
         #### If higher, adjust the height to make space and record adjustment for glyphs in block
         y_adjustment[i] <- added_height
         shape$metrics$height[i] <- shape$metrics$height[i] + added_height
       } else {
         #### Otherwise record negative adjustment to put it in line with the text in the list
-        bullet_adjustment[bullet_ind] <- -1 * added_height
+        y_bullet_adjustment[bullet_ind] <- -1 * added_height
       }
+      x_bullet_adjustment[bullet_ind] <- shape$shape$x_offset[first]
     }
 
     ## calculate y offset and height
@@ -428,8 +431,8 @@ makeContext.marquee <- function(x) {
   shape$shape$y_offset <- shape$shape$y_offset + top_offset[shape$shape$metric_id] - y_adjustment[shape$shape$metric_id]
 
   ## Do the same for bullets
-  bshape$shape$x_offset <- bshape$shape$x_offset + left_offset[bullet_blocks[bshape$shape$metric_id]] - bshape$shape$font_size/4
-  bshape$shape$y_offset <- bshape$shape$y_offset + top_offset[bullet_blocks[bshape$shape$metric_id]] - bullet_adjustment[bshape$shape$metric_id]
+  bshape$shape$x_offset <- bshape$shape$x_offset + left_offset[bullet_blocks[bshape$shape$metric_id]] - bshape$shape$font_size/4 + x_bullet_adjustment[bshape$shape$metric_id]
+  bshape$shape$y_offset <- bshape$shape$y_offset + top_offset[bullet_blocks[bshape$shape$metric_id]] - y_bullet_adjustment[bshape$shape$metric_id]
 
   # Store info in object
   x$shape <- shape$shape
