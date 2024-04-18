@@ -96,7 +96,7 @@ modify_style <- function(style_set, tag, ...) {
   }
   new_style <- style(...)
   old_style <- style_set[[tag]]
-  if (is.null(style)) {
+  if (is.null(old_style)) {
     style_set[[tag]] <- new_style
   } else {
     if (tag == "body" && any(vapply(new_style[args], is.null, logical(1)))) {
