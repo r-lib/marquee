@@ -193,8 +193,8 @@ print.marquee_style <- function(x, ...) {
   return(invisible(NULL))
 }
 #' @export
-str.marquee_style <- function(x, ...) {
-  options <- format(x, ...)
+str.marquee_style <- function(object, ...) {
+  options <- format(object, ...)
   if (length(options) == 0) {
     cat("<empty marquee style>\n")
     return(invisible(NULL))
