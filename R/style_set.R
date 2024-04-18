@@ -73,6 +73,9 @@ modify_style <- function(style_set, tag, ...) {
   }
   check_string(tag)
   if (is_style(..1)) {
+    if (tag == "body" && any(vapply(..1, is.null, logical(1)))) {
+      cli::cli_abort("The body tag can only be replaced by another complete style")
+    }
     style_set[[tag]] <- ..1
     return(style_set)
   }
@@ -86,6 +89,9 @@ modify_style <- function(style_set, tag, ...) {
   if (is.null(style)) {
     style_set[[tag]] <- new_style
   } else {
+    if (tag == "body" && any(vapply(new_style[args], is.null, logical(1)))) {
+      cli::cli_abort("The body tag cannot have any styles set to {.val NULL}")
+    }
     style_set[[tag]][args] <- new_style[args]
   }
   style_set
