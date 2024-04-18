@@ -17,7 +17,6 @@
 #include "utf8.h"
 
 using namespace cpp11::literals;
-using namespace std::string_literals;
 
 struct MARQUEE_DATA {
   std::stack<cpp11::list> style_stack;
@@ -221,7 +220,7 @@ static int enter_block_callback(MD_BLOCKTYPE type, void* detail, void* userdata)
   case MD_BLOCK_OL:       push_info(ud, "ol", true, ((MD_BLOCK_OL_DETAIL *) detail)->is_tight != 0, ((MD_BLOCK_OL_DETAIL *) detail)->start); break;
   case MD_BLOCK_LI:       push_info(ud, "li", true); break;
   case MD_BLOCK_HR:       push_info(ud, "hr", true); break;
-  case MD_BLOCK_H:        push_info(ud, "h"s + std::to_string(((MD_BLOCK_H_DETAIL*) detail)->level), true); break;
+  case MD_BLOCK_H:        push_info(ud, std::string("h") + std::to_string(((MD_BLOCK_H_DETAIL*) detail)->level), true); break;
   case MD_BLOCK_CODE:     push_info(ud, "cb", true); break;
   case MD_BLOCK_P:        push_info(ud, "p", true); break;
   case MD_BLOCK_QUOTE:    push_info(ud, "qb", true); break;
@@ -251,7 +250,7 @@ static int leave_block_callback(MD_BLOCKTYPE type, void* detail, void* userdata)
   case MD_BLOCK_OL:       pop_info(ud, "ol", true); break;
   case MD_BLOCK_LI:       pop_info(ud, "li", true); break;
   case MD_BLOCK_HR:       pop_info(ud, "hr", true); break;
-  case MD_BLOCK_H:        pop_info(ud, "h"s + std::to_string(((MD_BLOCK_H_DETAIL*) detail)->level), true); break;
+  case MD_BLOCK_H:        pop_info(ud, std::string("h") + std::to_string(((MD_BLOCK_H_DETAIL*) detail)->level), true); break;
   case MD_BLOCK_CODE:     pop_info(ud, "cb", true); break;
   case MD_BLOCK_P:        pop_info(ud, "p", true); break;
   case MD_BLOCK_QUOTE:    pop_info(ud, "qb", true); break;
