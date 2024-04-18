@@ -364,7 +364,7 @@ static int text_callback(MD_TEXTTYPE type, const MD_CHAR* text, MD_SIZE size, vo
 
 [[cpp11::register]]
 cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list> styles) {
-  MARQUEE_DATA userdata(styles);
+  MARQUEE_DATA userdata(styles[0]);
 
   MD_PARSER marquee_parser = {
     0,
@@ -381,6 +381,7 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
   for (R_xlen_t i = 0; i < text.size(); ++i) {
     userdata.current_id = i + 1;
     userdata.style_stack = std::stack<cpp11::list>();
+    if (i != 0) userdata.defined_styles = create_style_map(styles[i]);
 
     std::string str(text[i]);
 

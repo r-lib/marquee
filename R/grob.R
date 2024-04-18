@@ -137,7 +137,7 @@ marquee_grob <- function(text, style, x = 0, y = 1, width = NULL, default.units 
     sum(block) != 3 || any(nchar(parsed$text[block]) > 0, na.rm = TRUE)
   }, logical(1))
   ## If not inline, the prior p tag inherits the image styling so you can center it or add padding
-  parsed[images$index[!images$inline] - 1, names(style[[1]])] <- parsed[images$index[!images$inline], names(style[[1]])]
+  parsed[images$index[!images$inline] - 1, names(style[[1]][[1]])] <- parsed[images$index[!images$inline], names(style[[1]][[1]])]
   ## Convert all "paths" to grobs
   env <- caller_env()
   images$grobs <- images_as_grobs(images$path, env)
