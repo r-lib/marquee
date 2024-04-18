@@ -201,7 +201,7 @@ struct MD_CTX_tag {
 #endif
 
   /* For resolving of inline spans. */
-  MD_MARKSTACK opener_stacks[16];
+  MD_MARKSTACK opener_stacks[17];
 #define ASTERISK_OPENERS_oo_mod3_0      (ctx->opener_stacks[0])     /* Opener-only */
 #define ASTERISK_OPENERS_oo_mod3_1      (ctx->opener_stacks[1])
 #define ASTERISK_OPENERS_oo_mod3_2      (ctx->opener_stacks[2])
@@ -218,6 +218,7 @@ struct MD_CTX_tag {
 #define TILDE_OPENERS_2                 (ctx->opener_stacks[13])
 #define BRACKET_OPENERS                 (ctx->opener_stacks[14])
 #define DOLLAR_OPENERS                  (ctx->opener_stacks[15])
+#define CURLY_OPENERS                   (ctx->opener_stacks[16])
 
   /* Stack of dummies which need to call free() for pointers stored in them.
    * These are constructed during inline parsing and freed after all the block
@@ -2511,6 +2512,8 @@ md_free_ref_defs(MD_CTX* ctx)
  *  'D': Dummy mark, it reserves a space for splitting a previous mark
  *       (e.g. emphasis) or to make more space for storing some special data
  *       related to the preceding mark (e.g. link).
+ *  '{': Maybe start of custom span
+ *  '}': Maybe end of custom span
  *
  * Note that not all instances of these chars in the text imply creation of the
  * structure. Only those which have (or may have, after we see more context)
@@ -2590,6 +2593,9 @@ static MD_MARKSTACK*
 
     case _T('!'):
     case _T('['):   return &BRACKET_OPENERS;
+
+    case _T('{'):
+    case _T('}'):   return &CURLY_OPENERS;
 
     default:        MD_UNREACHABLE();
     }
@@ -2771,6 +2777,9 @@ md_build_mark_char_map(MD_CTX* ctx)
         ctx->mark_char_map[i] = 1;
     }
   }
+
+  ctx->mark_char_map['{'] = 1;
+  ctx->mark_char_map['}'] = 1;
 }
 
 static int
@@ -3217,6 +3226,33 @@ md_collect_marks(MD_CTX* ctx, const MD_LINE* lines, MD_SIZE n_lines, int table_m
       continue;
     }
     if(ch == _T(']')) {
+      ADD_MARK(ch, off, off+1, MD_MARK_POTENTIAL_CLOSER);
+      off++;
+      continue;
+    }
+
+    /* A potential custom or its part. */
+    if(ch == _T('{') && off+2 < line->end && (CH(off+1) == _T('.') || CH(off+1) == _T('#')) && !ISUNICODEWHITESPACE(off+2)) {
+      OFF tmp = off+3;
+      int closed_soon = 0;
+      while (tmp < line->end && !ISUNICODEWHITESPACE(tmp)) {
+        if (CH(tmp) == _T('}')) {
+          /*We reached the end before any text started*/
+          closed_soon = 1;
+          break;
+        }
+        ++tmp;
+      };
+      ++tmp;
+      if (closed_soon) {
+        off++;
+      } else {
+        ADD_MARK(ch, off, tmp, MD_MARK_POTENTIAL_OPENER);
+        off = tmp;
+      }
+      continue;
+    }
+    if(ch == _T('}')) {
       ADD_MARK(ch, off, off+1, MD_MARK_POTENTIAL_CLOSER);
       off++;
       continue;
@@ -3851,6 +3887,25 @@ md_analyze_dollar(MD_CTX* ctx, int mark_index)
     md_mark_stack_push(ctx, &DOLLAR_OPENERS, mark_index);
 }
 
+static void
+md_analyze_curly(MD_CTX* ctx, int mark_index)
+{
+  MD_MARK* mark = &ctx->marks[mark_index];
+  MD_MARKSTACK* stack = md_opener_stack(ctx, mark_index);
+
+  if((mark->flags & MD_MARK_POTENTIAL_CLOSER)  &&  stack->top >= 0) {
+    int opener_index = stack->top;
+
+    md_mark_stack_pop(ctx, stack);
+    md_rollback(ctx, opener_index, mark_index, MD_ROLLBACK_CROSSING);
+    md_resolve_range(ctx, opener_index, mark_index);
+    return;
+  }
+
+  if(mark->flags & MD_MARK_POTENTIAL_OPENER)
+    md_mark_stack_push(ctx, stack, mark_index);
+}
+
 static MD_MARK*
   md_scan_left_for_resolved_mark(MD_CTX* ctx, MD_MARK* mark_from, OFF off, MD_MARK** p_cursor)
   {
@@ -4087,6 +4142,8 @@ md_analyze_marks(MD_CTX* ctx, const MD_LINE* lines, MD_SIZE n_lines,
     case '.':   /* Pass through. */
     case ':':   /* Pass through. */
     case '@':   md_analyze_permissive_autolink(ctx, i); break;
+    case '{':   /* Pass through. */
+    case '}':   md_analyze_curly(ctx, i); break;
     }
 
     if(mark->flags & MD_MARK_RESOLVED) {
@@ -4141,7 +4198,7 @@ md_analyze_link_contents(MD_CTX* ctx, const MD_LINE* lines, MD_SIZE n_lines,
   int i;
 
   md_analyze_marks(ctx, lines, n_lines, mark_beg, mark_end, _T("&"), 0);
-  md_analyze_marks(ctx, lines, n_lines, mark_beg, mark_end, _T("*_~$"), 0);
+  md_analyze_marks(ctx, lines, n_lines, mark_beg, mark_end, _T("*_~${}"), 0);
 
   if((ctx->parser.flags & MD_FLAG_PERMISSIVEAUTOLINKS) != 0) {
     /* These have to be processed last, as they may be greedy and expand
@@ -4200,6 +4257,27 @@ md_enter_leave_span_wikilink(MD_CTX* ctx, int enter, const CHAR* target, SZ targ
 
   abort:
     md_free_attribute(ctx, &target_build);
+  return ret;
+}
+
+static int
+md_enter_leave_span_custom(MD_CTX* ctx, int enter, const CHAR* target, SZ target_size)
+{
+  MD_SPAN_CUSTOM_DETAIL det;
+  int ret = 0;
+
+  memset(&det, 0, sizeof(MD_SPAN_CUSTOM_DETAIL));
+  int off = target[1] == '#' ? 1 : 2;
+
+  det.cls = target + off;
+  det.size = target_size - off - 1; /* we ignore the separator in the class name */
+
+  if (enter)
+    MD_ENTER_SPAN(MD_SPAN_CUSTOM, &det);
+  else
+    MD_LEAVE_SPAN(MD_SPAN_CUSTOM, &det);
+
+  abort:
   return ret;
 }
 
@@ -4315,6 +4393,16 @@ md_process_inlines(MD_CTX* ctx, const MD_LINE* lines, MD_SIZE n_lines)
           text_type = MD_TEXT_NORMAL;
         }
         break;
+
+      case '{':
+      case '}':
+        {
+          const MD_MARK* opener = (mark->ch != '}' ? mark : &ctx->marks[mark->prev]);
+
+          MD_CHECK(md_enter_leave_span_custom(ctx, mark->ch != '}', STR(opener->beg), opener->end - opener->beg));
+
+          break;
+        }
 
       case '[':       /* Link, wiki link, image. */
       case '!':

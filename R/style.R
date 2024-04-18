@@ -136,12 +136,12 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   structure(list(
       size = size, # Important this is the first. Required by compiled code
       background = background, # Important this is the second. Required by compiled code
+      color = color, # Important this is the third. Required by compiled code
       family = family,
       weight = weight,
       italic = italic,
       width = width,
       features = features,
-      color = color,
       lineheight = lineheight,
       align = align,
       tracking = tracking,

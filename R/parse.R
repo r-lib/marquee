@@ -62,6 +62,9 @@
 #'
 #' `del` is text that should have strikethrough
 #'
+#' *custom spans* is a marquee specific extension to the syntax that allows you
+#' to make up tags on the fly. See the section on marquee syntax for more.
+#'
 #' # marquee syntax
 #' marquee uses md4c which is a fully CommonMark compliant markdown parser.
 #' CommonMark is an effort to create an internally coherent markdown
@@ -88,17 +91,44 @@
 #' markdown to HTML where these tags suddenly have meaning. They do not carry
 #' any special significance when rendered with marquee
 #'
+#' **Custom tags**
+#'
+#' While markdown provides most of what is necessary for standard text markup,
+#' there are situations, especially in visualisation, where we need something
+#' more. Often users reach for inline HTML spans for that, but since HTML is
+#' fully ignored in marquee this is not an option. Further, adding in HTML
+#' decreases readability of the unformatted text a lot.
+#'
+#' With marquee you can create a custom span using the `{.tag <some text>}`
+#' syntax, e.g. `{.sm small text}` to wrap "small text" in the `sm` tag. You can
+#' alternatively use `{#tag <some text>}` for the same effect. The only
+#' difference is that in the former syntax the `.` is stripped from the tag name,
+#' whereas in the latter the `#` remains part of the name. See the Styling
+#' section for the primal use of the latter syntax.
+#'
 #' # Styling
 #' During parsing, each token is assigned a style based on the provided style
 #' set. The styling is cascading, but without the intricacies of CSS. A child
-#' element inherits the styling of it's parent for the elements that are set to
+#' element inherits the styling of it's parent for the options that are set to
 #' `NULL` in the style matching the child tag. Any style element that are
 #' [relative()] are computed based on the value of the parent style element.
 #' [em()] elements are resolved based on the size element of the child style,
 #' and [rem()] elements are resolved using the size element of the `body` style.
+#' If a style is not provided for the tag, it fully inherits the style of it's
+#' parent.
 #'
-#' **Additional parsing information**
+#' **Automatic coloring**
+#' Recognizing that the primary use for custom tags may be to change the color
+#' of some text, marquee provides a shortcut for this. If a style is not found
+#' for the tag in the provided style set, marquee will check if the tag matches
+#' a valid color (i.e. a string from `grDevices::colors()`, or a valid hex
+#' string, e.g. `#53f2a9`). If it is a valid color it will set this as the font
+#' color of the style. This means that parsing "Color {.red this} red"
+#' automatically sets the color of "this" to red, even if no style is provided
+#' for the `red` tag. Likewise, parsing "Color {#00FF00 me} green" will
+#' automatically set the color of "me" to #00FF00 (fully satuared green).
 #'
+#' # Additional parsing information
 #' Apart from splitting the text up into tokens, `marquee_parse()` also provides
 #' some additional information useful for rendering the output in the expected
 #' way. The `id` column refers the tokens back to the original input text, the

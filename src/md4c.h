@@ -145,7 +145,13 @@ extern "C" {
 
     /* <u>...</u>
      * Note: Recognized only when MD_FLAG_UNDERLINE is enabled. */
-    MD_SPAN_U
+    MD_SPAN_U,
+
+    /* {.class ...}
+     * Detail: Structure MD_SPAN_CUSTOM_DETAIL
+     * Added by Thomas Lin Pedersen for marquee.
+     */
+    MD_SPAN_CUSTOM
   } MD_SPANTYPE;
 
   /* Text is the actual textual contents of span. */
@@ -297,6 +303,12 @@ extern "C" {
   typedef struct MD_SPAN_WIKILINK {
     MD_ATTRIBUTE target;
   } MD_SPAN_WIKILINK_DETAIL;
+
+  /* Detailed info for MD_SPAN_CUSTOM. */
+  typedef struct MD_SPAN_CUSTOM_DETAIL {
+    const MD_CHAR* cls;
+    MD_SIZE size;
+  } MD_SPAN_CUSTOM_DETAIL;
 
   /* Flags specifying extensions/deviations from CommonMark specification.
    *

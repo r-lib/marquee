@@ -15,8 +15,17 @@
 
 #include "named_entities.h"
 #include "utf8.h"
+#include "colors.h"
 
 using namespace cpp11::literals;
+
+std::map<std::string, cpp11::list> create_style_map(cpp11::list style_set) {
+  std::map<std::string, cpp11::list> map;
+  for (R_xlen_t i = 0; i < style_set.size(); ++i) {
+    map[style_set.names()[i]] = cpp11::as_cpp<cpp11::list>(style_set[i]);
+  }
+  return map;
+}
 
 struct MARQUEE_DATA {
   std::stack<cpp11::list> style_stack;
@@ -24,7 +33,7 @@ struct MARQUEE_DATA {
   std::vector<size_t> index_stack;
   std::stack<int> offset_stack;
   std::stack<bool> tight_stack;
-  cpp11::list_of<cpp11::list> defined_styles;
+  std::map<std::string, cpp11::list> defined_styles;
   std::vector<std::string> text;
   cpp11::writable::list style;
   cpp11::writable::integers id;
@@ -39,13 +48,13 @@ struct MARQUEE_DATA {
   unsigned current_indent;
   unsigned in_img;
 
-  MARQUEE_DATA(cpp11::list_of<cpp11::list> styles) :
+  MARQUEE_DATA(cpp11::list styles) :
     style_stack(),
     type_stack({""}),
     index_stack(),
     offset_stack({0}),
     tight_stack({false}),
-    defined_styles(styles),
+    defined_styles(create_style_map(styles)),
     text(),
     style(),
     id(),
@@ -155,11 +164,20 @@ inline cpp11::writable::list combine_styles(cpp11::list parent, cpp11::list def)
 inline void push_info(MARQUEE_DATA* userdata, std::string type, bool block = false, bool tight = false, int offset = 1) {
   userdata->type_stack.push(type);
   userdata->index_stack.push_back(userdata->until.size());
-  cpp11::list style(userdata->defined_styles[type]);
-  if (userdata->style_stack.empty()) {
-    userdata->style_stack.push(style);
+  auto style = userdata->defined_styles.find(type);
+  if (style == userdata->defined_styles.end()) {
+    if (userdata->style_stack.empty()) {
+      cpp11::stop("Opening style not found");
+    }
+    cpp11::writable::list last_style = userdata->style_stack.top();
+    if (is_color(type)) {
+      last_style[2] = cpp11::writable::strings({type});
+    }
+    userdata->style_stack.push(last_style);
+  } else if (userdata->style_stack.empty()) {
+    userdata->style_stack.push(style->second);
   } else {
-    cpp11::writable::list s = combine_styles(userdata->style_stack.top(), style);
+    cpp11::writable::list s = combine_styles(userdata->style_stack.top(), style->second);
     userdata->style_stack.push(s);
   }
 
@@ -288,6 +306,7 @@ static int enter_span_callback(MD_SPANTYPE type, void* detail, void* userdata) {
   case MD_SPAN_CODE:              push_info(ud, "code"); break;
   case MD_SPAN_U:                 push_info(ud, "u"); break;
   case MD_SPAN_DEL:               push_info(ud, "del"); break;
+  case MD_SPAN_CUSTOM:            push_info(ud, std::string(((MD_SPAN_CUSTOM_DETAIL *) detail)->cls, ((MD_SPAN_CUSTOM_DETAIL *) detail)->size)); break;
   case MD_SPAN_IMG:               // Will never end here
   case MD_SPAN_LATEXMATH:
   case MD_SPAN_LATEXMATH_DISPLAY:
@@ -315,6 +334,7 @@ static int leave_span_callback(MD_SPANTYPE type, void* detail, void* userdata) {
   case MD_SPAN_CODE:              pop_info(ud, "code"); break;
   case MD_SPAN_U:                 pop_info(ud, "u"); break;
   case MD_SPAN_DEL:               pop_info(ud, "del"); break;
+  case MD_SPAN_CUSTOM:            pop_info(ud, std::string(((MD_SPAN_CUSTOM_DETAIL *) detail)->cls, ((MD_SPAN_CUSTOM_DETAIL *) detail)->size)); break;
   case MD_SPAN_IMG:               pop_info(ud, "img"); break;
   case MD_SPAN_LATEXMATH:
   case MD_SPAN_LATEXMATH_DISPLAY:
