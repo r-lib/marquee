@@ -20,16 +20,16 @@ extern "C" SEXP _marquee_place_bullets(SEXP type, SEXP indent, SEXP string_is_em
   END_CPP11
 }
 // marquee.cpp
-cpp11::writable::logicals block_is_last(cpp11::integers indentation);
-extern "C" SEXP _marquee_block_is_last(SEXP indentation) {
+cpp11::writable::logicals block_is_last(cpp11::integers indentation, cpp11::integers id);
+extern "C" SEXP _marquee_block_is_last(SEXP indentation, SEXP id) {
   BEGIN_CPP11
-    return cpp11::as_sexp(block_is_last(cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(indentation)));
+    return cpp11::as_sexp(block_is_last(cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(indentation), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(id)));
   END_CPP11
 }
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
-    {"_marquee_block_is_last", (DL_FUNC) &_marquee_block_is_last, 1},
+    {"_marquee_block_is_last", (DL_FUNC) &_marquee_block_is_last, 2},
     {"_marquee_marquee_c",     (DL_FUNC) &_marquee_marquee_c,     2},
     {"_marquee_place_bullets", (DL_FUNC) &_marquee_place_bullets, 5},
     {NULL, NULL, 0}

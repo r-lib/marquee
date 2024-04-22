@@ -8,6 +8,6 @@ place_bullets <- function(type, indent, string_is_empty, bullet_number, bullets)
   .Call(`_marquee_place_bullets`, type, indent, string_is_empty, bullet_number, bullets)
 }
 
-block_is_last <- function(indentation) {
-  .Call(`_marquee_block_is_last`, indentation)
+block_is_last <- function(indentation, id) {
+  .Call(`_marquee_block_is_last`, indentation, id)
 }

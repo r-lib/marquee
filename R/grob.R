@@ -343,7 +343,7 @@ makeContext.marquee <- function(x) {
   last_line <- ink_left
 
   # Remove bottom-margin for blocks that are last child
-  block_last <- block_is_last(block_indent)
+  block_last <- block_is_last(block_indent, x$text$id[block_starts])
   margin_bottom <- x$text$margin_bottom[block_starts]
   margin_bottom[block_last] <- 0
 

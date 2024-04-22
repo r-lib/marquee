@@ -526,14 +526,15 @@ cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent,
 }
 
 [[cpp11::register]]
-cpp11::writable::logicals block_is_last(cpp11::integers indentation) {
+cpp11::writable::logicals block_is_last(cpp11::integers indentation, cpp11::integers id) {
   cpp11::writable::logicals res;
 
   for (R_xlen_t i = 0; i < indentation.size() - 1; ++i) {
     int ind = indentation[i];
+    int this_id = id[i];
     R_xlen_t next_block = i + 1;
-    while (next_block <= indentation.size() && ind < indentation[next_block]) next_block++;
-    res.push_back(next_block == indentation.size() || ind != indentation[next_block]);
+    while (next_block < indentation.size() && this_id == id[next_block] && ind < indentation[next_block]) next_block++;
+    res.push_back(next_block == indentation.size() || this_id != id[next_block] || ind != indentation[next_block]);
   }
   res.push_back(true);
 
