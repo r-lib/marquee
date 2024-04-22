@@ -401,11 +401,16 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
   cpp11::writable::strings res_names = {"text", "id", "block", "type", "indentation", "ol_index", "tight", "ends"};
 
   cpp11::list doc_style(userdata.style[0]);
-  double rem_size = REAL(doc_style[0])[0];
+  std::vector<double> rem_size = {REAL(doc_style[0])[0]};
+  for (R_xlen_t i = 1; i < userdata.style.size(); ++i) {
+    if (userdata.id[i] != userdata.id[i - 1]) {
+      rem_size.push_back(REAL(VECTOR_ELT(userdata.style[i], 0))[0]);
+    }
+  }
   for (R_xlen_t i = 0; i < doc_style.size(); ++i) {
     res_names.push_back(doc_style.names()[i]);
 
-    if (i == 1) { // Background element
+    if (i == 1) { // Background element - can have pattern so must be list
       cpp11::writable::list col;
       for (R_xlen_t j = 0; j < userdata.style.size(); ++j) {
         col.push_back(VECTOR_ELT(userdata.style[j], i));
@@ -419,7 +424,8 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
         if (is_em(elem)) {
           val = REAL(VECTOR_ELT(userdata.style[j], 0))[0] * REAL(VECTOR_ELT(elem, 0))[0];
         } else if (is_rem(elem)) {
-          val = rem_size * REAL(VECTOR_ELT(elem, 0))[0];
+          int id = userdata.id[j] - 1;
+          val = rem_size[id] * REAL(VECTOR_ELT(elem, 0))[0];
         } else {
           val = REAL(elem)[0];
         }
