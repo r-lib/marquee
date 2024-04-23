@@ -110,6 +110,8 @@ still be rendered in a particular way</p>
 inside this span is rendered verbatim</p>
 <p><code>u</code> is text that should be underlined</p>
 <p><code>del</code> is text that should have strikethrough</p>
+<p><em>custom spans</em> is a marquee specific extension to the syntax that allows you
+to make up tags on the fly. See the section on marquee syntax for more.</p>
     </div>
     <div id="marquee-syntax">
     <h2>marquee syntax</h2>
@@ -130,18 +132,44 @@ ignored. The path is returned as the token text.</p>
 different from classic markdown rendering except that people often convert
 markdown to HTML where these tags suddenly have meaning. They do not carry
 any special significance when rendered with marquee</p>
+<p><strong>Custom tags</strong></p>
+<p>While markdown provides most of what is necessary for standard text markup,
+there are situations, especially in visualisation, where we need something
+more. Often users reach for inline HTML spans for that, but since HTML is
+fully ignored in marquee this is not an option. Further, adding in HTML
+decreases readability of the unformatted text a lot.</p>
+<p>With marquee you can create a custom span using the <code>{.tag &lt;some text&gt;}</code>
+syntax, e.g. <code>{.sm small text}</code> to wrap "small text" in the <code>sm</code> tag. You can
+alternatively use <code>{#tag &lt;some text&gt;}</code> for the same effect. The only
+difference is that in the former syntax the <code>.</code> is stripped from the tag name,
+whereas in the latter the <code>#</code> remains part of the name. See the Styling
+section for the primal use of the latter syntax.</p>
     </div>
     <div id="styling">
     <h2>Styling</h2>
     <p>During parsing, each token is assigned a style based on the provided style
 set. The styling is cascading, but without the intricacies of CSS. A child
-element inherits the styling of it's parent for the elements that are set to
+element inherits the styling of it's parent for the options that are set to
 <code>NULL</code> in the style matching the child tag. Any style element that are
 <code><a href="style_helpers.html">relative()</a></code> are computed based on the value of the parent style element.
 <code><a href="style_helpers.html">em()</a></code> elements are resolved based on the size element of the child style,
-and <code><a href="style_helpers.html">rem()</a></code> elements are resolved using the size element of the <code>body</code> style.</p>
-<p><strong>Additional parsing information</strong></p>
-<p>Apart from splitting the text up into tokens, <code>marquee_parse()</code> also provides
+and <code><a href="style_helpers.html">rem()</a></code> elements are resolved using the size element of the <code>body</code> style.
+If a style is not provided for the tag, it fully inherits the style of it's
+parent.</p>
+<p><strong>Automatic coloring</strong>
+Recognizing that the primary use for custom tags may be to change the color
+of some text, marquee provides a shortcut for this. If a style is not found
+for the tag in the provided style set, marquee will check if the tag matches
+a valid color (i.e. a string from <code><a href="https://rdrr.io/r/grDevices/colors.html" class="external-link">grDevices::colors()</a></code>, or a valid hex
+string, e.g. <code>#53f2a9</code>). If it is a valid color it will set this as the font
+color of the style. This means that parsing "Color .red this red"
+automatically sets the color of "this" to red, even if no style is provided
+for the <code>red</code> tag. Likewise, parsing "Color #00FF00 me green" will
+automatically set the color of "me" to #00FF00 (fully satuared green).</p>
+    </div>
+    <div id="additional-parsing-information">
+    <h2>Additional parsing information</h2>
+    <p>Apart from splitting the text up into tokens, <code>marquee_parse()</code> also provides
 some additional information useful for rendering the output in the expected
 way. The <code>id</code> column refers the tokens back to the original input text, the
 <code>block</code> relates tokens together into blocks. Block elements increment the
@@ -186,7 +214,7 @@ The <code>ends</code> column indicate until which row in the output the tag is a
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
