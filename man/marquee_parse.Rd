@@ -69,6 +69,9 @@ inside this span is rendered verbatim
 \code{u} is text that should be underlined
 
 \code{del} is text that should have strikethrough
+
+\emph{custom spans} is a marquee specific extension to the syntax that allows you
+to make up tags on the fly. See the section on marquee syntax for more.
 }
 
 \section{marquee syntax}{
@@ -95,19 +98,47 @@ HTML tags are ignored, i.e. they are rendered verbatim. This is not that
 different from classic markdown rendering except that people often convert
 markdown to HTML where these tags suddenly have meaning. They do not carry
 any special significance when rendered with marquee
+
+\strong{Custom tags}
+
+While markdown provides most of what is necessary for standard text markup,
+there are situations, especially in visualisation, where we need something
+more. Often users reach for inline HTML spans for that, but since HTML is
+fully ignored in marquee this is not an option. Further, adding in HTML
+decreases readability of the unformatted text a lot.
+
+With marquee you can create a custom span using the \verb{\{.tag <some text>\}}
+syntax, e.g. \verb{\{.sm small text\}} to wrap "small text" in the \code{sm} tag. You can
+alternatively use \verb{\{#tag <some text>\}} for the same effect. The only
+difference is that in the former syntax the \code{.} is stripped from the tag name,
+whereas in the latter the \verb{#} remains part of the name. See the Styling
+section for the primal use of the latter syntax.
 }
 
 \section{Styling}{
 During parsing, each token is assigned a style based on the provided style
 set. The styling is cascading, but without the intricacies of CSS. A child
-element inherits the styling of it's parent for the elements that are set to
+element inherits the styling of it's parent for the options that are set to
 \code{NULL} in the style matching the child tag. Any style element that are
 \code{\link[=relative]{relative()}} are computed based on the value of the parent style element.
 \code{\link[=em]{em()}} elements are resolved based on the size element of the child style,
 and \code{\link[=rem]{rem()}} elements are resolved using the size element of the \code{body} style.
+If a style is not provided for the tag, it fully inherits the style of it's
+parent.
 
-\strong{Additional parsing information}
+\strong{Automatic coloring}
+Recognizing that the primary use for custom tags may be to change the color
+of some text, marquee provides a shortcut for this. If a style is not found
+for the tag in the provided style set, marquee will check if the tag matches
+a valid color (i.e. a string from \code{grDevices::colors()}, or a valid hex
+string, e.g. \verb{#53f2a9}). If it is a valid color it will set this as the font
+color of the style. This means that parsing "Color {.red this} red"
+automatically sets the color of "this" to red, even if no style is provided
+for the \code{red} tag. Likewise, parsing "Color {#00FF00 me} green" will
+automatically set the color of "me" to #00FF00 (fully satuared green).
+}
 
+\section{Additional parsing information}{
 Apart from splitting the text up into tokens, \code{marquee_parse()} also provides
 some additional information useful for rendering the output in the expected
 way. The \code{id} column refers the tokens back to the original input text, the

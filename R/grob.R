@@ -191,12 +191,18 @@ marquee_grob <- function(text, style, x = 0, y = 1, width = NULL, default.units 
     cli::cli_abort("{.arg vjust} must either be numeric or a character vector")
   }
 
-  gTree(
+  grob <- gTree(
     text = parsed, bullets = bullets, images = images, x = rep_along(text, x),
     y = rep_along(text, y), width = rep_along(text, width),
     hjust = rep_along(text, hjust), vjust = rep_along(text, vjust),
     angle = rep_along(text, angle), vp = vp, name = name, cl = "marquee"
   )
+  # Check if we can do all calculations upfront
+  if (all(is.na(grob$width) | unitType(absolute.size(grob$width)) != "null")) {
+    grob <- makeContent.marquee(makeContext.marquee(grob))
+    class(grob) <- c("marquee_precalculated", class(grob))
+  }
+  grob
 }
 
 #' @export
@@ -324,6 +330,26 @@ makeContext.marquee <- function(x) {
     space_before = 0,
     space_after = 0
   )
+
+  # If any widths are not defined we grab the text widths from the shaping and start again
+  if (anyNA(widths)) {
+    added_width <- rowSums(x$text[block_starts, c("padding_left", "padding_right", "margin_left", "margin_right")])
+    ## We go back from the most indented to the least and compound the widths
+    for (i in rev(seq_len(max(block_indent)))) {
+      blocks <- which(block_indent == i)
+      widths[blocks] <- vapply(blocks, function(j) {
+        k <- which(block_starts > block_starts[j] & block_starts <= x$text$ends[block_starts[j]])
+        max(shape$metrics$width[j], widths[j], widths[k] + added_width[k], na.rm = TRUE)
+      }, numeric(1))
+    }
+    if (anyNA(widths)) {
+      cli::cli_abort("Could not resolve width of text")
+    }
+    x$width <- unit(widths[block_indent == 1], "bigpts")
+    ## Restart evaluation
+    return(makeContext.marquee(x))
+  }
+
   # Inherit color and id from parsed text
   shape$shape$col <- x$text$color[shape$shape$string_id]
   shape$shape$id <- x$text$id[shape$shape$string_id]
@@ -619,6 +645,9 @@ makeContext.marquee <- function(x) {
 }
 
 #' @export
+makeContext.marquee_precalculated <- function(x) x
+
+#' @export
 heightDetails.textboxgrob <- function(x) {
   x$full_height
 }
@@ -784,3 +813,6 @@ makeContent.marquee <- function(x) {
 
   setChildren(x, inject(gList(!!!grobs)))
 }
+
+#' @export
+makeContent.marquee_precalculated <- function(x) x
