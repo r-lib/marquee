@@ -198,7 +198,7 @@ marquee_grob <- function(text, style, x = 0, y = 1, width = NULL, default.units 
     angle = rep_along(text, angle), vp = vp, name = name, cl = "marquee"
   )
   # Check if we can do all calculations upfront
-  if (all(is.na(grob$width) | unitType(absolute.size(grob$width)) != "null")) {
+  if (all(is.na(grob$width) | !unitType(absolute.size(grob$width)) %in% c("null", "sum", "min", "max"))) {
     grob <- makeContent.marquee(makeContext.marquee(grob))
     class(grob) <- c("marquee_precalculated", class(grob))
   }
