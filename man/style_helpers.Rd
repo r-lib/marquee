@@ -7,6 +7,7 @@
 \alias{em}
 \alias{rem}
 \alias{box}
+\alias{skip_inherit}
 \alias{marquee_bullets}
 \title{Helpers for defining styles}
 \format{
@@ -20,6 +21,8 @@ em(x)
 rem(x)
 
 box(top = NULL, right = top, bottom = top, left = right)
+
+skip_inherit(x)
 
 marquee_bullets
 }
@@ -43,8 +46,9 @@ indent is set to \code{em(2)}, then the indent will be equivalent to 24. \code{r
 works like \code{em()} but rather than using the font size of the current style it
 uses the font size of the root style (which is the body element). \code{box()}
 helps you construct styles that refers to sides of a box (margin, padding,
-and border size). \code{marquee_bullets} is just a character vector with 6
-sensible bullet glyphs for unordered lists.
+and border size). \code{skip_inherit()} tells the style inheritance to ignore this
+value and look for the value one above in the stack. \code{marquee_bullets} is
+just a character vector with 6 sensible bullet glyphs for unordered lists.
 }
 \examples{
 relative(0.35)
@@ -55,6 +59,8 @@ rem(1.2)
 
 # Argument default means it recycles like CSS if fewer values are specified
 box(6, em(1.5))
+
+skip_inherit("sans")
 
 marquee_bullets
 

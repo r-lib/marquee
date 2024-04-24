@@ -90,46 +90,54 @@ inline std::string entity_to_unicode(const std::string& entity) {
   return res;
 }
 
-bool is_font_feature(SEXP elem) {
+inline bool is_font_feature(SEXP elem) {
   return Rf_inherits(elem, "font_feature");
 }
 
-bool is_relative(SEXP elem) {
+inline bool is_relative(SEXP elem) {
   return Rf_inherits(elem, "marquee_relative");
 }
 
-bool is_em(SEXP elem) {
+inline bool is_em(SEXP elem) {
   return Rf_inherits(elem, "marquee_em");
 }
 
-bool is_rem(SEXP elem) {
+inline bool is_rem(SEXP elem) {
   return Rf_inherits(elem, "marquee_rem");
+}
+
+inline bool skips_inherit(SEXP elem) {
+  return Rf_inherits(elem, "marquee_skip_inherit");
 }
 
 inline cpp11::writable::list combine_styles(cpp11::list parent, cpp11::list def) {
   cpp11::writable::list new_style(parent.size());
   for (R_xlen_t i = 0; i < parent.size(); ++i) {
+    // Get the element to inherit from
+    SEXP parent_elem = skips_inherit(parent[i]) ? Rf_getAttrib(parent[i], Rf_mkString("inherit_val")) : parent[i];
+    if (Rf_isNull(parent_elem)) parent_elem = parent[i];
+
     if (Rf_isNull(def[i])) {
-      new_style[i] = parent[i];
+      new_style[i] = parent_elem;
     } else if (is_relative(def[i])) {
       double rel = REAL(VECTOR_ELT(def[i], 0))[0];
-      if (Rf_isReal(parent[i])) {
-        new_style[i] = Rf_ScalarReal(rel * REAL(parent[i])[0]);
-      } else if (Rf_isInteger(parent[i])) {
-        new_style[i] = Rf_ScalarReal(rel * INTEGER(parent[i])[0]);
-      } else if (is_em(parent[i]) || is_rem(parent[i])) {
-        cpp11::writable::list val(parent[i]);
+      if (Rf_isReal(parent_elem)) {
+        new_style[i] = Rf_ScalarReal(rel * REAL(parent_elem)[0]);
+      } else if (Rf_isInteger(parent_elem)) {
+        new_style[i] = Rf_ScalarReal(rel * INTEGER(parent_elem)[0]);
+      } else if (is_em(parent_elem) || is_rem(parent_elem)) {
+        cpp11::writable::list val(parent_elem);
         val[0] = Rf_ScalarReal(REAL(val[0])[0] * rel);
         new_style[i] = val;
       } else {
-        new_style[i] = parent[i];
+        new_style[i] = parent_elem;
       }
-    } else if (is_font_feature(parent[i])) {
+    } else if (is_font_feature(parent_elem)) {
       if (!is_font_feature(def[i])) {
         Rf_error("Malformed style object. font features can only be merged with other font features");
       }
-      cpp11::writable::strings features(VECTOR_ELT(parent[i], 0));
-      cpp11::writable::integers values(VECTOR_ELT(parent[i], 1));
+      cpp11::writable::strings features(VECTOR_ELT(parent_elem, 0));
+      cpp11::writable::integers values(VECTOR_ELT(parent_elem, 1));
       R_xlen_t n_old = features.size();
       cpp11::strings new_features(VECTOR_ELT(def[i], 0));
       cpp11::integers new_values(VECTOR_ELT(def[i], 1));
@@ -155,6 +163,9 @@ inline cpp11::writable::list combine_styles(cpp11::list parent, cpp11::list def)
       new_style[i] = val;
     } else {
       new_style[i] = def[i];
+    }
+    if (skips_inherit(new_style[i])) {
+      Rf_setAttrib(new_style[i], Rf_mkString("inherit_val"), parent_elem);
     }
   }
   new_style.attr("names") = parent.attr("names");

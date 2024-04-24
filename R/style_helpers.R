@@ -9,8 +9,9 @@
 #' works like `em()` but rather than using the font size of the current style it
 #' uses the font size of the root style (which is the body element). `box()`
 #' helps you construct styles that refers to sides of a box (margin, padding,
-#' and border size). `marquee_bullets` is just a character vector with 6
-#' sensible bullet glyphs for unordered lists.
+#' and border size). `skip_inherit()` tells the style inheritance to ignore this
+#' value and look for the value one above in the stack. `marquee_bullets` is
+#' just a character vector with 6 sensible bullet glyphs for unordered lists.
 #'
 #' @param x A decimal number. If a vector is provided only the first element
 #' will be used
@@ -31,6 +32,8 @@
 #'
 #' # Argument default means it recycles like CSS if fewer values are specified
 #' box(6, em(1.5))
+#'
+#' skip_inherit("sans")
 #'
 #' marquee_bullets
 #'
@@ -106,6 +109,23 @@ print.marquee_box <- function(x, ...) {
   cat(format(x, ...), sep = "\n")
   invisible(NULL)
 }
+
+#' @rdname style_helpers
+#' @export
+skip_inherit <- function(x) {
+  if (is_box(x)) x[] <- lapply(x[], skip_inherit)
+  else class(x) <- c("marquee_skip_inherit", class(x))
+  x
+}
+
+#' @export
+format.marquee_skip_inherit <- function(x, ...) {
+  str <- NextMethod()
+  paste0(str, " (no inheritance)")
+}
+
+#' @export
+print.marquee_skip_inherit <- print.marquee_relative
 
 #' @rdname style_helpers
 #' @export
