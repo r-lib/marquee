@@ -21,7 +21,7 @@
 #'
 #' @examples
 #' # Create a style
-#' s_set <- style_set(body = body_style(), p = style(indent = em(2)))
+#' s_set <- style_set(base = base_style(), p = style(indent = em(2)))
 #'
 #' # Modify an existing tag
 #' modify_style(s_set, "p", size = 16)
@@ -45,11 +45,11 @@ style_set <- function(...) {
       stop_input_type(styles[[i]], "a marquee style object", arg = names(styles)[i])
     }
   }
-  if (is.null(styles$body)) {
-    cli::cli_abort("The style must contain a style for the body tag")
+  if (is.null(styles$base)) {
+    cli::cli_abort("The style must contain a base style")
   }
-  if (any(vapply(styles$body, is.null, logical(1)))) {
-    cli::cli_abort("The body style must be a complete style specification")
+  if (any(vapply(styles$base, is.null, logical(1)))) {
+    cli::cli_abort("The base style must be a complete style specification")
   }
   names(styles) <- tolower(names(styles))
   class(styles) <- "marquee_style_set"
@@ -83,8 +83,8 @@ modify_style <- function(style_set, tag, ...) {
   }
   check_string(tag)
   if (is_style(..1)) {
-    if (tag == "body" && any(vapply(..1, is.null, logical(1)))) {
-      cli::cli_abort("The body tag can only be replaced by another complete style")
+    if (tag == "base" && any(vapply(..1, is.null, logical(1)))) {
+      cli::cli_abort("The base tag can only be replaced by another complete style")
     }
     style_set[[tag]] <- ..1
     return(style_set)
@@ -99,8 +99,8 @@ modify_style <- function(style_set, tag, ...) {
   if (is.null(old_style)) {
     style_set[[tag]] <- new_style
   } else {
-    if (tag == "body" && any(vapply(new_style[args], is.null, logical(1)))) {
-      cli::cli_abort("The body tag cannot have any styles set to {.val NULL}")
+    if (tag == "base" && any(vapply(new_style[args], is.null, logical(1)))) {
+      cli::cli_abort("The base tag cannot have any styles set to {.val NULL}")
     }
     style_set[[tag]][args] <- new_style[args]
   }
@@ -115,8 +115,8 @@ remove_style <- function(style_set, tag) {
     stop_input_type(style_set, "a style set object")
   }
   check_string(tag)
-  if (tag == "body") {
-    cli::cli_abort("The body style cannot be removed")
+  if (tag == "base") {
+    cli::cli_abort("The base style cannot be removed")
   }
   style_set[tag] <- NULL
   style_set

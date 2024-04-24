@@ -378,10 +378,13 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
     NULL
   };
 
+  std::vector<double> rem_size;
   for (R_xlen_t i = 0; i < text.size(); ++i) {
     userdata.current_id = i + 1;
     userdata.style_stack = std::stack<cpp11::list>();
     if (i != 0) userdata.defined_styles = create_style_map(styles[i]);
+    userdata.style_stack.push(userdata.defined_styles.find("base")->second);
+    rem_size.push_back(REAL(userdata.style_stack.top()[0])[0]);
 
     std::string str(text[i]);
 
@@ -401,12 +404,6 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
   cpp11::writable::strings res_names = {"text", "id", "block", "type", "indentation", "ol_index", "tight", "ends"};
 
   cpp11::list doc_style(userdata.style[0]);
-  std::vector<double> rem_size = {REAL(doc_style[0])[0]};
-  for (R_xlen_t i = 1; i < userdata.style.size(); ++i) {
-    if (userdata.id[i] != userdata.id[i - 1]) {
-      rem_size.push_back(REAL(VECTOR_ELT(userdata.style[i], 0))[0]);
-    }
-  }
   for (R_xlen_t i = 0; i < doc_style.size(); ++i) {
     res_names.push_back(doc_style.names()[i]);
 

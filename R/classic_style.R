@@ -8,7 +8,7 @@
 #' @param body_font The font family to use for body text
 #' @param header_font The font family to use for headers
 #' @param code_font The font family to use for code and code block text
-#' @inheritDotParams body_style -family -size
+#' @inheritDotParams base_style -family -size
 #'
 #' @return A style set object
 #'
@@ -19,9 +19,10 @@
 #'
 classic_style <- function(base_size = 12, body_font = "", header_font = "",
                           code_font = "mono", ...) {
-  body <- body_style(family = body_font, size = base_size, ...)
+  base <- base_style(family = body_font, size = base_size, ...)
   style_set(
-    body = body,
+    base = base,
+    body = style(),
     ul   = style(padding = box(0, 0, 0, em(2)), background = NA, border = NA),
     ol   = style(padding = box(0, 0, 0, em(2)), background = NA, border = NA),
     li   = style(padding = box(0), background = NA, border = NA),

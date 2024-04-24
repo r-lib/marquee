@@ -23,7 +23,7 @@ on this}
 \item{code_font}{The font family to use for code and code block text}
 
 \item{...}{
-  Arguments passed on to \code{\link[=body_style]{body_style}}
+  Arguments passed on to \code{\link[=base_style]{base_style}}
   \describe{
     \item{\code{weight}}{The font weight to use. Can either be a number (\code{0}, \code{100},
 \code{200}, \code{300}, \code{400}, \code{500}, \code{600}, \code{700}, \code{800}, or \code{900}) or a strings

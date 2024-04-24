@@ -2,7 +2,7 @@
 % Please edit documentation in R/style.R
 \name{style}
 \alias{style}
-\alias{body_style}
+\alias{base_style}
 \title{Create a style specification for a single tag}
 \usage{
 style(
@@ -30,7 +30,7 @@ style(
   img_asp = NULL
 )
 
-body_style(
+base_style(
   family = "",
   weight = "normal",
   italic = FALSE,
@@ -135,7 +135,7 @@ A \code{marquee_style} object
 \code{style()} constructs a \code{marquee_style} object specifying the styling for a
 single tag. The meaning of \code{NULL} is to inherit the value from the parent
 element. It follows that top parent (the body element), must have values for
-all it's options. The \code{body_style()} constructor is a convenient constructor
+all it's options. The \code{base_style()} constructor is a convenient constructor
 for a style with sensible defaults for all it's options.
 }
 \examples{
@@ -143,6 +143,6 @@ for a style with sensible defaults for all it's options.
 style(color = "red", underline = TRUE)
 
 # Full style
-body_style()
+base_style()
 
 }

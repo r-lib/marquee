@@ -3,7 +3,7 @@
 #' `style()` constructs a `marquee_style` object specifying the styling for a
 #' single tag. The meaning of `NULL` is to inherit the value from the parent
 #' element. It follows that top parent (the body element), must have values for
-#' all it's options. The `body_style()` constructor is a convenient constructor
+#' all it's options. The `base_style()` constructor is a convenient constructor
 #' for a style with sensible defaults for all it's options.
 #'
 #' @param family The name of the font family to use
@@ -66,7 +66,7 @@
 #' style(color = "red", underline = TRUE)
 #'
 #' # Full style
-#' body_style()
+#' base_style()
 #'
 style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
                   features = NULL, size = NULL, color = NULL, lineheight = NULL,
@@ -206,7 +206,7 @@ str.marquee_style <- function(object, ...) {
 
 #' @rdname style
 #' @export
-body_style <- function(family = "", weight = "normal", italic = FALSE,
+base_style <- function(family = "", weight = "normal", italic = FALSE,
                        width = "normal", features = systemfonts::font_feature(),
                        size = 12, color = "black", lineheight = 1.6,
                        align = "left", tracking = 0, indent = 0, hanging = 0,

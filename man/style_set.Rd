@@ -36,7 +36,7 @@ style set from an existing one rather than building one from scratch.
 }
 \examples{
 # Create a style
-s_set <- style_set(body = body_style(), p = style(indent = em(2)))
+s_set <- style_set(base = base_style(), p = style(indent = em(2)))
 
 # Modify an existing tag
 modify_style(s_set, "p", size = 16)
