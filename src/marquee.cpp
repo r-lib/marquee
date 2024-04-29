@@ -113,8 +113,8 @@ inline bool skips_inherit(SEXP elem) {
 inline cpp11::writable::list combine_styles(cpp11::list parent, cpp11::list def) {
   cpp11::writable::list new_style(parent.size());
   for (R_xlen_t i = 0; i < parent.size(); ++i) {
-    // Get the element to inherit from
-    SEXP parent_elem = skips_inherit(parent[i]) ? Rf_getAttrib(parent[i], Rf_mkString("inherit_val")) : parent[i];
+    // Get the element to inherit from - Rf_getAttrib may allocate so PROTECT is needed
+    SEXP parent_elem = PROTECT(skips_inherit(parent[i]) ? Rf_getAttrib(parent[i], Rf_mkString("inherit_val")) : parent[i]);
     if (Rf_isNull(parent_elem)) parent_elem = parent[i];
 
     if (Rf_isNull(def[i])) {
@@ -167,6 +167,7 @@ inline cpp11::writable::list combine_styles(cpp11::list parent, cpp11::list def)
     if (skips_inherit(new_style[i])) {
       Rf_setAttrib(new_style[i], Rf_mkString("inherit_val"), parent_elem);
     }
+    UNPROTECT(1);
   }
   new_style.attr("names") = parent.attr("names");
   return new_style;
