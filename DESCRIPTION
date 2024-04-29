@@ -26,10 +26,13 @@ Imports:
     vctrs
 Suggests: 
     ggplot2,
+    knitr,
     patchwork,
+    rmarkdown,
     rsvg
 Remotes: 
     r-lib/systemfonts,
-    r-lib/textshaping#40
+    r-lib/textshaping
 URL: https://github.com/thomasp85/marquee
 BugReports: https://github.com/thomasp85/marquee/issues
+VignetteBuilder: knitr

@@ -1,0 +1,29 @@
+---
+title: "Marquee Styling"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Marquee Styling}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(marquee)
+```
+
+As we discussed in the Marquee Syntax article, most of the syntax in markdown is semantic, meaining that it concerns itself with the nature of what it encodes, rather than the look of it. The other side of the coin, how it looks, will be dealt with in this article. Note that this division between semantics and style is also seen in HTML5 where the looks is fully relegated to CSS and the tags are all semantic.
+
+## A slightly less cascading style
+
+HTML has CSS to take care of styling for it, and that has over the years morphed into a sprawling and powerful language of it's own. Both too complicated to support for something like marquee, and too complicated to be needed for styling markdown (after all it's main goal is to style full webpages, not documents). Marquee instead defines it's own limited styling system which is simple enough to reason about, and powerful enough to support what is needed for markdown text. Many concepts are borrowed from CSS so if you are used to that you should feel pretty much at home.
+
+### A style
+
+In marquee, a style defines the full specification for how an element (block or span) should visually appear. It holds `r length(formals(style))` different settings concerning everything from font rendering, to spacing, coloring, and alignment. Rather than going through all here, I'll point towards the documentation for the `style()` function.
