@@ -94,7 +94,7 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   if (!is_modifier(size)) check_number_decimal(size, allow_null = TRUE)
 
   check_string(color, allow_null = TRUE, allow_na = TRUE)
-  if (!is.null(color) && is.na(color)) color <- NA_character_
+  if (!is.null(color) && is.na(color)) color[] <- NA_character_
 
   if (!is_relative(lineheight)) check_number_decimal(lineheight, allow_null = TRUE)
 
@@ -113,12 +113,12 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   if (!is_box(padding)) stop_input_type(padding, "a marquee_box object", allow_null = TRUE)
 
   if (!inherits(background, "GridPattern")) {
-    check_string(background, allow_null = TRUE, allow_na = TRUE)
-    if (!is.null(background) && is.na(background)) background <- NA_character_
+    check_string(unclass(background), allow_null = TRUE, allow_na = TRUE)
+    if (!is.null(background) && is.na(background)) background[] <- NA_character_
   }
 
   check_string(border, allow_null = TRUE, allow_na = TRUE)
-  if (!is.null(border) && is.na(border)) border <- NA_character_
+  if (!is.null(border) && is.na(border)) border[] <- NA_character_
 
   if (is.null(border_size)) border_size <- box()
   if (!is_box(border_size)) stop_input_type(border_size, "a marquee_box object", allow_null = TRUE)
@@ -184,12 +184,10 @@ format.marquee_style <- function(x, ...) {
 #' @export
 print.marquee_style <- function(x, ...) {
   options <- format(x, ...)
-  if (length(options) == 0) {
-    cat("An empty marquee style\n")
-    return(invisible(NULL))
+  cat("<marquee_style[", length(options), "]>\n", sep = "")
+  if (length(options) != 0) {
+    cat(options, sep = "\n")
   }
-  cat("A marquee style\n")
-  cat(options, sep = "\n")
   return(invisible(NULL))
 }
 #' @export

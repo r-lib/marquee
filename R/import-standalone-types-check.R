@@ -486,6 +486,31 @@ check_character <- function(x,
   )
 }
 
+check_numeric <- function(x,
+                          ...,
+                          allow_null = FALSE,
+                          arg = caller_arg(x),
+                          call = caller_env()) {
+  if (!missing(x)) {
+    if (is.numeric(x)) {
+      return(invisible(NULL))
+    }
+    if (allow_null && is_null(x)) {
+      return(invisible(NULL))
+    }
+  }
+
+  stop_input_type(
+    x,
+    "a numeric vector",
+    ...,
+    allow_na = FALSE,
+    allow_null = allow_null,
+    arg = arg,
+    call = call
+  )
+}
+
 check_logical <- function(x,
                           ...,
                           allow_null = FALSE,

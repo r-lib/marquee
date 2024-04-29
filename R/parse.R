@@ -149,11 +149,10 @@
 #'
 marquee_parse <- function(text, style) {
   check_character(text)
-  if (is_style_set(style)) style <- list(style)
-  if (any(!vapply(style, is_style_set, logical(1)))) {
-    cli::cli_abort("{.arg style} must be a style set or a list of style sets")
+  if (!is_style_set(style)) {
+    cli::cli_abort("{.arg style} must be a style set")
   }
-  style <- rep_len(style, length(text))
+  style <- vctrs::vec_recycle(style, length(text))
   parsed <- marquee_c(text, style)
   # Remove terminal line end from code blocks
   parsed$text[parsed$type == "cb"] <- sub("\n$", "", parsed$text[parsed$type == "cb"])
