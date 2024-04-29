@@ -16,14 +16,13 @@ element_marquee(
   margin = NULL,
   style = NULL,
   width = NULL,
-  inherit.blank = FALSE,
-  ...
+  inherit.blank = FALSE
 )
 }
 \arguments{
 \item{family}{The font family of the base style}
 
-\item{colour}{The font colour of the base style}
+\item{colour, color}{The font colour of the base style}
 
 \item{size}{The font size of the base style}
 
@@ -60,7 +59,7 @@ small shifts in the visuals when going from \code{element_text()} to
 \code{element_marquee()} as size reporting may differ between the two elements.
 }
 \examples{
-if (is_installed("ggplot2")) {
+if (rlang::is_installed("ggplot2")) {
   library(ggplot2)
   p <- ggplot(mtcars) +
     geom_point(aes(mpg, disp)) +
@@ -72,7 +71,12 @@ if (is_installed("ggplot2")) {
 
   ggplot(mtcars) +
     geom_histogram(aes(x = mpg)) +
-    labs(title = "I put a plot in your title so you can plot while you title\n\n![](p)\n\nWhat more could you _possibly_ want?") +
+    labs(title =
+"I put a plot in your title so you can plot while you title
+
+![](p)
+
+What more could you _possibly_ want?") +
     theme(title = element_marquee())
 }
 

@@ -95,6 +95,7 @@ most that amount of space. You can use grid units to set it to an absolute
 amount.
 }
 \examples{
+library(ggplot2)
 # Standard use
 p <- ggplot(mtcars, aes(wt, mpg))
 p + geom_marquee(aes(label = rownames(mtcars)))

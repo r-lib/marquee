@@ -11,7 +11,7 @@
 #' `element_marquee()` as size reporting may differ between the two elements.
 #'
 #' @param family The font family of the base style
-#' @param colour The font colour of the base style
+#' @param colour,color The font colour of the base style
 #' @param size The font size of the base style
 #' @param lineheight The lineheight of the base style
 #' @param margin The margin for the body tag
@@ -23,7 +23,7 @@
 #' @export
 #'
 #' @examples
-#' if (is_installed("ggplot2")) {
+#' if (rlang::is_installed("ggplot2")) {
 #'   library(ggplot2)
 #'   p <- ggplot(mtcars) +
 #'     geom_point(aes(mpg, disp)) +
@@ -35,14 +35,19 @@
 #'
 #'   ggplot(mtcars) +
 #'     geom_histogram(aes(x = mpg)) +
-#'     labs(title = "I put a plot in your title so you can plot while you title\n\n![](p)\n\nWhat more could you _possibly_ want?") +
+#'     labs(title =
+#' "I put a plot in your title so you can plot while you title
+#'
+#' ![](p)
+#'
+#' What more could you _possibly_ want?") +
 #'     theme(title = element_marquee())
 #' }
 #'
 element_marquee <- function(family = NULL, colour = NULL, size = NULL, hjust = NULL,
                             vjust = NULL, angle = NULL, lineheight = NULL,
                             color = NULL, margin = NULL, style = NULL, width = NULL,
-                            inherit.blank = FALSE, ...) {
+                            inherit.blank = FALSE) {
   if (!is.null(color))
     colour <- color
   n <- max(length(family), length(colour), length(size),
@@ -57,7 +62,7 @@ element_marquee <- function(family = NULL, colour = NULL, size = NULL, hjust = N
                  inherit.blank = inherit.blank),
             class = c("element_marquee", "element_text", "element"))
 }
-#' @export
+
 element_grob.element_marquee <- function(element, label = "", x = NULL, y = NULL, family = NULL,
                                          colour = NULL, size = NULL, hjust = NULL, vjust = NULL,
                                          angle = NULL, lineheight = NULL, margin = NULL, margin_x = FALSE,

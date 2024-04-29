@@ -29,6 +29,7 @@
 #' @export
 #'
 #' @examples
+#' library(ggplot2)
 #' # Standard use
 #' p <- ggplot(mtcars, aes(wt, mpg))
 #' p + geom_marquee(aes(label = rownames(mtcars)))
