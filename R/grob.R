@@ -195,20 +195,26 @@ marquee_grob <- function(text, style, x = 0, y = 1, width = NULL, default.units 
     text = parsed, bullets = bullets, images = images, x = rep_along(text, x),
     y = rep_along(text, y), width = rep_along(text, width),
     hjust = rep_along(text, hjust), vjust = rep_along(text, vjust),
-    angle = rep_along(text, angle), vp = vp, name = name, cl = "marquee"
+    angle = rep_along(text, angle), vp = vp, name = name, cl = "marquee_grob"
   )
   # Check if we can do all calculations upfront
   if (all(is.na(grob$width) | !unitType(absolute.size(grob$width)) %in% c("null", "sum", "min", "max"))) {
-    grob <- makeContent.marquee(makeContext.marquee(grob))
-    class(grob) <- c("marquee_precalculated", class(grob))
+    grob <- makeContent.marquee_grob(makeContext.marquee_grob(grob))
+    class(grob) <- c("marquee_precalculated_grob", class(grob))
   }
   grob
 }
 
 #' @export
-makeContext.marquee <- function(x) {
+makeContext.marquee_grob <- function(x) {
   # Everything is calculated in bigpts (1 inch == 72 bigpts)
-  width <- convertWidth(x$width, "bigpts", TRUE)
+  # We inspect the angle, if it is more vertical we use the vertical direction
+  # of the viewport for conversion
+  width <- ifelse(
+    findInterval(x$angle, c(0, c(0, 90, 180, 270) + 45)) %% 2 == 1,
+    convertWidth(x$width, "bigpts", TRUE),
+    convertHeight(x$width, "bigpts", TRUE)
+  )
 
   # Determine location of blocks, their indent and location in overall parsed text
   blocks <- rle(x$text$block)
@@ -330,6 +336,7 @@ makeContext.marquee <- function(x) {
     space_before = 0,
     space_after = 0
   )
+  if (nrow(shape$shape) == 0) return(nullGrob())
 
   # If any widths are not defined we grab the text widths from the shaping and start again
   if (anyNA(widths)) {
@@ -339,7 +346,7 @@ makeContext.marquee <- function(x) {
       blocks <- which(block_indent == i)
       widths[blocks] <- vapply(blocks, function(j) {
         k <- which(block_starts > block_starts[j] & block_starts <= x$text$ends[block_starts[j]])
-        max(shape$metrics$width[j], widths[j], widths[k] + added_width[k], na.rm = TRUE)
+        max(shape$metrics$width[j], widths[j], widths[k], na.rm = TRUE) + added_width[j]
       }, numeric(1))
     }
     if (anyNA(widths)) {
@@ -347,7 +354,7 @@ makeContext.marquee <- function(x) {
     }
     x$width <- unit(widths[block_indent == 1], "bigpts")
     ## Restart evaluation
-    return(makeContext.marquee(x))
+    return(makeContext.marquee_grob(x))
   }
 
   # Inherit color and id from parsed text
@@ -514,8 +521,24 @@ makeContext.marquee <- function(x) {
   top_offset <- top_offset - (x$heights * x$vjust)[x$text$id[block_starts]]
 
   # Precalculate full sizing of grob
-  x$full_width <- max(x$x + (1 - x$hjust) * unit(x$widths, "bigpts")) - min(x$x - x$hjust * unit(x$widths, "bigpts"))
-  x$full_height <- max(x$y + (1 - x$vjust) * unit(x$heights, "bigpts")) - min(x$y - x$vjust * unit(x$heights, "bigpts"))
+  x0 <- -x$hjust * x$widths
+  x1 <- (1 - x$hjust) * x$widths
+  y0 <- -x$vjust * x$heights
+  y1 <- (1 - x$vjust) * x$heights
+  rad <- x$angle * 2 * pi / 360
+  crad <- cos(rad)
+  srad <- sin(rad)
+  blx <- x0*crad - y0*srad
+  bly <- x0*srad + y0*crad
+  brx <- x1*crad - y0*srad
+  bry <- x1*srad + y0*crad
+  trx <- x1*crad - y1*srad
+  try <- x1*srad + y1*crad
+  tlx <- x0*crad - y1*srad
+  tly <- x0*srad + y1*crad
+
+  x$full_width <- max(x$x + unit(pmax(blx, brx, trx, tlx), "bigpts")) - min(x$x + unit(pmin(blx, brx, trx, tlx), "bigpts"))
+  x$full_height <- max(x$y + unit(pmax(bly, bry, try, tly), "bigpts")) - min(x$y + unit(pmin(bly, bry, try, tly), "bigpts"))
 
   # Extract info about decoration (background, border, underline, etc)
   ## Figure out which blocks has backgrounds or borders
@@ -645,19 +668,19 @@ makeContext.marquee <- function(x) {
 }
 
 #' @export
-makeContext.marquee_precalculated <- function(x) x
+makeContext.marquee_precalculated_grob <- function(x) x
 
 #' @export
-heightDetails.textboxgrob <- function(x) {
+heightDetails.marquee_grob <- function(x) {
   x$full_height
 }
 #' @export
-widthDetails.textboxgrob <- function(x) {
+widthDetails.marquee_grob <- function(x) {
   x$full_width
 }
 
 #' @export
-makeContent.marquee <- function(x) {
+makeContent.marquee_grob <- function(x) {
   # Create the font list of unique fonts
   font_id <- paste0(x$shape$font_path, "&", x$shape$font_index)
   font_match <- match(font_id, unique(font_id))
