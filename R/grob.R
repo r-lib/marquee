@@ -830,11 +830,21 @@ makeContent.marquee_grob <- function(x) {
     }
     ## Combine to a single grob
     inject(
-      grobTree(!!!rects, !!!images, glyphs, lines, vp = viewport(x$x[grob], x$y[grob], just = c(0, 0), angle = x$angle[grob], clip = "off"))
+      grobTree(!!!rects, !!!images, glyphs, lines, vp = viewport(x$x[grob], x$y[grob], just = c(0, 0), angle = x$angle[grob]))
     )
   })
 
-  setChildren(x, inject(gList(!!!grobs)))
+  # Combine all separate texts into one grob
+  if (length(x$images$id) == 0 && length(x$rects$id) == 0) {
+    ## If there are no rects and images we can draw directly on the main surface
+    children <- inject(gList(!!!grobs))
+  } else {
+    ## If rects/images exists they set their own clipping and we need to use a
+    ## group
+    children <- gList(groupGrob(inject(grobTree(!!!grobs))))
+  }
+
+  setChildren(x, children)
 }
 
 #' @export
