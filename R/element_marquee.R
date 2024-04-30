@@ -22,27 +22,25 @@
 #'
 #' @export
 #'
-#' @examples
-#' if (rlang::is_installed("ggplot2")) {
-#'   library(ggplot2)
-#'   p <- ggplot(mtcars) +
-#'     geom_point(aes(mpg, disp)) +
-#'     labs(title = "A {.red *marquee*} title\n* Look at this bullet list\n\n* great, huh?") +
-#'     theme_gray(base_size = 6) +
-#'     theme(title = element_marquee())
+#' @examplesIf utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")
+#' library(ggplot2)
+#' p <- ggplot(mtcars) +
+#'   geom_point(aes(mpg, disp)) +
+#'   labs(title = "A {.red *marquee*} title\n* Look at this bullet list\n\n* great, huh?") +
+#'   theme_gray(base_size = 6) +
+#'   theme(title = element_marquee())
 #'
-#'   plot(p)
+#' plot(p)
 #'
-#'   ggplot(mtcars) +
-#'     geom_histogram(aes(x = mpg)) +
-#'     labs(title =
+#' ggplot(mtcars) +
+#'   geom_histogram(aes(x = mpg)) +
+#'   labs(title =
 #' "I put a plot in your title so you can plot while you title
 #'
 #' ![](p)
 #'
 #' What more could you _possibly_ want?") +
-#'     theme(title = element_marquee())
-#' }
+#'   theme(title = element_marquee())
 #'
 element_marquee <- function(family = NULL, colour = NULL, size = NULL, hjust = NULL,
                             vjust = NULL, angle = NULL, lineheight = NULL,

@@ -95,6 +95,8 @@ most that amount of space. You can use grid units to set it to an absolute
 amount.
 }
 \examples{
+\dontshow{if (utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+
 library(ggplot2)
 # Standard use
 p <- ggplot(mtcars, aes(wt, mpg))
@@ -124,5 +126,5 @@ p + geom_marquee(aes(label = rownames(mtcars), fill = gear), style = label_style
 # Use markdown to style the text
 red_bold_names <- sub("(\\\\w+)", "{.red **\\\\1**}", rownames(mtcars))
 p + geom_marquee(aes(label = red_bold_names))
-
+\dontshow{\}) # examplesIf}
 }

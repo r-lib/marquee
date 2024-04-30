@@ -28,7 +28,8 @@
 #'
 #' @export
 #'
-#' @examples
+#' @examplesIf utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")
+#'
 #' library(ggplot2)
 #' # Standard use
 #' p <- ggplot(mtcars, aes(wt, mpg))
