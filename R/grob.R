@@ -538,8 +538,8 @@ makeContext.marquee_grob <- function(x) {
   tly <- x0*srad + y1*crad
 
   x$bbox <- list(
-    x = x$x + unit(c(blx, brx, trx, tlx), "bigpts"),
-    y = x$y + unit(c(bly, bry, try, tly), "bigpts")
+    x = rep(x$x, 4) + unit(c(blx, brx, trx, tlx), "bigpts"),
+    y = rep(x$y, 4) + unit(c(bly, bry, try, tly), "bigpts")
   )
   x$full_width <- max(x$x + unit(pmax(blx, brx, trx, tlx), "bigpts")) - min(x$x + unit(pmin(blx, brx, trx, tlx), "bigpts"))
   x$full_height <- max(x$y + unit(pmax(bly, bry, try, tly), "bigpts")) - min(x$y + unit(pmin(bly, bry, try, tly), "bigpts"))
