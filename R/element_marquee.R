@@ -75,7 +75,7 @@ element_grob.element_marquee <- function(element, label = "", x = NULL, y = NULL
   )
   margin <- margin %||% element$margin
   if (!is.null(margin)) {
-    pad <- skip_inherit(box(
+    pad <- skip_inherit(trbl(
       if (margin_y) margin[1] else 0,
       if (margin_x) margin[2] else 0,
       if (margin_y) margin[3] else 0,

@@ -54,15 +54,15 @@ measured in points. Can be \code{\link[=relative]{relative()}} in which case it 
 parent hanging, \code{\link[=em]{em()}} in which case it is based on the font size in this
 style, or \code{\link[=rem]{rem()}} in which case it is based on the font size of the body
 element.}
-    \item{\code{margin}}{The margin around the element, given as a call to \code{\link[=box]{box()}}}
-    \item{\code{padding}}{The padding around the element, given as a call to \code{\link[=box]{box()}}}
+    \item{\code{margin}}{The margin around the element, given as a call to \code{\link[=trbl]{trbl()}}}
+    \item{\code{padding}}{The padding around the element, given as a call to \code{\link[=trbl]{trbl()}}}
     \item{\code{background}}{The color of the background fill. The background includes
 the padding but not the margin. Can be a solid color or a gradient or pattern
 made with \code{grid::linearGradient()}/\code{grid::radialGradient()}/\code{grid::pattern()}}
     \item{\code{border}}{The color of the background stroke. The background includes
 the padding but not the margin}
     \item{\code{border_size}}{The line width of the background stroke, given as a call
-to \code{\link[=box]{box()}}}
+to \code{\link[=trbl]{trbl()}}}
     \item{\code{border_radius}}{The corner radius of the background, given in points}
     \item{\code{bullets}}{A vector of strings to use for bullets in unordered lists.
 \code{marquee_bullets} provides a selection}

@@ -40,15 +40,15 @@
 #' parent hanging, [em()] in which case it is based on the font size in this
 #' style, or [rem()] in which case it is based on the font size of the body
 #' element.
-#' @param margin The margin around the element, given as a call to [box()]
-#' @param padding The padding around the element, given as a call to [box()]
+#' @param margin The margin around the element, given as a call to [trbl()]
+#' @param padding The padding around the element, given as a call to [trbl()]
 #' @param background The color of the background fill. The background includes
 #' the padding but not the margin. Can be a solid color or a gradient or pattern
 #' made with `grid::linearGradient()`/`grid::radialGradient()`/`grid::pattern()`
 #' @param border The color of the background stroke. The background includes
 #' the padding but not the margin
 #' @param border_size The line width of the background stroke, given as a call
-#' to [box()]
+#' to [trbl()]
 #' @param border_radius The corner radius of the background, given in points
 #' @param bullets A vector of strings to use for bullets in unordered lists.
 #' `marquee_bullets` provides a selection
@@ -106,11 +106,11 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
 
   if (!is_modifier(hanging)) check_number_decimal(hanging, allow_null = TRUE)
 
-  if (is.null(margin)) margin <- box()
-  if (!is_box(margin)) stop_input_type(margin, "a marquee_box object", allow_null = TRUE)
+  if (is.null(margin)) margin <- trbl()
+  if (!is_trbl(margin)) stop_input_type(margin, "a marquee_trbl object", allow_null = TRUE)
 
-  if (is.null(padding)) padding <- box()
-  if (!is_box(padding)) stop_input_type(padding, "a marquee_box object", allow_null = TRUE)
+  if (is.null(padding)) padding <- trbl()
+  if (!is_trbl(padding)) stop_input_type(padding, "a marquee_trbl object", allow_null = TRUE)
 
   if (!inherits(background, "GridPattern")) {
     check_string(unclass(background), allow_null = TRUE, allow_na = TRUE)
@@ -120,8 +120,8 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   check_string(border, allow_null = TRUE, allow_na = TRUE)
   if (!is.null(border) && is.na(border)) border[] <- NA_character_
 
-  if (is.null(border_size)) border_size <- box()
-  if (!is_box(border_size)) stop_input_type(border_size, "a marquee_box object", allow_null = TRUE)
+  if (is.null(border_size)) border_size <- trbl()
+  if (!is_trbl(border_size)) stop_input_type(border_size, "a marquee_trbl object", allow_null = TRUE)
 
   if (!is_modifier(border_radius)) check_number_decimal(border_radius, allow_null = TRUE)
 
@@ -208,10 +208,10 @@ base_style <- function(family = "", weight = "normal", italic = FALSE,
                        width = "normal", features = systemfonts::font_feature(),
                        size = 12, color = "black", lineheight = 1.6,
                        align = "left", tracking = 0, indent = 0, hanging = 0,
-                       margin = box(0, 0, rem(1)), padding = box(0), background = NA,
-                       border = NA, border_size = box(0), border_radius = 0,
-                       bullets = marquee_bullets, underline = FALSE,
-                       strikethrough = FALSE, img_asp = 1.65) {
+                       margin = trbl(0, 0, rem(1)), padding = trbl(0),
+                       background = NA, border = NA, border_size = trbl(0),
+                       border_radius = 0, bullets = marquee_bullets,
+                       underline = FALSE, strikethrough = FALSE, img_asp = 1.65) {
   style(
     family = family,
     weight = weight,

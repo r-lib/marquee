@@ -83,7 +83,7 @@ modify_style <- function(style_set, tag, ...) {
   for (i in seq_along(opts)) {
     opt <- opts[[i]]
     if (is.null(opt) || is_style(opt) || is_modifier(opt) ||
-        is_box(opt) || inherits(opt, "marquee_skip_inherit") ||
+        is_trbl(opt) || inherits(opt, "marquee_skip_inherit") ||
         inherits(opt, "font_feature") || inherits(opt, "GridPattern")) {
       opt <- list(opt)
     }
