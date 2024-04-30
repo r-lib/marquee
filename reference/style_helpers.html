@@ -6,11 +6,13 @@ style a font size half of it's parent. em() specify a numeric value as
 relative to the font size of the current style. If the font size is 12, and
 indent is set to em(2), then the indent will be equivalent to 24. rem()
 works like em() but rather than using the font size of the current style it
-uses the font size of the root style (which is the body element). box()
-helps you construct styles that refers to sides of a box (margin, padding,
-and border size). skip_inherit() tells the style inheritance to ignore this
-value and look for the value one above in the stack. marquee_bullets is
-just a character vector with 6 sensible bullet glyphs for unordered lists."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
+uses the font size of the root style (which is the body element). trbl()
+helps you construct styles that refers to sides of a rectangle (margin,
+padding, and border size). The function names refers to the order of the
+arguments (top, right, bottom, left). skip_inherit() tells the style
+inheritance to ignore this value and look for the value one above in the
+stack. marquee_bullets is just a character vector with 6 sensible bullet
+glyphs for unordered lists."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
@@ -74,11 +76,13 @@ style a font size half of it's parent. <code>em()</code> specify a numeric value
 relative to the font size of the current style. If the font size is <code>12</code>, and
 indent is set to <code>em(2)</code>, then the indent will be equivalent to 24. <code>rem()</code>
 works like <code>em()</code> but rather than using the font size of the current style it
-uses the font size of the root style (which is the body element). <code>box()</code>
-helps you construct styles that refers to sides of a box (margin, padding,
-and border size). <code>skip_inherit()</code> tells the style inheritance to ignore this
-value and look for the value one above in the stack. <code>marquee_bullets</code> is
-just a character vector with 6 sensible bullet glyphs for unordered lists.</p>
+uses the font size of the root style (which is the body element). <code>trbl()</code>
+helps you construct styles that refers to sides of a rectangle (margin,
+padding, and border size). The function names refers to the order of the
+arguments (top, right, bottom, left). <code>skip_inherit()</code> tells the style
+inheritance to ignore this value and look for the value one above in the
+stack. <code>marquee_bullets</code> is just a character vector with 6 sensible bullet
+glyphs for unordered lists.</p>
     </div>
 
     <div id="ref-usage">
@@ -88,7 +92,7 @@ just a character vector with 6 sensible bullet glyphs for unordered lists.</p>
 <span></span>
 <span><span class="fu">rem</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">box</span><span class="op">(</span>top <span class="op">=</span> <span class="cn">NULL</span>, right <span class="op">=</span> <span class="va">top</span>, bottom <span class="op">=</span> <span class="va">top</span>, left <span class="op">=</span> <span class="va">right</span><span class="op">)</span></span>
+<span><span class="fu">trbl</span><span class="op">(</span>top <span class="op">=</span> <span class="cn">NULL</span>, right <span class="op">=</span> <span class="va">top</span>, bottom <span class="op">=</span> <span class="va">top</span>, left <span class="op">=</span> <span class="va">right</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">skip_inherit</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
@@ -107,8 +111,8 @@ will be used</p></dd>
 
 
 <dt>top, right, bottom, left</dt>
-<dd><p>Values for the sides of the box. Either numbers
-or modifiers (relative, em, or rem)</p></dd>
+<dd><p>Values for the sides of the rectangles. Either
+numbers or modifiers (relative, em, or rem)</p></dd>
 
 </dl></div>
     <div id="value">
@@ -130,8 +134,8 @@ or modifiers (relative, em, or rem)</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rem(1.2) </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Argument default means it recycles like CSS if fewer values are specified</span></span></span>
-<span class="r-in"><span><span class="fu">box</span><span class="op">(</span><span class="fl">6</span>, <span class="fu">em</span><span class="op">(</span><span class="fl">1.5</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A marquee box</span>
+<span class="r-in"><span><span class="fu">trbl</span><span class="op">(</span><span class="fl">6</span>, <span class="fu">em</span><span class="op">(</span><span class="fl">1.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A marquee trbl</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    top: 6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  right: em(1.5)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bottom: 6</span>

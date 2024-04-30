@@ -106,11 +106,11 @@ for a style with sensible defaults for all it's options.</p>
 <span>  tracking <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  indent <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  hanging <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  margin <span class="op">=</span> <span class="fu"><a href="style_helpers.html">box</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fu"><a href="style_helpers.html">rem</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  padding <span class="op">=</span> <span class="fu"><a href="style_helpers.html">box</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  margin <span class="op">=</span> <span class="fu"><a href="style_helpers.html">trbl</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fu"><a href="style_helpers.html">rem</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  padding <span class="op">=</span> <span class="fu"><a href="style_helpers.html">trbl</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
 <span>  background <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  border <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  border_size <span class="op">=</span> <span class="fu"><a href="style_helpers.html">box</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  border_size <span class="op">=</span> <span class="fu"><a href="style_helpers.html">trbl</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
 <span>  border_radius <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  bullets <span class="op">=</span> <span class="va">marquee_bullets</span>,</span>
 <span>  underline <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -192,11 +192,11 @@ element.</p></dd>
 
 
 <dt>margin</dt>
-<dd><p>The margin around the element, given as a call to <code><a href="style_helpers.html">box()</a></code></p></dd>
+<dd><p>The margin around the element, given as a call to <code><a href="style_helpers.html">trbl()</a></code></p></dd>
 
 
 <dt>padding</dt>
-<dd><p>The padding around the element, given as a call to <code><a href="style_helpers.html">box()</a></code></p></dd>
+<dd><p>The padding around the element, given as a call to <code><a href="style_helpers.html">trbl()</a></code></p></dd>
 
 
 <dt>background</dt>
@@ -212,7 +212,7 @@ the padding but not the margin</p></dd>
 
 <dt>border_size</dt>
 <dd><p>The line width of the background stroke, given as a call
-to <code><a href="style_helpers.html">box()</a></code></p></dd>
+to <code><a href="style_helpers.html">trbl()</a></code></p></dd>
 
 
 <dt>border_radius</dt>
