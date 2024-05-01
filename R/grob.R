@@ -537,8 +537,14 @@ makeContext.marquee_grob <- function(x) {
   tlx <- x0*crad - y1*srad
   tly <- x0*srad + y1*crad
 
-  x$full_width <- max(x$x + unit(pmax(blx, brx, trx, tlx), "bigpts")) - min(x$x + unit(pmin(blx, brx, trx, tlx), "bigpts"))
-  x$full_height <- max(x$y + unit(pmax(bly, bry, try, tly), "bigpts")) - min(x$y + unit(pmin(bly, bry, try, tly), "bigpts"))
+  if (length(x$x) > 1) {
+    x$full_width <- max(x$x + unit(pmax(blx, brx, trx, tlx), "bigpts")) - min(x$x + unit(pmin(blx, brx, trx, tlx), "bigpts"))
+    x$full_height <- max(x$y + unit(pmax(bly, bry, try, tly), "bigpts")) - min(x$y + unit(pmin(bly, bry, try, tly), "bigpts"))
+  } else {
+    # If we are dealing with a single text (we often are), we can simplify this
+    x$full_width <- unit(diff(range(blx, brx, trx, tlx)), "bigpts")
+    x$full_height <- unit(diff(range(bly, bry, try, tly)), "bigpts")
+  }
 
   # Extract info about decoration (background, border, underline, etc)
   ## Figure out which blocks has backgrounds or borders
