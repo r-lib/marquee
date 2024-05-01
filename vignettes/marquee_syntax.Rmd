@@ -1,0 +1,308 @@
+---
+title: "Marquee Syntax"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Marquee Syntax}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This document will go over the syntax recognized by marquee, which is largely an extension of the [CommonMark](https://commonmark.org) spec. A cornerstone of the markdown philosophy is that *any* text is valid markdown, and this carries over to marquee. This means that if you make an error in your text, you will not get an error during parsing - the output will just not look how you expected (say, you forget to close an emphasis you'll simply get a wrong emphasis span). While markdown is pretty well-known at this point, this document will go through it all and lastly touch on the few addition to CommonMark that marquee adds.
+
+### Markdown vs CommonMark
+
+In the above I used two different names to discuss the syntax that marquee adheres to. Markdown is the original specification developed by John Gruber and Aaron Swartz in 2004. The spec was intentionally vague and ambiguous which led to a divergence in how different parsers handled edge cases. CommonMark was developed to tackle this by bringing forth a stringent and internally consistent syntax that parsers could develop up against. On top of CommonMark, various entities has then build their own flavour of extended syntax, most well-known perhaps is GitHub flavoured markdown (GFM). Marquee is CommonMark compliant, meaning that it adheres to the specific syntax interpretation that CommonMark defined. Further, like GFM, marquee provides it's own additions to the syntax, some overlapping with other flavours, and some uniquely it's own.
+
+In the following we will use the name "Markdown" to refer to the CommonMark syntax.
+
+## Standard Markdown syntax
+
+Markdown can be thought of as a way to naturally mark text as belonging to various stylistic or contextual elements. It favors ease of reading and writing in it's raw representation over flexibility, but does cover almost all standard needs for text formatting (this document is written with markdown). The elements that can be marked broadly falls into two buckets: Block elements and span elements.
+
+### Block elements
+
+A block element is an element that contains some completed content, in the sense that two following blocks are contextually separated. A block can contain further blocks inside of it, or raw text.
+
+#### Paragraphs (`p`)
+
+The most basic block element is a paragraph. A paragraph is any run of text that is not another block element. Paragraphs are separated by two consecutive line breaks.
+
+```         
+this is the first paragraph
+
+this is a second one
+```
+
+You can use single line breaks in a paragraph to wrap the text in the raw format. These linebreaks are ignored when parsing. This means that this text:
+
+```         
+here we add linebreaks
+because we want the raw
+text to have a certain
+width
+```
+
+is semantically similar to
+
+```         
+here we add linebreaks because we want the raw text to have a certain width
+```
+
+If you want to force a linebreak inside your paragraph, you end the line with two spaces and a linebreak. Be aware that some code editors strips trailing spaces when saving the document.
+
+#### Headers (`h1`-`h6`)
+
+Markdown supports up to six levels of headers. They can be defined in one of two ways:
+
+```         
+# Header 1
+## Header 2
+### Header 3
+#### Header 4
+##### Header 5
+###### Header 6
+```
+
+and
+
+```         
+Header 1
+========
+
+Header 2
+--------
+```
+
+The last style only supports level 1 and 2, but are visually more pronounced in the raw encoding.
+
+#### Block quotes (`bq`)
+
+A block quote is semantically a paragraph you wish to highlight in some way. It can contain further blocks inside of it that will all be part of the block. It is created using email-style quoting
+
+```         
+> This is a block quote
+> 
+> It contains two paragraphs
+```
+
+#### Code blocks (`cb`)
+
+A code block is intended to hold unparsed text (often code). Any markdown inside a codeblock is ignored and shown as-is. This means that a code block cannot contain child blocks as there is no way to specify them. Code blocks are created by either indenting everything with 4 spaces, or enclosing text with ```` ``` ````, e.g.
+
+```         
+This is a paragraph
+
+    This is a code block
+    
+    # This will not be converted to a header
+    
+new paragraph
+```
+
+or
+
+````         
+This is a paragraph
+
+```
+This is a code block
+
+# This will not be converted to a header
+```
+    
+new paragraph
+````
+
+#### Lists (`ul`, `ol`, and `li`)
+
+Lists in markdown comes in two flavors: Unordered and ordered. Ordered lists can be created by using either `*`, `-`, or `+` as a bullet, and ordered by using a number followed by either `.` or `)`. All the styles are semantically equivalent so it is up to taste what to choose.
+
+```         
+* This is an unordered list
+* It has a second bullet point
+
+1. This is an ordered list
+2. next item
+```
+
+Depending on whether there is an empty line between consecutive elements the list might be considered tight or not which defines how it is styled by the parser
+
+```         
+# Tight
+- This is
+- a tight
+- list
+
+# Untight
+- This is
+
+- so untight
+
+- I can't even
+```
+
+List items can have child blocks, either multiple paragraph or other block elements itself
+
+```         
+* First list item
+
+* Second one
+
+  This contains a second paragraph. It must be indented
+  
+  > We could even add a block quote
+  
+* Third item contains a sub list
+
+  1. let's make it ordered
+  2. and tight
+```
+
+Ordered lists only care about the number of the first item. The remaining item numbers are not inspected. This means that this list
+
+```         
+1. item one
+2. item two
+3. item three
+```
+
+is semantically equivalent to
+
+```         
+1. item one
+9. item two
+4. item three
+```
+
+The first number, however instructs the renderer where to start the numbering from
+
+```         
+5. This list starts counting from 5
+6. and so on
+1. This will be item 7 despite what we wrote
+```
+
+#### Horizontal rulers (`hr`)
+
+Last of the block items are horizontal rulers. They demarcate a break between two blocks and can be created using three or more asterisks (`*`) or hyphens (`-`), optionally with spacing in between, on their own line, e.g.
+
+```         
+* * *
+```
+
+or
+
+```         
+-------------------------
+```
+
+### Span elements
+
+Span elements are elements that do not break the flow of text but are considered "inline". The classic example is marking some text as being emphasized (often rendered italicized). You wouldn't expect such an element to break into a new line, but rather to keep the flow.
+
+#### Emphasize (`em`)
+
+To add emphasis to some text, wrap it with a single asterisk (`*`) on either side. Classic markdown also allows the use of underscore (`_`), but in many flavors (marquee included), this has been repurposed and thus doesn't work.
+
+```         
+Within this line of text we add *emphasis* on one word
+```
+
+While emphasis is often styled with italic, this is not a given and emphasis should be considered semantic rather than stylistic.
+
+#### Strong (`str`)
+
+To give a part of a text more weight you can wrap it in two asterisks on either side. Like with emphasis above, this is semantic, but often equates to rendering the text with bold
+
+```         
+I'm making a **strong** point here
+```
+
+#### Link (`a`)
+
+While links are rather useless in marquee as it is intended for raster rendering, the syntax is supported and will often result in a slightly different (though unclickable) rendering style. Links are created using the following syntax
+
+```         
+[link text](link-url)
+```
+
+Links can also be created by enclosing a URL in `<>`, e.g.
+
+```         
+<link-url>
+```
+
+In that case the url will be used as the text as well
+
+#### Code (`code`)
+
+Inline code, like code blocks will render its content as-is. A code span is created by enclosing the text in a single back-tick (`` ` ``)
+
+```         
+This text has some fancy code in it `six <- 1 + 5`, right?
+```
+
+#### Images (`img`)
+
+Images are included in the text using a link-like syntax, but prepended by an exclamation mark:
+
+```         
+![Image title](image-path)
+```
+
+The title/alt-text is ignored by marquee for the same reasons links are useless, but can be used to make the raw text more easy to understand. While standard markdown expect the image path to point to a file on the system, with marquee it can also name a graphic object in the environment. For example, if you have created a plot with ggplot2 and saved it to the `p` variable, you can insert it into your markdown document by simply adding
+
+```         
+![](p)
+```
+
+While images are semantically span elements, marquee will treat images that resides on their own line (surrounded by empty lines) as a block element.
+
+## Markdown extensions
+
+Apart from the base syntax described above, marquee allows a few additional features:
+
+#### Underline (`u`)
+
+You can underline a run of text by enclosing it with underscore. Note that this feature means that the classic use of underscore as an alias for asterisk when emphasizing text no longer works. Note that while emphasis is semantic, underline is very much a stylistic mark
+
+```         
+We will _underline_ a word
+```
+
+#### Strikethrough (`del`)
+
+If you want to give the appearance of something being deleted, you can enclose it with tilde (`~`)
+
+```         
+I'm sure this is ~good~ better
+```
+
+#### Custom spans
+
+Marquee has it's own style of custom span elements, if you need to style a text run in a special way. It is created by enclosing the text with `{.name` and `}`, which will give the enclosed text the `name` style (which is up to you how to render). Be aware that the preceding dot is removed from the span element name. Alternatively you can use `{#name` and `}`, which will give the enclosed text the `#name` style (note that the hash is not stripped from the span element name).
+
+```         
+Sometimes my text is so {.stylish eloquent} that the basic markdown elements are not enough
+```
+
+## Miscellaneous
+
+#### Escaping syntax
+
+As you can see from the above, a small set of characters holds special meaning in markdown (some even holds multiple meanings). These are: `\`, `` ` ``, `*`, `_`, `~`, `{`, `}`, `[`, `]`, `(`, `)`, `#`, `+`, `-`, `.`, `!`. Using any of these you run the risk of your text being interpreted in ways you did not intent. If you wish to include one of these characters as-is, you can escape it using `\`, to instruct the parser to ignore any formatting that may be deduced from the character.
+
+```         
+I just like \*asterisks\* around words
+```
+
+#### Where is my HTML-support?
+
+If you are a seassoned markdown user you may be accustomed to mixing in HTML code with your markdown text if you need to do some very technical formatting. This works because markdown passes such code through unaltered and if the end result is in HTML, then the included HTML will be part of the final HTML document. However, HTML is not part of markdown, and marquee will simply pass it through. Since the parsed text will not be rendered into HTML it means that any HTML code you include will be visible in it's raw format.
