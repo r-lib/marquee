@@ -28,7 +28,8 @@
 #'
 #' @export
 #'
-#' @examples
+#' @examplesIf utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")
+#'
 #' library(ggplot2)
 #' # Standard use
 #' p <- ggplot(mtcars, aes(wt, mpg))
@@ -48,9 +49,9 @@
 #' label_style <- modify_style(
 #'   classic_style(),
 #'   "body",
-#'   padding = skip_inherit(box(4)),
+#'   padding = skip_inherit(trbl(4)),
 #'   border = "black",
-#'   border_size = skip_inherit(box(1)),
+#'   border_size = skip_inherit(trbl(1)),
 #'   border_radius = 3
 #' )
 #' p + geom_marquee(aes(label = rownames(mtcars), fill = gear), style = label_style)
@@ -71,6 +72,7 @@ geom_marquee <- function(mapping = NULL, data = NULL, stat = "identity",
   )
 }
 
+#' @export
 GeomMarquee <- new_environment(list(geom = NULL))
 
 make_marquee_geom <- function() {
@@ -119,12 +121,14 @@ make_marquee_geom <- function() {
       data$vjust <- compute_just(data$vjust, data$y, data$x, data$angle)
       data$hjust <- compute_just(data$hjust, data$x, data$y, data$angle)
 
-      marquee_grob(
+      grob <- marquee_grob(
         text = lab, style = styles,
         x = data$x, y = data$y, width = data$width,
         hjust = data$hjust, vjust = data$vjust,
-        angle = data$angle, name = "geom_marquee"
+        angle = data$angle
       )
+      grob$name <- grobName(grob, "geom_marquee")
+      grob
     },
 
     draw_key = ggplot2::draw_key_label

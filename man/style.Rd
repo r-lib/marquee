@@ -43,11 +43,11 @@ base_style(
   tracking = 0,
   indent = 0,
   hanging = 0,
-  margin = box(0, 0, rem(1)),
-  padding = box(0),
+  margin = trbl(0, 0, rem(1)),
+  padding = trbl(0),
   background = NA,
   border = NA,
-  border_size = box(0),
+  border_size = trbl(0),
   border_radius = 0,
   bullets = marquee_bullets,
   underline = FALSE,
@@ -102,9 +102,9 @@ parent hanging, \code{\link[=em]{em()}} in which case it is based on the font si
 style, or \code{\link[=rem]{rem()}} in which case it is based on the font size of the body
 element.}
 
-\item{margin}{The margin around the element, given as a call to \code{\link[=box]{box()}}}
+\item{margin}{The margin around the element, given as a call to \code{\link[=trbl]{trbl()}}}
 
-\item{padding}{The padding around the element, given as a call to \code{\link[=box]{box()}}}
+\item{padding}{The padding around the element, given as a call to \code{\link[=trbl]{trbl()}}}
 
 \item{background}{The color of the background fill. The background includes
 the padding but not the margin. Can be a solid color or a gradient or pattern
@@ -114,7 +114,7 @@ made with \code{grid::linearGradient()}/\code{grid::radialGradient()}/\code{grid
 the padding but not the margin}
 
 \item{border_size}{The line width of the background stroke, given as a call
-to \code{\link[=box]{box()}}}
+to \code{\link[=trbl]{trbl()}}}
 
 \item{border_radius}{The corner radius of the background, given in points}
 

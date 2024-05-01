@@ -7,16 +7,18 @@
 #' relative to the font size of the current style. If the font size is `12`, and
 #' indent is set to `em(2)`, then the indent will be equivalent to 24. `rem()`
 #' works like `em()` but rather than using the font size of the current style it
-#' uses the font size of the root style (which is the body element). `box()`
-#' helps you construct styles that refers to sides of a box (margin, padding,
-#' and border size). `skip_inherit()` tells the style inheritance to ignore this
-#' value and look for the value one above in the stack. `marquee_bullets` is
-#' just a character vector with 6 sensible bullet glyphs for unordered lists.
+#' uses the font size of the root style (which is the body element). `trbl()`
+#' helps you construct styles that refers to sides of a rectangle (margin,
+#' padding, and border size). The function names refers to the order of the
+#' arguments (top, right, bottom, left). `skip_inherit()` tells the style
+#' inheritance to ignore this value and look for the value one above in the
+#' stack. `marquee_bullets` is just a character vector with 6 sensible bullet
+#' glyphs for unordered lists.
 #'
 #' @param x A decimal number. If a vector is provided only the first element
 #' will be used
-#' @param top,right,bottom,left Values for the sides of the box. Either numbers
-#' or modifiers (relative, em, or rem)
+#' @param top,right,bottom,left Values for the sides of the rectangles. Either
+#' numbers or modifiers (relative, em, or rem)
 #'
 #' @return Objects of the relevant class
 #'
@@ -31,7 +33,7 @@
 #' rem(1.2)
 #'
 #' # Argument default means it recycles like CSS if fewer values are specified
-#' box(6, em(1.5))
+#' trbl(6, em(1.5))
 #'
 #' skip_inherit("sans")
 #'
@@ -88,24 +90,24 @@ is_modifier <- function(x) inherits(x, c("marquee_relative", "marquee_em", "marq
 
 #' @rdname style_helpers
 #' @export
-box <- function(top = NULL, right = top, bottom = top, left = right) {
+trbl <- function(top = NULL, right = top, bottom = top, left = right) {
   if (!is.null(top) && !is_modifier(top)) check_number_decimal(top, allow_null = TRUE)
   if (!is.null(right) && !is_modifier(right)) check_number_decimal(right, allow_null = TRUE)
   if (!is.null(bottom) && !is_modifier(bottom)) check_number_decimal(bottom)
   if (!is.null(left) && !is_modifier(left)) check_number_decimal(left, allow_null = TRUE)
-  structure(list(top, right, bottom, left), class = "marquee_box")
+  structure(list(top, right, bottom, left), class = "marquee_trbl")
 }
 
-is_box <- function(x) inherits(x, "marquee_box")
+is_trbl <- function(x) inherits(x, "marquee_trbl")
 
 #' @export
-format.marquee_box <- function(x, ...) {
+format.marquee_trbl <- function(x, ...) {
   paste0(c("   top: ", " right: ", "bottom: ", "  left: "), vapply(x, format, character(1), ...))
 }
 
 #' @export
-print.marquee_box <- function(x, ...) {
-  cat("A marquee box\n")
+print.marquee_trbl <- function(x, ...) {
+  cat("A marquee trbl\n")
   cat(format(x, ...), sep = "\n")
   invisible(NULL)
 }
@@ -113,7 +115,7 @@ print.marquee_box <- function(x, ...) {
 #' @rdname style_helpers
 #' @export
 skip_inherit <- function(x) {
-  if (is_box(x)) x[] <- lapply(x[], skip_inherit)
+  if (is_trbl(x)) x[] <- lapply(x[], skip_inherit)
   else class(x) <- c("marquee_skip_inherit", class(x))
   x
 }

@@ -59,25 +59,24 @@ small shifts in the visuals when going from \code{element_text()} to
 \code{element_marquee()} as size reporting may differ between the two elements.
 }
 \examples{
-if (rlang::is_installed("ggplot2")) {
-  library(ggplot2)
-  p <- ggplot(mtcars) +
-    geom_point(aes(mpg, disp)) +
-    labs(title = "A {.red *marquee*} title\n* Look at this bullet list\n\n* great, huh?") +
-    theme_gray(base_size = 6) +
-    theme(title = element_marquee())
+\dontshow{if (utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+library(ggplot2)
+p <- ggplot(mtcars) +
+  geom_point(aes(mpg, disp)) +
+  labs(title = "A {.red *marquee*} title\n* Look at this bullet list\n\n* great, huh?") +
+  theme_gray(base_size = 6) +
+  theme(title = element_marquee())
 
-  plot(p)
+plot(p)
 
-  ggplot(mtcars) +
-    geom_histogram(aes(x = mpg)) +
-    labs(title =
+ggplot(mtcars) +
+  geom_histogram(aes(x = mpg)) +
+  labs(title =
 "I put a plot in your title so you can plot while you title
 
 ![](p)
 
 What more could you _possibly_ want?") +
-    theme(title = element_marquee())
-}
-
+  theme(title = element_marquee())
+\dontshow{\}) # examplesIf}
 }

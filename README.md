@@ -33,11 +33,6 @@ grob based on markdown text and a style that can be rendered with grid:
 readme <- paste(readLines("README.Rmd")[-seq_len(17)], collapse = "\n")
 
 library(marquee)
-#> 
-#> Attaching package: 'marquee'
-#> The following object is masked from 'package:graphics':
-#> 
-#>     box
 library(grid)
 
 fancy_style <- classic_style(

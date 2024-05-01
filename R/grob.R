@@ -541,8 +541,14 @@ makeContext.marquee_grob <- function(x) {
     x = rep(x$x, 4) + unit(c(blx, brx, trx, tlx), "bigpts"),
     y = rep(x$y, 4) + unit(c(bly, bry, try, tly), "bigpts")
   )
-  x$full_width <- max(x$x + unit(pmax(blx, brx, trx, tlx), "bigpts")) - min(x$x + unit(pmin(blx, brx, trx, tlx), "bigpts"))
-  x$full_height <- max(x$y + unit(pmax(bly, bry, try, tly), "bigpts")) - min(x$y + unit(pmin(bly, bry, try, tly), "bigpts"))
+  if (length(x$x) > 1) {
+    x$full_width <- max(x$x + unit(pmax(blx, brx, trx, tlx), "bigpts")) - min(x$x + unit(pmin(blx, brx, trx, tlx), "bigpts"))
+    x$full_height <- max(x$y + unit(pmax(bly, bry, try, tly), "bigpts")) - min(x$y + unit(pmin(bly, bry, try, tly), "bigpts"))
+  } else {
+    # If we are dealing with a single text (we often are), we can simplify this
+    x$full_width <- unit(diff(range(blx, brx, trx, tlx)), "bigpts")
+    x$full_height <- unit(diff(range(bly, bry, try, tly)), "bigpts")
+  }
 
   # Extract info about decoration (background, border, underline, etc)
   ## Figure out which blocks has backgrounds or borders
@@ -842,11 +848,21 @@ makeContent.marquee_grob <- function(x) {
     }
     ## Combine to a single grob
     inject(
-      grobTree(!!!rects, !!!images, glyphs, lines, vp = viewport(x$x[grob], x$y[grob], just = c(0, 0), angle = x$angle[grob], clip = "off"))
+      grobTree(!!!rects, !!!images, glyphs, lines, vp = viewport(x$x[grob], x$y[grob], just = c(0, 0), angle = x$angle[grob]))
     )
   })
 
-  setChildren(x, inject(gList(!!!grobs)))
+  # Combine all separate texts into one grob
+  if (length(x$images$id) == 0 && length(x$rects$id) == 0) {
+    ## If there are no rects and images we can draw directly on the main surface
+    children <- inject(gList(!!!grobs))
+  } else {
+    ## If rects/images exists they set their own clipping and we need to use a
+    ## group
+    children <- gList(groupGrob(inject(grobTree(!!!grobs))))
+  }
+
+  setChildren(x, children)
 }
 
 #' @export
