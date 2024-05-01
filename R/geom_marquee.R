@@ -72,6 +72,7 @@ geom_marquee <- function(mapping = NULL, data = NULL, stat = "identity",
   )
 }
 
+#' @export
 GeomMarquee <- new_environment(list(geom = NULL))
 
 make_marquee_geom <- function() {
