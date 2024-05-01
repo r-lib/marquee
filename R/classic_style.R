@@ -42,6 +42,6 @@ classic_style <- function(base_size = 12, body_font = "", header_font = "",
     code = style(family = code_font, size = relative(0.85), background = "#0000000A", padding = trbl(em(0.2), 0), border_radius = 3),
     u    = style(underline = TRUE),
     del  = style(strikethrough = TRUE),
-    img  = style(align = "center"),
+    img  = style(align = "center", border = NA),
   )
 }
