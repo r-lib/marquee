@@ -121,12 +121,14 @@ make_marquee_geom <- function() {
       data$vjust <- compute_just(data$vjust, data$y, data$x, data$angle)
       data$hjust <- compute_just(data$hjust, data$x, data$y, data$angle)
 
-      marquee_grob(
+      grob <- marquee_grob(
         text = lab, style = styles,
         x = data$x, y = data$y, width = data$width,
         hjust = data$hjust, vjust = data$vjust,
-        angle = data$angle, name = "geom_marquee"
+        angle = data$angle
       )
+      grob$name <- grobName(grob, "geom_marquee")
+      grob
     },
 
     draw_key = ggplot2::draw_key_label
