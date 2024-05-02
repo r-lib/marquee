@@ -3,5 +3,7 @@ pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   marquee_style: marquee_style.html
-last_built: 2024-04-30T09:15Z
+  marquee_syntax: marquee_syntax.html
+  marquee: marquee.html
+last_built: 2024-05-02T06:51Z
 
