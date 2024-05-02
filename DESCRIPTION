@@ -17,6 +17,7 @@ LinkingTo:
     cpp11
 Imports: 
     cli,
+    glue,
     grid,
     jpeg,
     png,
