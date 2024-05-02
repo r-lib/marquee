@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
   fig.align = "center",
   dpi = 300
 )
-should_eval <- getRversion() >= "3.4"
+should_eval <- getRversion() >= "4.3"
 ```
 
 ```{r setup}
