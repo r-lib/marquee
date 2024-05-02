@@ -688,38 +688,47 @@ widthDetails.marquee_grob <- function(x) {
 #' @export
 makeContent.marquee_grob <- function(x) {
   # Create the font list of unique fonts
-  font_id <- paste0(x$shape$font_path, "&", x$shape$font_index)
-  font_match <- match(font_id, unique(font_id))
-  unique_font <- !duplicated(font_id)
-  fonts <- Map(glyphFont, x$shape$font_path[unique_font], x$shape$font_index[unique_font], "", 0, "")
-  fonts <- inject(glyphFontList(!!!fonts))
+  if (nrow(x$shape) > 0) {
+    font_id <- paste0(x$shape$font_path, "&", x$shape$font_index)
+    font_match <- match(font_id, unique(font_id))
+    unique_font <- !duplicated(font_id)
+    fonts <- Map(glyphFont, x$shape$font_path[unique_font], x$shape$font_index[unique_font], "", 0, "")
+    fonts <- inject(glyphFontList(!!!fonts))
+  }
 
   # We need to make a grob for each markdown text
-  indices <- split(seq_len(nrow(x$shape)), x$shape$id)
+  ## We do it this way around because some grobs may not contain glyphs
+  indices <- vector("list", length(x$x))
+  indices[sort(unique(x$shape$id))] <- split(seq_len(nrow(x$shape)), x$shape$id)
 
-  grobs <- lapply(seq_along(indices), function(grob) {
+  grobs <- lapply(seq_along(x$x), function(grob) {
     ## Construct glyph grob
     i <- indices[[grob]]
-    glyphs <- glyphInfo(
-      id = x$shape$index[i],
-      x = x$shape$x_offset[i],
-      y = x$shape$y_offset[i],
-      font = font_match[i],
-      size = x$shape$font_size[i],
-      fontList = fonts,
-      width = x$widths[grob],
-      height = -x$heights[grob],
-      hAnchor = glyphAnchor(0, "left"),
-      vAnchor = glyphAnchor(0, "bottom"),
-      col = x$shape$col[i]
-    )
-    glyphs <- glyphGrob(
-      glyphs,
-      x = 0,
-      y = 0,
-      hjust = 0,
-      vjust = 0
-    )
+    if (length(i) > 0) {
+      glyphs <- glyphInfo(
+        id = x$shape$index[i],
+        x = x$shape$x_offset[i],
+        y = x$shape$y_offset[i],
+        font = font_match[i],
+        size = x$shape$font_size[i],
+        fontList = fonts,
+        width = x$widths[grob],
+        height = -x$heights[grob],
+        hAnchor = glyphAnchor(0, "left"),
+        vAnchor = glyphAnchor(0, "bottom"),
+        col = x$shape$col[i]
+      )
+      glyphs <- glyphGrob(
+        glyphs,
+        x = 0,
+        y = 0,
+        hjust = 0,
+        vjust = 0
+      )
+    } else {
+      glyphs <- NULL
+    }
+
     ## Construct span and block rects
     rects <- lapply(which(x$rects$id == grob), function(i) {
       ### If the same stroke is around all sides we can just apply it to the rect
