@@ -537,6 +537,10 @@ makeContext.marquee_grob <- function(x) {
   tlx <- x0*crad - y1*srad
   tly <- x0*srad + y1*crad
 
+  x$bbox <- list(
+    x = rep(x$x, 4) + unit(c(blx, brx, trx, tlx), "bigpts"),
+    y = rep(x$y, 4) + unit(c(bly, bry, try, tly), "bigpts")
+  )
   if (length(x$x) > 1) {
     x$full_width <- max(x$x + unit(pmax(blx, brx, trx, tlx), "bigpts")) - min(x$x + unit(pmin(blx, brx, trx, tlx), "bigpts"))
     x$full_height <- max(x$y + unit(pmax(bly, bry, try, tly), "bigpts")) - min(x$y + unit(pmin(bly, bry, try, tly), "bigpts"))
@@ -683,6 +687,14 @@ heightDetails.marquee_grob <- function(x) {
 #' @export
 widthDetails.marquee_grob <- function(x) {
   x$full_width
+}
+#' @export
+xDetails.marquee_grob <- function(x, theta) {
+  xDetails(structure(x$bbox, class = "points"), theta)
+}
+#' @export
+yDetails.marquee_grob <- function(x, theta) {
+  yDetails(structure(x$bbox, class = "points"), theta)
 }
 
 #' @export
