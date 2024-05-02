@@ -115,7 +115,7 @@ in a very different and more low-level way.</p>
 <span><span class="va">grob</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="va">grob</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-2-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-3-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>From this small example you can see that markdown behaves as you’d
 expect. We have emphasis, strong, underline, and strikethrough, and
 stuff like headings etc. In fact, the full markdown (CommonMark) spec is
@@ -143,7 +143,7 @@ to create a completely new style:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text</span>, <span class="va">new_style</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-3-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-4-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>Besides standard markdown, marquee also allows you to create custom
 span classes. These span classes can be styled to anything, but marquee
 contains a nifty feature where, if the class matches a recognized color
@@ -161,14 +161,14 @@ name or hex-code, it will be automatically coloured.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_custom</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-4-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-5-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>If you provide a styling for the custom class it takes precedence
 over any matching color name</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_custom</span>, <span class="fu"><a href="../reference/style_set.html">modify_style</a></span><span class="op">(</span><span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"red"</span>, tracking <span class="op">=</span> <span class="fl">400</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-5-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-6-1.png" width="98%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="use-in-ggplot2">Use in ggplot2<a class="anchor" aria-label="anchor" href="#use-in-ggplot2"></a>
@@ -196,7 +196,7 @@ much more capable:</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>style <span class="op">=</span> <span class="va">fancy_font</span>, size <span class="op">=</span> <span class="fl">2.5</span>, family <span class="op">=</span> <span class="st">"spectral"</span><span class="op">)</span> <span class="co"># You may not have this font</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-6-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-7-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>However, the main use will probably be to mix in italicized, bold, or
 colored fonts in labels, which marquee makes very easy</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -221,7 +221,7 @@ colored fonts in labels, which marquee makes very easy</p>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-7-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-8-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>Another use of the geom, where rich text may come more into play, is
 in annotations. Let’s make a textbox style and add some lorem ipsum to
 our plot</p>
@@ -235,7 +235,7 @@ our plot</p>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="va">GeomMarquee</span><span class="op">$</span><span class="va">geom</span>, </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="va">GeomMarquee</span>, </span>
 <span>    label <span class="op">=</span> <span class="va">md_text</span>, </span>
 <span>    x <span class="op">=</span> <span class="fl">450</span>, </span>
 <span>    y <span class="op">=</span> <span class="fl">35</span>, </span>
@@ -246,7 +246,7 @@ our plot</p>
 <span>    hjust <span class="op">=</span> <span class="st">"right"</span>,</span>
 <span>    vjust <span class="op">=</span> <span class="st">"top"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-8-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-9-1.png" width="98%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="the-marquee-element">The marquee element<a class="anchor" aria-label="anchor" href="#the-marquee-element"></a>
@@ -263,7 +263,7 @@ text.</p>
 <span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="va">md_text</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="../reference/element_marquee.html">element_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">9</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-9-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-10-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>As can be seen, the defaults will let the text run for as long as it
 needs without doing any text wrapping. This is because it makes
 alignment behave in the same way as <code><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text()</a></code>.
@@ -277,7 +277,7 @@ value you wish.</p>
 <span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="va">md_text</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="../reference/element_marquee.html">element_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">9</span>, width <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-10-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-11-1.png" width="98%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -304,7 +304,7 @@ image.</p>
 <span><span class="st">laborum."</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_fig</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-11-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-12-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>Compare that to</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">md_text_fig2</span> <span class="op">&lt;-</span> </span>
@@ -320,7 +320,7 @@ image.</p>
 <span><span class="st">laborum."</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_fig2</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-12-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-13-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>However, marquee has a pretty unique trick up it’s sleeve compared to
 other markdown formats. It doesn’t just accept paths to images — it also
 accepts R graphic objects (currently grid grobs, ggplot2 plots and
@@ -344,7 +344,7 @@ patchwork plots). It all works as you’d expect:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_plot</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-13-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-14-1.png" width="98%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="wrapping-up">Wrapping up<a class="anchor" aria-label="anchor" href="#wrapping-up"></a>
