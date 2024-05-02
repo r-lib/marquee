@@ -28,6 +28,7 @@ Suggests:
     ggplot2,
     knitr,
     patchwork,
+    ragg,
     rmarkdown,
     rsvg
 Remotes: 

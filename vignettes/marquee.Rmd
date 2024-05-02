@@ -11,7 +11,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  dev.args = list(type = "cairo"),
+  dev = "ragg_png",
   fig.width = 6,
   out.width = "98%",
   fig.align = "center",
