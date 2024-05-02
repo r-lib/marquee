@@ -72,7 +72,15 @@ geom_marquee <- function(mapping = NULL, data = NULL, stat = "identity",
   )
 }
 
+#' Geom class for geom_marquee
+#'
+#' This environment contains the Geom needed for [geom_marquee()] in the `geom`
+#' variable. It is set up like this to avoid ggplot2 to be a hard dependency of
+#' marquee
+#'
 #' @export
+#'
+#' @keywords internal
 GeomMarquee <- new_environment(list(geom = NULL))
 
 make_marquee_geom <- function() {
