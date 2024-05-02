@@ -66,7 +66,7 @@ geom_marquee <- function(mapping = NULL, data = NULL, stat = "identity",
   check_installed("ggplot2")
 
   ggplot2::layer(
-    data = data, mapping = mapping, stat = stat, geom = GeomMarquee$geom,
+    data = data, mapping = mapping, stat = stat, geom = GeomMarquee,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
     params = list2(size.unit = size.unit, na.rm = na.rm, ...)
   )
@@ -78,13 +78,25 @@ geom_marquee <- function(mapping = NULL, data = NULL, stat = "identity",
 #' variable. It is set up like this to avoid ggplot2 to be a hard dependency of
 #' marquee
 #'
-#' @export
+#' @usage
+#' GeomMarquee
+#'
+#' @name GeomMarquee
+#' @aliases GeomMarquee
+#' @export GeomMarquee
 #'
 #' @keywords internal
-GeomMarquee <- new_environment(list(geom = NULL))
+#'
+NULL
+
+on_load(
+  makeActiveBinding("GeomMarquee", function() geom_env$geom, environment(geom_marquee))
+)
+
+geom_env <- new_environment(list(geom = NULL))
 
 make_marquee_geom <- function() {
-  GeomMarquee$geom <- ggplot2::ggproto(
+  geom_env$geom <- ggplot2::ggproto(
     "GeomMarquee", ggplot2::Geom,
 
     required_aes = c("x", "y", "label"),
