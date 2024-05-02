@@ -6,6 +6,8 @@
 \alias{marquee-package}
 \title{marquee: Markdown Parser and Renderer for R Graphics}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Provides the mean to parse and render markdown text with grid along with facilities to define the styling of the text.
 }
 \seealso{
