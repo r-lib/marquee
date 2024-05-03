@@ -5,9 +5,9 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/thomasp85/marquee/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/thomasp85/marquee/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/r-lib/marquee/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/marquee/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/thomasp85/marquee/branch/main/graph/badge.svg)](https://app.codecov.io/gh/thomasp85/marquee?branch=main)
+coverage](https://codecov.io/gh/r-lib/marquee/branch/main/graph/badge.svg)](https://app.codecov.io/gh/r-lib/marquee?branch=main)
 <!-- badges: end -->
 
 marquee is a markdown parser and renderer for the R graphics engine. It
@@ -20,7 +20,7 @@ marquee is not yet on CRAN. In the meantime you can install the
 development version like so:
 
 ``` r
-pak::pak("thomasp85/marquee")
+pak::pak("r-lib/marquee")
 ```
 
 ## Examples
