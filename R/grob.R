@@ -336,7 +336,7 @@ makeContext.marquee_grob <- function(x) {
     align = x$text$align,
     hjust = 0,
     vjust = 1,
-    max_width = rep(convertWidth(unit(widths, "bigpts"), "inches", TRUE), blocks$lengths),
+    max_width = rep(convertWidth(unit(widths, "bigpts"), "inches", TRUE), x$blocks$length),
     tracking = tracking,
     indent = convertWidth(unit(x$text$indent, "bigpts"), "inches", TRUE),
     hanging = convertWidth(unit(x$text$hanging, "bigpts"), "inches", TRUE),
@@ -422,7 +422,7 @@ makeContext.marquee_grob <- function(x) {
     ### Init height as sum of top and bottom margin+padding
     heights[i] <- x$text$margin_top[j] + x$text$padding_top[j] + x$text$padding_bottom[j] + x$text$margin_bottom[j]
     ### If block has content of it's own, add it to the height
-    if (x$text$text[j] != "" || blocks$lengths[i] != 1) {
+    if (x$text$text[j] != "" || x$blocks$length[i] != 1) {
       heights[i] <- heights[i] + shape$metrics$height[i]
     }
 
