@@ -13,8 +13,9 @@ Provides the mean to parse and render markdown text with grid along with facilit
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/thomasp85/marquee}
-  \item Report bugs at \url{https://github.com/thomasp85/marquee/issues}
+  \item \url{https://marquee.r-lib.org}
+  \item \url{https://github.com/r-lib/marquee}
+  \item Report bugs at \url{https://github.com/r-lib/marquee/issues}
 }
 
 }
@@ -24,6 +25,11 @@ Useful links:
 Authors:
 \itemize{
   \item Martin Mitáš (Author of MD4C)
+}
+
+Other contributors:
+\itemize{
+  \item Posit Software, PBC [copyright holder, funder]
 }
 
 }

@@ -5,7 +5,8 @@ Authors@R: c(
     person("Thomas Lin", "Pedersen", , "thomasp85@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5147-4711")),
     person("Martin", "Mitáš", role = "aut",
-           comment = "Author of MD4C")
+           comment = "Author of MD4C"),
+    person("Posit Software, PBC", role = c("cph", "fnd"))
   )
 Description: Provides the mean to parse and render markdown text with grid along
     with facilities to define the styling of the text.
@@ -35,6 +36,7 @@ Suggests:
 Remotes: 
     r-lib/systemfonts,
     r-lib/textshaping
-URL: https://github.com/thomasp85/marquee
-BugReports: https://github.com/thomasp85/marquee/issues
+URL: https://marquee.r-lib.org, https://github.com/r-lib/marquee
+BugReports: https://github.com/r-lib/marquee/issues
+Config/Needs/website: tidyverse/tidytemplate
 VignetteBuilder: knitr

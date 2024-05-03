@@ -1,0 +1,11 @@
+url: https://marquee.r-lib.org
+
+development:
+  mode: auto
+
+template:
+  bootstrap: 5
+  package: tidytemplate
+  includes:
+    in_header: |
+      <script defer data-domain="marquee.r-lib.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>
