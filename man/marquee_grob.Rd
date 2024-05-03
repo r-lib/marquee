@@ -86,10 +86,10 @@ padding.
 These elements are rendered as an empty block. The standard style sets a
 bottom border size and no size for the other sides.
 
-\strong{Bottom margin of last child elements}
+\strong{Margin collapsing}
 
-The bottom margin of the last child is automatically set to 0 to ensure that
-margins doesn't accumulate as you exits nested elements.
+Margin calculations follows the margin collapsing rules of HTML. Read more
+about these at \href{https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_box_model/Mastering_margin_collapsing}{mdn}
 
 \strong{Underline and strikethrough}
 

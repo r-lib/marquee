@@ -54,10 +54,10 @@
 #' These elements are rendered as an empty block. The standard style sets a
 #' bottom border size and no size for the other sides.
 #'
-#' **Bottom margin of last child elements**
+#' **Margin collapsing**
 #'
-#' The bottom margin of the last child is automatically set to 0 to ensure that
-#' margins doesn't accumulate as you exits nested elements.
+#' Margin calculations follows the margin collapsing rules of HTML. Read more
+#' about these at [mdn](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_box_model/Mastering_margin_collapsing)
 #'
 #' **Underline and strikethrough**
 #'
@@ -141,6 +141,20 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE, x = 
   env <- caller_env()
   images$grobs <- images_as_grobs(images$path, env)
 
+  # Determine location of blocks, their indent and location in overall parsed text
+  bl <- rle(parsed$block)$lengths
+  bs <- cumsum(c(0, bl[-length(bl)])) + 1
+  blocks <- list(length = bl, start = bs, indent = parsed$indentation[bs])
+
+  # Perform margin collapsing
+  collapsed_margins <- list(top = parsed$margin_top, bottom = parsed$margin_bottom)
+  for (root in blocks$start[blocks$indent == 1]) {
+    block_tree <- collect_children(root, blocks$start, parsed$ends, parsed$indentation)
+    collapsed_margins <- set_margins(block_tree, collapsed_margins)
+  }
+  parsed$margin_top <- collapsed_margins$top
+  parsed$margin_bottom <- collapsed_margins$bottom
+
   # Handle bullets
   bullets <- place_bullets(
     parsed$type,
@@ -191,8 +205,8 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE, x = 
   }
 
   grob <- gTree(
-    text = parsed, bullets = bullets, images = images, x = rep_along(text, x),
-    y = rep_along(text, y), width = rep_along(text, width),
+    text = parsed, blocks = blocks, bullets = bullets, images = images,
+    x = rep_along(text, x), y = rep_along(text, y), width = rep_along(text, width),
     hjust = rep_along(text, hjust), vjust = rep_along(text, vjust),
     angle = rep_along(text, angle), vp = vp, name = name, cl = "marquee_grob"
   )
@@ -215,21 +229,15 @@ makeContext.marquee_grob <- function(x) {
     convertHeight(x$width, "bigpts", TRUE)
   )
 
-  # Determine location of blocks, their indent and location in overall parsed text
-  blocks <- rle(x$text$block)
-  block_starts <- cumsum(c(0, blocks$lengths[-length(blocks$lengths)])) + 1
-  block_id <- blocks$values
-  block_indent <- x$text$indentation[block_starts]
-
   # Calculate width of each block
-  widths <- rep(NA, length(block_id))
+  widths <- rep(NA, length(x$blocks$start))
   left_offset <- widths
-  indent_stack <- rep(NA, max(block_indent))
+  indent_stack <- rep(NA, max(x$blocks$indent))
 
   ## Iterate over blocks, calculate offset and width based on parent + margin/padding
-  for (i in seq_along(block_id)) {
-    j <- block_starts[i]
-    indent <- block_indent[i]
+  for (i in seq_along(x$blocks$start)) {
+    j <- x$blocks$start[i]
+    indent <- x$blocks$indent[i]
     if (indent == 1) {
       ### This is the body tag. start fresh
       widths[i] <- width[x$text$id[j]] - x$text$margin_left[j] - x$text$padding_left[j] - x$text$padding_right[j] - x$text$margin_right[j]
@@ -339,19 +347,19 @@ makeContext.marquee_grob <- function(x) {
 
   # If any widths are not defined we grab the text widths from the shaping and start again
   if (anyNA(widths)) {
-    added_width <- rowSums(x$text[block_starts, c("padding_left", "padding_right", "margin_left", "margin_right")])
+    added_width <- rowSums(x$text[x$blocks$start, c("padding_left", "padding_right", "margin_left", "margin_right")])
     ## We go back from the most indented to the least and compound the widths
-    for (i in rev(seq_len(max(block_indent)))) {
-      blocks <- which(block_indent == i)
+    for (i in rev(seq_len(max(x$blocks$indent)))) {
+      blocks <- which(x$blocks$indent == i)
       widths[blocks] <- vapply(blocks, function(j) {
-        k <- which(block_starts > block_starts[j] & block_starts <= x$text$ends[block_starts[j]])
+        k <- which(x$blocks$start > x$blocks$start[j] & x$blocks$start <= x$text$ends[x$blocks$start[j]])
         max(shape$metrics$width[j], widths[j], widths[k], na.rm = TRUE) + added_width[j]
       }, numeric(1))
     }
     if (anyNA(widths)) {
       cli::cli_abort("Could not resolve width of text")
     }
-    x$width <- unit(widths[block_indent == 1], "bigpts")
+    x$width <- unit(widths[x$blocks$indent == 1], "bigpts")
     ## Restart evaluation
     return(makeContext.marquee_grob(x))
   }
@@ -362,7 +370,7 @@ makeContext.marquee_grob <- function(x) {
   bshape <- x$bullets$shape
 
   # Init height structures
-  heights <- rep(NA, length(block_id))
+  heights <- rep(NA, length(x$blocks$start))
   top_offset <- heights
   cur_offset <- 0
 
@@ -374,22 +382,17 @@ makeContext.marquee_grob <- function(x) {
   first_line <- ink_left
   last_line <- ink_left
 
-  # Remove bottom-margin for blocks that are last child
-  block_last <- block_is_last(block_indent, x$text$id[block_starts])
-  margin_bottom <- x$text$margin_bottom[block_starts]
-  margin_bottom[block_last] <- 0
-
   # Init bullet info
   bullet_blocks <- x$text$block[x$bullets$placement]
-  y_adjustment <- rep(0, length(block_id))
+  y_adjustment <- rep(0, length(x$blocks$start))
   y_bullet_adjustment <- rep(0, length(bullet_blocks))
   x_bullet_adjustment <- rep(0, length(bullet_blocks))
 
   # Position blocks underneath each other, calculate justification info, and position bullets
-  for (i in seq_along(block_id)) {
+  for (i in seq_along(x$blocks$start)) {
     ## j is the location in x$text where style is given
-    j <- block_starts[i]
-    indent <- block_indent[i]
+    j <- x$blocks$start[i]
+    indent <- x$blocks$indent[i]
 
     ## Position bullet if attached to this block
     bullet_ind <- which(i == bullet_blocks)
@@ -417,7 +420,7 @@ makeContext.marquee_grob <- function(x) {
     ### Record offset based on top padding and margin
     top_offset[i] <- cur_offset - x$text$margin_top[j] - x$text$padding_top[j]
     ### Init height as sum of top and bottom margin+padding
-    heights[i] <- x$text$margin_top[j] + x$text$padding_top[j] + x$text$padding_bottom[j] + margin_bottom[i]
+    heights[i] <- x$text$margin_top[j] + x$text$padding_top[j] + x$text$padding_bottom[j] + x$text$margin_bottom[j]
     ### If block has content of it's own, add it to the height
     if (x$text$text[j] != "" || blocks$lengths[i] != 1) {
       heights[i] <- heights[i] + shape$metrics$height[i]
@@ -431,15 +434,15 @@ makeContext.marquee_grob <- function(x) {
       heights[indent_stack[k]] <- heights[indent_stack[k]] + heights[i]
     }
 
-    next_indent <- if (i == length(block_id)) 1 else block_indent[i + 1]
+    next_indent <- if (i == length(x$blocks$start)) 1 else x$blocks$indent[i + 1]
     if (indent > next_indent) {
       ### If exiting a block, add parent blocks bottom padding + margin to offset
       for (k in next_indent + seq_len(indent - next_indent) - 1) {
-        cur_offset <- cur_offset - x$text$padding_bottom[block_starts[indent_stack[k]]] - margin_bottom[indent_stack[k]]
+        cur_offset <- cur_offset - x$text$padding_bottom[x$blocks$start[indent_stack[k]]] - x$text$margin_bottom[x$blocks$start[indent_stack[k]]]
       }
     } else if (indent < next_indent) {
       ### If block has children, move up offset so it doesn't include bottom margin and padding
-      cur_offset <- cur_offset + x$text$padding_bottom[j] + margin_bottom[i]
+      cur_offset <- cur_offset + x$text$padding_bottom[j] + x$text$margin_bottom[j]
     }
     indent_stack[indent] <- i
 
@@ -468,12 +471,12 @@ makeContext.marquee_grob <- function(x) {
 
   # Store info in object
   x$shape <- shape$shape
-  x$widths <- widths[block_indent == 1]
-  x$heights <- heights[block_indent == 1]
+  x$widths <- widths[x$blocks$indent == 1]
+  x$heights <- heights[x$blocks$indent == 1]
   ## Adjust y so it is zero-justified
   x$shape$y_offset <- x$shape$y_offset + x$heights[x$shape$id]
   bshape$shape$y_offset <- bshape$shape$y_offset + x$heights[bshape$shape$id]
-  top_offset <- top_offset + x$heights[x$text$id[block_starts]]
+  top_offset <- top_offset + x$heights[x$text$id[x$blocks$start]]
   ## Combine main text with bullets
   bshape$shape$string_id <- bshape$shape$string_id + max(x$shape$string_id)
   x$shape <- rbind(x$shape, bshape$shape)
@@ -516,8 +519,8 @@ makeContext.marquee_grob <- function(x) {
   # Perform justification
   x$shape$x_offset <- x$shape$x_offset - (x$widths * x$hjust)[x$shape$id]
   x$shape$y_offset <- x$shape$y_offset - (x$heights * x$vjust)[x$shape$id]
-  left_offset <- left_offset - (x$widths * x$hjust)[x$text$id[block_starts]]
-  top_offset <- top_offset - (x$heights * x$vjust)[x$text$id[block_starts]]
+  left_offset <- left_offset - (x$widths * x$hjust)[x$text$id[x$blocks$start]]
+  top_offset <- top_offset - (x$heights * x$vjust)[x$text$id[x$blocks$start]]
 
   # Precalculate full sizing of grob
   x0 <- -x$hjust * x$widths
@@ -561,24 +564,24 @@ makeContext.marquee_grob <- function(x) {
      )
 
   ## Handle block backgrounds
-  block_bg <- has_deco[block_starts]
+  block_bg <- has_deco[x$blocks$start]
   block_rects <- list(
-    id = x$text$id[block_starts[block_bg]],
-    x = left_offset[block_bg] - x$text$padding_left[block_starts[block_bg]],
-    y = top_offset[block_bg] + x$text$padding_top[block_starts[block_bg]],
-    width = widths[block_bg] + x$text$padding_left[block_starts[block_bg]] + x$text$padding_right[block_starts[block_bg]],
-    height = heights[block_bg] - x$text$margin_top[block_starts[block_bg]] - margin_bottom[block_bg],
-    fill = x$text$background[block_starts[block_bg]],
-    col = x$text$border[block_starts[block_bg]],
-    r = x$text$border_radius[block_starts[block_bg]],
-    left = x$text$border_size_left[block_starts[block_bg]],
-    right = x$text$border_size_right[block_starts[block_bg]],
-    top = x$text$border_size_top[block_starts[block_bg]],
-    bottom = x$text$border_size_bottom[block_starts[block_bg]]
+    id = x$text$id[x$blocks$start[block_bg]],
+    x = left_offset[block_bg] - x$text$padding_left[x$blocks$start[block_bg]],
+    y = top_offset[block_bg] + x$text$padding_top[x$blocks$start[block_bg]],
+    width = widths[block_bg] + x$text$padding_left[x$blocks$start[block_bg]] + x$text$padding_right[x$blocks$start[block_bg]],
+    height = heights[block_bg] - x$text$margin_top[x$blocks$start[block_bg]] - x$text$margin_bottom[x$blocks$start[block_bg]],
+    fill = x$text$background[x$blocks$start[block_bg]],
+    col = x$text$border[x$blocks$start[block_bg]],
+    r = x$text$border_radius[x$blocks$start[block_bg]],
+    left = x$text$border_size_left[x$blocks$start[block_bg]],
+    right = x$text$border_size_right[x$blocks$start[block_bg]],
+    top = x$text$border_size_top[x$blocks$start[block_bg]],
+    bottom = x$text$border_size_bottom[x$blocks$start[block_bg]]
   )
 
   ## Handle span backgrounds
-  span_bg <- which(has_deco & !seq_along(has_deco) %in% block_starts)
+  span_bg <- which(has_deco & !seq_along(has_deco) %in% x$blocks$start)
   ### Consecutive spans with same bg/border are merged
   span_bg_may_merge <- which(span_bg[-1] - span_bg[-length(span_bg)] == 1)
   span_bg <- as.list(span_bg)
@@ -875,3 +878,46 @@ makeContent.marquee_grob <- function(x) {
 
 #' @export
 makeContent.marquee_precalculated <- function(x) x
+
+collect_children <- function(elem, block_starts, block_ends, block_indent) {
+  if (elem == block_ends[elem]) {
+    children <- list()
+  } else {
+    children <- block_starts[block_starts > elem & block_starts <= block_ends[elem] & block_indent[block_starts] == block_indent[elem] + 1]
+    children <- lapply(children, collect_children, block_starts = block_starts, block_ends = block_ends, block_indent = block_indent)
+  }
+  list(
+    element = elem,
+    children = children
+  )
+}
+get_first <- function(tree) {
+  if (length(tree$children) != 0) {
+    c(tree$element, get_first(tree$children[[1]]))
+  } else {
+    tree$element
+  }
+}
+get_last <- function(tree) {
+  if (length(tree$children) != 0) {
+    c(tree$element, get_last(tree$children[[length(tree$children)]]))
+  } else {
+    tree$element
+  }
+}
+set_margins <- function(tree, margins) {
+  tops <- get_first(tree)
+  margins$top[tops[1]] <- max(margins$top[tops])
+  margins$top[tops[-1]] <- 0
+  bottoms <- get_last(tree)
+  margins$bottom[bottoms[1]] <- max(margins$bottom[bottoms])
+  margins$bottom[bottoms[-1]] <- 0
+  for (child in tree$children) {
+    margins <- set_margins(child, margins)
+  }
+  for (i in seq_along(tree$children)[-1]) {
+    margins$bottom[tree$children[[i-1]]$element] <- max(margins$bottom[tree$children[[i-1]]$element], margins$top[tree$children[[i]]$element])
+    margins$top[tree$children[[i]]$element] <- 0
+  }
+  margins
+}
