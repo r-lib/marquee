@@ -73,6 +73,7 @@ further information on how rendering proceeds.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">marquee_grob</span><span class="op">(</span></span>
 <span>  <span class="va">text</span>,</span>
 <span>  <span class="va">style</span>,</span>
+<span>  ignore_html <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  x <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  y <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -95,6 +96,10 @@ by <code><a href="marquee_parse.html">marquee_parse()</a></code></p></dd>
 <dt>style</dt>
 <dd><p>A style set such as <code><a href="classic_style.html">classic_style()</a></code> that defines how the text
 should be rendered</p></dd>
+
+
+<dt>ignore_html</dt>
+<dd><p>Should HTML code be removed from the output</p></dd>
 
 
 <dt>x, y</dt>
