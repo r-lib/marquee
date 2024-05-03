@@ -6,7 +6,7 @@
 \usage{
 marquee_grob(
   text,
-  style,
+  style = classic_style(),
   ignore_html = TRUE,
   x = 0,
   y = 1,

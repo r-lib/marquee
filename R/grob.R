@@ -114,8 +114,8 @@
 #' first or last line respectively.
 #'
 #' @export
-marquee_grob <- function(text, style, ignore_html = TRUE, x = 0, y = 1,
-                         width = NULL, default.units = "npc", hjust = "left",
+marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE, x = 0,
+                         y = 1, width = NULL, default.units = "npc", hjust = "left",
                          vjust = "top", angle = 0, vp = NULL, name = NULL) {
   parsed <- if (!is_parsed(text)) marquee_parse(text, style, ignore_html) else text
 

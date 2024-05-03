@@ -4,7 +4,7 @@
 \alias{marquee_parse}
 \title{Parse a text as marquee}
 \usage{
-marquee_parse(text, style, ignore_html = TRUE)
+marquee_parse(text, style = classic_style(), ignore_html = TRUE)
 }
 \arguments{
 \item{text}{A character string. The core quality of markdown is that any text

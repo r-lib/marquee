@@ -148,7 +148,7 @@
 #' @examples
 #' marquee_parse("# Header of the example\nSome body text", classic_style())
 #'
-marquee_parse <- function(text, style, ignore_html = TRUE) {
+marquee_parse <- function(text, style = classic_style(), ignore_html = TRUE) {
   check_character(text)
   if (!is_style_set(style)) {
     cli::cli_abort("{.arg style} must be a style set")
