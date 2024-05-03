@@ -16,7 +16,7 @@ images_as_grobs <- function(paths, env = caller_env()) {
       )
     } else if (is_svg[i]) {
       check_installed("rsvg")
-      svg <- charToRaw(paste0(trimws(readLines(paths[i])), collapse = ""))
+      svg <- suppressWarnings(charToRaw(paste0(trimws(readLines(paths[i])), collapse = "")))
       obj <- try_fetch(
         rsvg::rsvg_nativeraster(svg, width = 500),
         error = function(...) NULL
