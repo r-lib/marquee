@@ -368,6 +368,7 @@ static int text_callback(MD_TEXTTYPE type, const MD_CHAR* text, MD_SIZE size, vo
   case MD_TEXT_BR:        append_text(ud, "\n"); break;
   case MD_TEXT_SOFTBR:    append_text(ud, " "); break;
   case MD_TEXT_ENTITY:    append_text(ud, entity_to_unicode(std::string(text, size))); break;
+  case MD_TEXT_HTML:      return 0;
   default:                append_text(ud, std::string(text, size)); break;
   }
 
@@ -375,12 +376,12 @@ static int text_callback(MD_TEXTTYPE type, const MD_CHAR* text, MD_SIZE size, vo
 }
 
 [[cpp11::register]]
-cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list> styles) {
+cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list> styles, cpp11::logicals ignore_html) {
   MARQUEE_DATA userdata(styles[0]);
 
   MD_PARSER marquee_parser = {
     0,
-    MD_FLAG_NOHTML | MD_FLAG_STRIKETHROUGH | MD_FLAG_UNDERLINE,
+    MD_FLAG_STRIKETHROUGH | MD_FLAG_UNDERLINE,
     enter_block_callback,
     leave_block_callback,
     enter_span_callback,
@@ -393,6 +394,7 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
   std::vector<double> rem_size;
   for (R_xlen_t i = 0; i < text.size(); ++i) {
     userdata.current_id = i + 1;
+    marquee_parser.flags = ignore_html[i] ? MD_FLAG_STRIKETHROUGH | MD_FLAG_UNDERLINE : MD_FLAG_NOHTML | MD_FLAG_STRIKETHROUGH | MD_FLAG_UNDERLINE;
     userdata.style_stack = std::stack<cpp11::list>();
     if (i != 0) userdata.defined_styles = create_style_map(styles[i]);
     userdata.style_stack.push(userdata.defined_styles.find("base")->second);

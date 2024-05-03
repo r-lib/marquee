@@ -6,10 +6,10 @@
 #include <R_ext/Visibility.h>
 
 // marquee.cpp
-cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list> styles);
-extern "C" SEXP _marquee_marquee_c(SEXP text, SEXP styles) {
+cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list> styles, cpp11::logicals ignore_html);
+extern "C" SEXP _marquee_marquee_c(SEXP text, SEXP styles, SEXP ignore_html) {
   BEGIN_CPP11
-    return cpp11::as_sexp(marquee_c(cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(text), cpp11::as_cpp<cpp11::decay_t<cpp11::list_of<cpp11::list>>>(styles)));
+    return cpp11::as_sexp(marquee_c(cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(text), cpp11::as_cpp<cpp11::decay_t<cpp11::list_of<cpp11::list>>>(styles), cpp11::as_cpp<cpp11::decay_t<cpp11::logicals>>(ignore_html)));
   END_CPP11
 }
 // marquee.cpp
@@ -30,7 +30,7 @@ extern "C" SEXP _marquee_block_is_last(SEXP indentation, SEXP id) {
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
     {"_marquee_block_is_last", (DL_FUNC) &_marquee_block_is_last, 2},
-    {"_marquee_marquee_c",     (DL_FUNC) &_marquee_marquee_c,     2},
+    {"_marquee_marquee_c",     (DL_FUNC) &_marquee_marquee_c,     3},
     {"_marquee_place_bullets", (DL_FUNC) &_marquee_place_bullets, 5},
     {NULL, NULL, 0}
 };

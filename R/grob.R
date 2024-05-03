@@ -8,8 +8,7 @@
 #'
 #' @param text Either a character vector or a `marquee_parsed` object as created
 #' by [marquee_parse()]
-#' @param style A style set such as [classic_style()] that defines how the text
-#' should be rendered
+#' @inheritParams marquee_parse
 #' @param x,y The location of the markdown text in the graphics. If numeric it
 #' will be converted to units using `default.units`
 #' @param width The width of each markdown text. If numeric it will be converted
@@ -115,10 +114,10 @@
 #' first or last line respectively.
 #'
 #' @export
-marquee_grob <- function(text, style, x = 0, y = 1, width = NULL, default.units = "npc",
-                         hjust = "left", vjust = "top", angle = 0, vp = NULL,
-                         name = NULL) {
-  parsed <- if (!is_parsed(text)) marquee_parse(text, style) else text
+marquee_grob <- function(text, style, ignore_html = TRUE, x = 0, y = 1,
+                         width = NULL, default.units = "npc", hjust = "left",
+                         vjust = "top", angle = 0, vp = NULL, name = NULL) {
+  parsed <- if (!is_parsed(text)) marquee_parse(text, style, ignore_html) else text
 
   # Set bottom margin for tight list `li` elements to match the lineheight
   is_tight <- parsed$type == "li" & parsed$tight

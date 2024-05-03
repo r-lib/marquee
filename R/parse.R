@@ -9,6 +9,7 @@
 #' is valid markdown so there is no restrictions on the content
 #' @param style A style set such as [classic_style()] that defines how the text
 #' should be rendered
+#' @param ignore_html Should HTML code be removed from the output
 #'
 #' @return A data frame describing the various tokens of the text and the style
 #' to apply to them. The output is mainly meant for programmatic consumption
@@ -147,13 +148,15 @@
 #' @examples
 #' marquee_parse("# Header of the example\nSome body text", classic_style())
 #'
-marquee_parse <- function(text, style) {
+marquee_parse <- function(text, style, ignore_html = TRUE) {
   check_character(text)
   if (!is_style_set(style)) {
     cli::cli_abort("{.arg style} must be a style set")
   }
   style <- vctrs::vec_recycle(style, length(text))
-  parsed <- marquee_c(text, style)
+  ignore_html <- as.logical(vctrs::vec_recycle(ignore_html, length(text)))
+  ignore_html[is.na(ignore_html)] <- TRUE
+  parsed <- marquee_c(text, style, ignore_html)
   # Remove terminal line end from code blocks
   parsed$text[parsed$type == "cb"] <- sub("\n$", "", parsed$text[parsed$type == "cb"])
   class(parsed) <- c("marquee_parsed", class(parsed))

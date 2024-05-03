@@ -7,6 +7,7 @@
 marquee_grob(
   text,
   style,
+  ignore_html = TRUE,
   x = 0,
   y = 1,
   width = NULL,
@@ -24,6 +25,8 @@ by \code{\link[=marquee_parse]{marquee_parse()}}}
 
 \item{style}{A style set such as \code{\link[=classic_style]{classic_style()}} that defines how the text
 should be rendered}
+
+\item{ignore_html}{Should HTML code be removed from the output}
 
 \item{x, y}{The location of the markdown text in the graphics. If numeric it
 will be converted to units using \code{default.units}}

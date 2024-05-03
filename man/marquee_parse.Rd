@@ -4,7 +4,7 @@
 \alias{marquee_parse}
 \title{Parse a text as marquee}
 \usage{
-marquee_parse(text, style)
+marquee_parse(text, style, ignore_html = TRUE)
 }
 \arguments{
 \item{text}{A character string. The core quality of markdown is that any text
@@ -12,6 +12,8 @@ is valid markdown so there is no restrictions on the content}
 
 \item{style}{A style set such as \code{\link[=classic_style]{classic_style()}} that defines how the text
 should be rendered}
+
+\item{ignore_html}{Should HTML code be removed from the output}
 }
 \value{
 A data frame describing the various tokens of the text and the style
