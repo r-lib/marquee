@@ -32,7 +32,8 @@ Suggests:
     patchwork,
     ragg,
     rmarkdown,
-    rsvg
+    rsvg,
+    testthat (>= 3.0.0)
 Remotes: 
     r-lib/systemfonts,
     r-lib/textshaping
@@ -40,3 +41,4 @@ URL: https://marquee.r-lib.org, https://github.com/r-lib/marquee
 BugReports: https://github.com/r-lib/marquee/issues
 Config/Needs/website: tidyverse/tidytemplate
 VignetteBuilder: knitr
+Config/testthat/edition: 3

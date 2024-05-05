@@ -77,13 +77,13 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   check_string(family, allow_null = TRUE)
 
   if (is.character(weight)) weight <- systemfonts::as_font_weight(weight)
-  if (!is.null(weight) && length(weight) != 1) cli::cli_abort("{.arg weight} must be a scalar")
+  check_number_whole(weight, allow_null = TRUE)
   if (!is.null(weight)) weight <- as.integer(weight)
 
   check_bool(italic, allow_null = TRUE)
 
   if (is.character(width)) width <- systemfonts::as_font_width(width)
-  if (!is.null(width) && length(width) != 1) cli::cli_abort("{.arg width} must be a scalar")
+  check_number_whole(width, allow_null = TRUE)
   if (!is.null(width)) width <- as.integer(width)
 
   if (!is.null(features) && !inherits(features, "font_feature")) {

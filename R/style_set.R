@@ -43,6 +43,7 @@ style_set <- function(...) {
     if (!is_named2(styles)) {
       cli::cli_abort("All arguments must be named")
     }
+    names(styles) <- tolower(names(styles))
     for (i in seq_along(styles)) {
       if (!is_style(styles[[i]])) {
         stop_input_type(styles[[i]], "a marquee style object", arg = names(styles)[i])
@@ -54,7 +55,6 @@ style_set <- function(...) {
     if (any(vapply(styles$base, is.null, logical(1)))) {
       cli::cli_abort("The base style must be a complete style specification")
     }
-    names(styles) <- tolower(names(styles))
     styles <- list(styles)
   }
   vctrs::new_vctr(styles, class = "marquee_style_set")
