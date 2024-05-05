@@ -128,7 +128,9 @@ test_that("style checks it's inputs", {
   expect_snapshot_error(style(background = TRUE))
   expect_silent(s <- style(background = NA))
   expect_type(s$background, "character")
-  expect_silent(s <- style(background = linearGradient()))
+  if ("linearGradient" %in% getNamespaceExports("grid")) {
+    expect_silent(s <- style(background = linearGradient()))
+  }
 
   # Border
   expect_silent(s <- style(border = "red"))
