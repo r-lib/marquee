@@ -108,7 +108,7 @@ make_marquee_geom <- function() {
     ),
 
     draw_panel = function(data, panel_params, coord, na.rm = FALSE, size.unit = "mm") {
-      lab <- data$label
+      lab <- as.character(data$label)
 
       styles <- data$style
       if (!is_style_set(styles)) {
