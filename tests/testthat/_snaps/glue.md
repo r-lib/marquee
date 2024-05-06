@@ -1,12 +1,16 @@
 # glue properly detects custom spans
 
-    <text>:1:5: unexpected '{'
+    Failed to parse glue component
+    Caused by error in `parse()`:
+    ! <text>:1:5: unexpected '{'
     1: .red{
             ^
 
 ---
 
-    object '.red' not found
+    Failed to evaluate glue component {.red}
+    Caused by error:
+    ! object '.red' not found
 
 ---
 
