@@ -117,6 +117,30 @@
 marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE, x = 0,
                          y = 1, width = NULL, default.units = "npc", hjust = "left",
                          vjust = "top", angle = 0, vp = NULL, name = NULL) {
+  # Basic input checking
+  if (is.character(hjust) && !all(hjust %in% c("left", "left-ink", "center", "center-ink", "right-ink", "right"))) {
+    cli::cli_abort(c(
+      "{.arg hjust} must be a valid justification",
+      i = "Use either numerics or one of {.or {.val {c('left', 'left-ink', 'center', 'center-ink', 'right-ink', 'right')}}}"
+    ))
+  } else if (!is.numeric(hjust) && !is.character(hjust)) {
+    cli::cli_abort("{.arg hjust} must either be numeric or a character vector")
+  }
+  if (is.character(vjust) && !all(vjust %in% c("bottom", "bottom-ink", "last-line", "center", "center-ink", "first-line", "top-ink", "top"))) {
+    cli::cli_abort(c(
+      "{.arg vjust} must be a valid justification",
+      i = "Use either a numerics or one of {.or {.val {c('bottom', 'bottom-ink', 'last-line', 'center', 'center-ink', 'first-line', 'top-ink', 'top')}}}"
+    ))
+  } else if (!is.numeric(vjust) && !is.character(vjust)) {
+    cli::cli_abort("{.arg vjust} must either be numeric or a character vector")
+  }
+
+  if (!is.unit(x)) x <- unit(x, default.units)
+  if (!is.unit(y)) y <- unit(y, default.units)
+  width <- width %||% unit(1, "npc")
+  if (!is.unit(width)) width <- unit(width, default.units)
+
+  # Parse input
   parsed <- if (!is_parsed(text)) marquee_parse(text, style, ignore_html) else text
 
   # Set bottom margin for tight list `li` elements to match the lineheight
@@ -180,29 +204,6 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE, x = 
   ## Inherit color and id from the relevant block
   bullets$shape$shape$col <- parsed$color[bullets$index[bullets$shape$shape$metric_id]]
   bullets$shape$shape$id <- parsed$id[bullets$index[bullets$shape$shape$metric_id]]
-
-  if (!is.unit(x)) x <- unit(x, default.units)
-  if (!is.unit(y)) y <- unit(y, default.units)
-  width <- width %||% unit(1, "npc")
-  if (!is.unit(width)) width <- unit(width, default.units)
-
-  # Basic input checking
-  if (is.character(hjust) && !all(hjust %in% c("left", "left-ink", "center", "center-ink", "right-ink", "right"))) {
-    cli::cli_abort(c(
-      "{.arg hjust} must be a valid justification",
-      i = "Use either numerics or one of {.or {.val {c('left', 'left-ink', 'center', 'center-ink', 'right-ink', 'right')}}}"
-    ))
-  } else if (!is.numeric(hjust) && !is.character(hjust)) {
-    cli::cli_abort("{.arg hjust} must either be numeric or a character vector")
-  }
-  if (is.character(vjust) && !all(vjust %in% c("bottom", "bottom-ink", "last-line", "center", "center-ink", "first-line", "top-ink", "top"))) {
-    cli::cli_abort(c(
-      "{.arg vjust} must be a valid justification",
-      i = "Use either a numerics or one of {.or {.val {c('bottom', 'bottom-ink', 'last-line', 'center', 'center-ink', 'first-line', 'top-ink', 'top')}}}"
-    ))
-  } else if (!is.numeric(vjust) && !is.character(vjust)) {
-    cli::cli_abort("{.arg vjust} must either be numeric or a character vector")
-  }
 
   grob <- gTree(
     text = parsed, blocks = blocks, bullets = bullets, images = images,
