@@ -1,4 +1,7 @@
 test_that("images are picked up", {
+
+  skip_if_not(getRversion() >= "4.1")
+
   logo <- system.file("help", "figures", "logo.png", package = "marquee")
   grob <- textGrob("test")
   gg <- ggplot2::ggplot()
