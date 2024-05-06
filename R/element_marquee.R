@@ -68,10 +68,10 @@ element_grob.element_marquee <- function(element, label = "", x = NULL, y = NULL
   if (is.null(label)) return(ggplot2::zeroGrob())
   style <- style %||% element$style %||% classic_style()
   style <- modify_style(style, "base",
-    family = family %||% element$family %||% style$base$family,
-    color = colour %||% element$colour %||% style$base$color,
-    size = size %||% element$size %||% style$base$size,
-    lineheight = lineheight %||% element$lineheight %||% style$base$lineheight
+    family = family %||% element$family %||% style$base$family %||% "",
+    color = colour %||% element$colour %||% style$base$color %||% "black",
+    size = size %||% element$size %||% style$base$size %||% 12,
+    lineheight = lineheight %||% element$lineheight %||% style$base$lineheight %||% 1
   )
   margin <- margin %||% element$margin
   if (!is.null(margin)) {
