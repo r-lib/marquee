@@ -25,7 +25,7 @@ images_as_grobs <- function(paths, env = caller_env()) {
         obj <- svg_grob(svg, ncol(obj) / nrow(obj))
       }
     }
-    if (is.null(obj)) {
+    if (is.null(obj) && paths[i] != "") {
       obj <- get0(paths[i], envir = env)
     }
     if (inherits(obj, "patchwork")) {
