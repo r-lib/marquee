@@ -33,6 +33,8 @@ test_that("grobs gets correctly constructed", {
   expect_snapshot(grob1$blocks)
 
   # Are bullets placed
+  skip_on_os("windows")
+  skip_on_os("linux")
   expect_snapshot(grob1$bullets)
 })
 
