@@ -2,7 +2,10 @@ test_that("images are picked up", {
 
   skip_if_not(getRversion() >= "4.1")
 
-  logo <- system.file("help", "figures", "logo.png", package = "marquee")
+  # Depending on how we are testing the logo may reside in one of these locations
+  logo <- system.file("man", "figures", "logo.png", package = "marquee")
+  if (logo == "") logo <- system.file("help", "figures", "logo.png", package = "marquee")
+
   grob <- textGrob("test")
   gg <- ggplot2::ggplot()
   patch <- patchwork::wrap_plots(gg, gg)
