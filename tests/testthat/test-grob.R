@@ -51,7 +51,7 @@ test_that("grob looks as it should (sadly too complex to test other way)", {
   skip_on_os("linux")
   file <- tempfile()
   ragg::agg_png(file, width = 500, height = 1000)
-  grid.draw(textGrob("test"))
+  grid.draw(grob1)
   dev.off()
 
   expect_snapshot_file(file, "marquee_grob.png")
