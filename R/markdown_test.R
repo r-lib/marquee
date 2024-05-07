@@ -21,7 +21,7 @@ ggplot(mtcars) +
   geom_point(aes(mpg, disp))
 ```
 
-The above illustrates a couple of things:
+The {.red above} illustrates a {.custom couple of {#0d5 things}}:
 
 * * *
 

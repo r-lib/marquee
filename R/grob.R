@@ -262,8 +262,8 @@ makeContext.marquee_grob <- function(x) {
     ## Start with width
     if (is.null(vp) || unitType(absolute.size(vp$width)) == "null") {
       if (images$inline[i]) {
-        ### No absolute size + inline. set width to 1.2em
-        width <- x$text$size[images$index[i]] * 1.2
+        ### No absolute size + inline. set width to 1em
+        width <- x$text$size[images$index[i]]
         # if raster or svg we cap at height instead of width and let aspect ratio determine width
         if (inherits(images$grobs[[i]], "rastergrob")) {
           asp <- ncol(images$grobs[[i]]$raster) / nrow(images$grobs[[i]]$raster)
@@ -663,11 +663,7 @@ makeContext.marquee_grob <- function(x) {
     glyph <- which(x$shape$string_id == images$index[i])
     grob <- images$grobs[[i]]
     grob$vp$x <- unit(x$shape$x_offset[glyph], "bigpts")
-    descend <- 0
-    if (images$inline[i]) {
-      ## If inline we move baseline down to lowest descender of the line
-      descend <- min(x$shape$descender[x$shape$y_offset == x$shape$y_offset[glyph]])
-    }
+    descend <- x$shape$descender[glyph]
     grob$vp$y <- unit(x$shape$y_offset[glyph] + descend, "bigpts")
     grob
   })
