@@ -32,6 +32,10 @@ This document will get you up to speed on using marquee for rich text formatting
 > **NOTE** This vignette was compiled on a system without access to the required graphics engine features. Because of this all code blocks below have not been run
 ```
 
+## Requirements
+
+Before we start we should note that marquee has been build for the future. What I mean by this is that it is based on a slew of new features in the R graphics engine putting very hard requirements on what R version it can be used with *and* which graphics devices it works with. If, for some reason, your setup cannot accommodate these needs you can perhaps get some of the way using [gridtext](https://wilkelab.org/gridtext/)/[ggtext](https://wilkelab.org/ggtext/). The nuisance of this will likely diminish or completely disappear with time.
+
 ## An example
 
 ```{r, eval=should_eval}
