@@ -100,6 +100,17 @@ parser for the dialect and a grid renderer for text written in the
 dialect. The package aims to fill the same use cases as <a href="https://wilkelab.org/gridtext/" class="external-link">gridtext</a> and <a href="https://wilkelab.org/ggtext/" class="external-link">ggtext</a> by Claus Wilke, but works
 in a very different and more low-level way.</p>
 <div class="section level2">
+<h2 id="requirements">Requirements<a class="anchor" aria-label="anchor" href="#requirements"></a>
+</h2>
+<p>Before we start we should note that marquee has been build for the
+future. What I mean by this is that it is based on a slew of new
+features in the R graphics engine putting very hard requirements on what
+R version it can be used with <em>and</em> which graphics devices it
+works with. If, for some reason, your setup cannot accommodate these
+needs you can perhaps get some of the way using <a href="https://wilkelab.org/gridtext/" class="external-link">gridtext</a>/<a href="https://wilkelab.org/ggtext/" class="external-link">ggtext</a>. The nuisance of this
+will likely diminish or completely disappear with time.</p>
+</div>
+<div class="section level2">
 <h2 id="an-example">An example<a class="anchor" aria-label="anchor" href="#an-example"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -342,7 +353,8 @@ patchwork plots). It all works as you’d expect:</p>
 <span><span class="st">laborum."</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_plot</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre></div>
+<span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span>
+<span><span class="co">#&gt; Warning in .useGroup(ref, NULL): Unknown group</span></span></code></pre></div>
 <p><img src="marquee_files/figure-html/unnamed-chunk-14-1.png" width="98%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
