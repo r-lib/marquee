@@ -490,6 +490,9 @@ makeContext.marquee_grob <- function(x) {
   shape$shape$x_offset <- shape$shape$x_offset + left_offset[shape$shape$metric_id]
   shape$shape$y_offset <- shape$shape$y_offset + top_offset[shape$shape$metric_id] - y_adjustment[shape$shape$metric_id]
 
+  # Apply baseline shift
+  shape$shape$y_offset <- shape$shape$y_offset + x$text$baseline[shape$shape$string_id]
+
   ## Do the same for bullets
   bshape$shape$x_offset <- bshape$shape$x_offset + left_offset[bullet_blocks[bshape$shape$metric_id]] - bshape$shape$font_size/4 + x_bullet_adjustment[bshape$shape$metric_id]
   bshape$shape$y_offset <- bshape$shape$y_offset + top_offset[bullet_blocks[bshape$shape$metric_id]] - y_bullet_adjustment[bshape$shape$metric_id]

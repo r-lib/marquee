@@ -179,6 +179,18 @@ test_that("style checks it's inputs", {
   expect_snapshot_error(style(strikethrough = "A"))
   expect_snapshot_error(style(strikethrough = 1))
 
+  # Baseline
+  expect_silent(s <- style(baseline = 9))
+  expect_equal(s$baseline, 9)
+  expect_snapshot_error(style(baseline = "A"))
+  expect_snapshot_error(style(baseline = TRUE))
+  expect_silent(s <- style(baseline = em(9)))
+  expect_equal(s$baseline, em(9))
+  expect_silent(s <- style(baseline = rem(9)))
+  expect_equal(s$baseline, rem(9))
+  expect_silent(s <- style(baseline = relative(9)))
+  expect_equal(s$baseline, relative(9))
+
   # Image aspect ratio
   expect_silent(s <- style(img_asp = 1.6))
   expect_equal(s$img_asp, 1.6)

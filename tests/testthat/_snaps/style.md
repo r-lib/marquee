@@ -184,6 +184,14 @@
 
 ---
 
+    `baseline` must be a number or `NULL`, not the string "A".
+
+---
+
+    `baseline` must be a number or `NULL`, not `TRUE`.
+
+---
+
     `img_asp` must be a number or `NULL`, not the string "A".
 
 ---

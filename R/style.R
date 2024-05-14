@@ -73,7 +73,8 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
                   align = NULL, tracking = NULL, indent = NULL, hanging = NULL,
                   margin = NULL, padding = NULL, background = NULL, border = NULL,
                   border_size = NULL, border_radius = NULL, bullets = NULL,
-                  underline = NULL, strikethrough = NULL, img_asp = NULL) {
+                  underline = NULL, strikethrough = NULL, baseline = NULL,
+                  img_asp = NULL) {
   check_string(family, allow_null = TRUE)
 
   if (is.character(weight)) weight <- systemfonts::as_font_weight(weight)
@@ -133,6 +134,8 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
 
   check_number_decimal(img_asp, allow_null = TRUE)
 
+  if (!is_modifier(baseline)) check_number_decimal(baseline, allow_null = TRUE)
+
   structure(list(
       size = size, # Important this is the first. Required by compiled code
       background = background, # Important this is the second. Required by compiled code
@@ -164,6 +167,7 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
       bullets = bullets,
       underline = underline,
       strikethrough = strikethrough,
+      baseline = baseline,
       img_asp = img_asp
     ),
     class = "marquee_style"
@@ -211,7 +215,8 @@ base_style <- function(family = "", weight = "normal", italic = FALSE,
                        margin = trbl(0, 0, rem(1)), padding = trbl(0),
                        background = NA, border = NA, border_size = trbl(0),
                        border_radius = 0, bullets = marquee_bullets,
-                       underline = FALSE, strikethrough = FALSE, img_asp = 1.65) {
+                       underline = FALSE, strikethrough = FALSE, baseline = 0,
+                       img_asp = 1.65) {
   style(
     family = family,
     weight = weight,
@@ -234,6 +239,7 @@ base_style <- function(family = "", weight = "normal", italic = FALSE,
     bullets = bullets,
     underline = underline,
     strikethrough = strikethrough,
+    baseline = baseline,
     img_asp = img_asp
   )
 }
