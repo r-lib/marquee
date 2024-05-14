@@ -263,6 +263,14 @@ makeContext.marquee_grob <- function(x) {
   size <- x$text$size
   tracking <- x$text$tracking
   images <- x$images
+  images$y_adjust <- rep(0, length(images$inline))
+  if (length(images$inline) > 0) {
+    # Some fonts are much higher than their point size. We move the image baseline up half the difference
+    image_font <- systemfonts::font_info(x$text$family[images$index[images$inline]], size = size[images$index[images$inline]])
+    actual_size <- image_font$max_ascend - image_font$max_descend
+    images$y_adjust[images$inline] <- (actual_size - size[images$index[images$inline]]) / 2
+  }
+
   for (i in seq_along(images$index)) {
     vp <- images$grobs[[i]]$vp
     scale <- 1
@@ -370,6 +378,15 @@ makeContext.marquee_grob <- function(x) {
     x$width <- unit(widths[x$blocks$indent == 1], "bigpts")
     ## Restart evaluation
     return(makeContext.marquee_grob(x))
+  }
+
+  # Set correct height for block images
+  if (any(!x$images$inline)) {
+    block_glyph_match <- match(shape$shape$string_id, x$images$index[!x$images$inline])
+    block_glyphs <- !is.na(block_glyph_match)
+    shape$shape$y_offset[block_glyphs] <- -size[x$images$index[!x$images$inline][block_glyph_match[block_glyphs]]]
+    shape$shape$descender[block_glyphs] <- 0
+    shape$metrics$height[x$text$block[x$images$index[!x$images$inline]]] <- size[x$images$index[!x$images$inline]]
   }
 
   # Inherit color and id from parsed text
@@ -671,7 +688,7 @@ makeContext.marquee_grob <- function(x) {
     grob <- images$grobs[[i]]
     grob$vp$x <- unit(x$shape$x_offset[glyph], "bigpts")
     descend <- x$shape$descender[glyph]
-    grob$vp$y <- unit(x$shape$y_offset[glyph] + descend, "bigpts")
+    grob$vp$y <- unit(x$shape$y_offset[glyph] + descend + images$y_adjust[i], "bigpts")
     grob
   })
   ## Remove the null-glyphs from the shape
