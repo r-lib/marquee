@@ -9,9 +9,10 @@ test_that("images are picked up", {
   grob <- textGrob("test")
   gg <- ggplot2::ggplot()
   patch <- patchwork::wrap_plots(gg, gg)
+  table <- gt::gt(mtcars)
   unknown <- "test"
 
-  image_locs <- c(logo, "grob", "gg", "patch", unknown)
+  image_locs <- c(logo, "grob", "gg", "patch", "table", unknown)
 
   imgs <- images_as_grobs(image_locs)
 
@@ -20,5 +21,10 @@ test_that("images are picked up", {
   expect_s3_class(imgs[[2]], "text")
   expect_s3_class(imgs[[3]], "gtable")
   expect_s3_class(imgs[[4]], "gtable")
-  expect_s3_class(imgs[[5]], "missing_grob")
+  expect_s3_class(imgs[[6]], "missing_grob")
+  if ("as_gtable" %in% getNamespaceExports("gt")) {
+    expect_s3_class(imgs[[5]], "gtable")
+  } else {
+    expect_s3_class(imgs[[5]], "missing_grob")
+  }
 })

@@ -103,6 +103,13 @@
 #' the aspect ratio will match the raster, otherwise the aspect ratio will be
 #' taken from the styling of the element (defaults to 1.65)
 #'
+#' # Table rendering
+#' While marquee does not support the extended table syntax for markdown it does
+#' allow you to include tables in the output. It does so by supporting gt
+#' objects as valid paths in image tags in the same way as ggplots etc. This
+#' meeans that you can style your tables any way you wish and with the full
+#' power of gt, which is much more flexible than the markdown table syntax.
+#'
 #' # Textbox justification
 #' The justification options exceeds the classic ones provided by grid. While
 #' numeric values are available as always, the number of possible text values

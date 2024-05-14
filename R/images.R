@@ -36,6 +36,12 @@ images_as_grobs <- function(paths, env = caller_env()) {
       check_installed("ggplot2")
       obj <- ggplot2::ggplotGrob(obj)
     }
+    if (inherits(obj, "gt_tbl")) {
+      check_installed("gt")
+      if ("as_gtable" %in% getNamespaceExports("gt")) {
+        obj <- gt::as_gtable(obj)
+      }
+    }
     if (is.null(obj) || !is.grob(obj)) {
       obj <- missing_grob()
     }

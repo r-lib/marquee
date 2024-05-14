@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
   dpi = 300
 )
 should_eval <- getRversion() >= "4.3"
+has_gt_gtable <- "as_gtable" %in% getNamespaceExports("gt")
 ```
 
 ```{r setup}
@@ -133,7 +134,7 @@ Another use of the geom, where rich text may come more into play, is in annotati
 text_box_style <- modify_style(
   classic_style(base_size = 2),
   "body",
-  padding = skip_inherit(trbl(0, 10, 10)),
+  padding = skip_inherit(trbl(10)),
   border_radius = 3
 )
 
@@ -228,6 +229,47 @@ laborum."
 
 grid.draw(marquee_grob(md_text_plot, classic_style()))
 ```
+
+## A bit about tables
+
+The table markdown syntax is not supported in marquee. However, you can still include tables in marquee, and with much more styling support than standard markdown table syntax provide. This magic is an extension of what was talked about above. More to the point, gt table objects are recognized as valid objects in the image tag path and can thus be included directly in the output. We show the power here with a table specification taken from the [gt introduction](https://gt.rstudio.com/articles/gt.html):
+
+```{r, collapse=TRUE}
+library(gt)
+airquality_m <- airquality[1:10, ]
+airquality_m$Year <- 1973L
+table <- gt(airquality_m)
+table <- tab_header(table, 
+  title = "New York Air Quality Measurements",
+  subtitle = "Daily measurements in New York City (May 1-10, 1973)"
+)
+table <- tab_spanner(table, 
+  label = "Time",
+  columns = c(Year, Month, Day)
+)
+table <- tab_spanner(table,
+  label = "Measurement",
+  columns = c(Ozone, Solar.R, Wind, Temp)
+)
+```
+
+```{block, include=!has_gt_gtable}
+> This vignette has been rendered with an older version of gt that does not support converting gt objects to gtables. Because of this you will see a "missing grob" in the example below
+```
+
+```{r, fig.asp=1.1, eval=should_eval}
+md_text_table <- 
+"# Lorem Ipsum 
+Below we have a table created with gt
+
+![](table)
+
+*Such tables, much cells*"
+
+grid.draw(marquee_grob(md_text_table, classic_style()))
+```
+
+The support is still somewhat experimental as gt-to-grob conversion is getting build out. Some gt features rely on HTML formatting still and will end up looking weird, but standard table inclusion works as expected.
 
 ## Wrapping up
 

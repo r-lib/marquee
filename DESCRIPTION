@@ -28,6 +28,7 @@ Imports:
     vctrs
 Suggests: 
     ggplot2,
+    gt,
     knitr,
     patchwork,
     ragg,
