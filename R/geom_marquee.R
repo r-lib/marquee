@@ -159,7 +159,7 @@ on_load(on_package_load("ggplot2", {
  make_marquee_geom()
 }))
 
-combine_styles <- function(style, family, size, lineheight, color, background) {browser()
+combine_styles <- function(style, family, size, lineheight, color, background) {
   style <- modify_style(style, "base", family = family, size = size, color = color, lineheight = lineheight)
   modify_style(style, "body", background = skip_inherit(background))
 }
