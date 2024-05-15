@@ -27,6 +27,7 @@ style(
   bullets = NULL,
   underline = NULL,
   strikethrough = NULL,
+  baseline = NULL,
   img_asp = NULL
 )
 
@@ -52,6 +53,7 @@ base_style(
   bullets = marquee_bullets,
   underline = FALSE,
   strikethrough = FALSE,
+  baseline = 0,
   img_asp = 1.65
 )
 }
@@ -124,6 +126,8 @@ to \code{\link[=trbl]{trbl()}}}
 \item{underline}{Should text be underlined}
 
 \item{strikethrough}{Should text be strikethrough}
+
+\item{baseline}{The baseline shift to apply to the text}
 
 \item{img_asp}{The default aspect ratio for block level images if not
 provided by the image itself}

@@ -54,6 +54,7 @@
 #' `marquee_bullets` provides a selection
 #' @param underline Should text be underlined
 #' @param strikethrough Should text be strikethrough
+#' @param baseline The baseline shift to apply to the text
 #' @param img_asp The default aspect ratio for block level images if not
 #' provided by the image itself
 #'

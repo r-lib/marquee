@@ -1,7 +1,11 @@
 #' Classic styling for markdown
 #'
 #' This function facilitates construction of a complete style set based on the
-#' classic look of an HTML rendered markdown document.
+#' classic look of an HTML rendered markdown document. It contains style
+#' specifications for all the supported markdown elements as well as a `sub` and
+#' `sup` style that can be used for subscripts and superscript respectively.
+#' These are only accessible through custom spans (e.g. `H{.sub 2}O`) as
+#' markdown doesn't provide a syntax for these formats.
 #'
 #' @param base_size The base font size for the text. All other sizing is based
 #' on this

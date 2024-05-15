@@ -68,6 +68,7 @@ to \code{\link[=trbl]{trbl()}}}
 \code{marquee_bullets} provides a selection}
     \item{\code{underline}}{Should text be underlined}
     \item{\code{strikethrough}}{Should text be strikethrough}
+    \item{\code{baseline}}{The baseline shift to apply to the text}
     \item{\code{img_asp}}{The default aspect ratio for block level images if not
 provided by the image itself}
   }}
@@ -77,7 +78,11 @@ A style set object
 }
 \description{
 This function facilitates construction of a complete style set based on the
-classic look of an HTML rendered markdown document.
+classic look of an HTML rendered markdown document. It contains style
+specifications for all the supported markdown elements as well as a \code{sub} and
+\code{sup} style that can be used for subscripts and superscript respectively.
+These are only accessible through custom spans (e.g. \verb{H\{.sub 2\}O}) as
+markdown doesn't provide a syntax for these formats.
 }
 \examples{
 classic_style(16, "serif", "sans")
