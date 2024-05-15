@@ -264,7 +264,7 @@ makeContext.marquee_grob <- function(x) {
   tracking <- x$text$tracking
   images <- x$images
   images$y_adjust <- rep(0, length(images$inline))
-  if (length(images$inline) > 0) {
+  if (sum(images$inline) > 0) {
     # Some fonts are much higher than their point size. We move the image baseline up half the difference
     image_font <- systemfonts::font_info(x$text$family[images$index[images$inline]], size = size[images$index[images$inline]])
     actual_size <- image_font$max_ascend - image_font$max_descend
