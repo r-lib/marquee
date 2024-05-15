@@ -92,6 +92,7 @@ for a style with sensible defaults for all it's options.</p>
 <span>  bullets <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  underline <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  strikethrough <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  baseline <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  img_asp <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -117,6 +118,7 @@ for a style with sensible defaults for all it's options.</p>
 <span>  bullets <span class="op">=</span> <span class="va">marquee_bullets</span>,</span>
 <span>  underline <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  strikethrough <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  baseline <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  img_asp <span class="op">=</span> <span class="fl">1.65</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -234,6 +236,10 @@ to <code><a href="style_helpers.html">trbl()</a></code></p></dd>
 <dd><p>Should text be strikethrough</p></dd>
 
 
+<dt>baseline</dt>
+<dd><p>The baseline shift to apply to the text</p></dd>
+
+
 <dt>img_asp</dt>
 <dd><p>The default aspect ratio for block level images if not
 provided by the image itself</p></dd>
@@ -256,7 +262,7 @@ provided by the image itself</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Full style</span></span></span>
 <span class="r-in"><span><span class="fu">base_style</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;marquee_style[31]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;marquee_style[32]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               size: 12</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         background: NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              color: black</span>
@@ -287,6 +293,7 @@ provided by the image itself</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            bullets: •, ◦, ▪, ▫, ‣, ⁃</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          underline: FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      strikethrough: FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           baseline: 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            img_asp: 1.65</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

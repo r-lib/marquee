@@ -102,7 +102,8 @@ glue. This function let's you use both together.</p>
     <dl><dt>...</dt>
 <dd><p>[<code>expressions</code>]<br> Unnamed arguments are taken to be expression
 string(s) to format. Multiple inputs are concatenated together before formatting.
-Named arguments are taken to be temporary variables available for substitution.</p></dd>
+Named arguments are taken to be temporary variables available for substitution.</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>For <span class="st">`</span><span class="at">glue_data()</span><span class="st">`</span>, elements <span class="cf">in</span> <span class="st">`</span><span class="at">...</span><span class="st">`</span> override the values <span class="cf">in</span> <span class="st">`</span><span class="at">.x</span><span class="st">`</span>.</span></code></pre><p></p></div></dd>
 
 
 <dt>.sep</dt>
@@ -152,9 +153,12 @@ syntactic elements), when parsing the expression string. Setting <code>.literal 
 
 
 <dt>.transformer</dt>
-<dd><p>[<code>function]</code><br> A function taking three parameters <code>code</code>, <code>envir</code> and
-<code>data</code> used to transform the output of each block before, during, or after
-evaluation. For example transformers see <code>vignette("transformers")</code>.</p></dd>
+<dd><p>[<code>function]</code><br> A function taking two arguments, <code>text</code>
+and <code>envir</code>, where <code>text</code> is the unparsed string inside the glue block and
+<code>envir</code> is the execution environment. A <code>.transformer</code> lets you modify a
+glue block before, during, or after evaluation, allowing you to create your
+own custom <code>glue()</code>-like functions. See <code>vignette("transformers")</code> for
+examples.</p></dd>
 
 
 <dt>.trim</dt>
