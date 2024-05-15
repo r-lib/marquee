@@ -39,7 +39,7 @@ images_as_grobs <- function(paths, env = caller_env()) {
     if (inherits(obj, "gt_tbl")) {
       check_installed("gt")
       if ("as_gtable" %in% getNamespaceExports("gt")) {
-        obj <- gt::as_gtable(obj)
+        obj <- as_gtable$fun(obj)
       }
     }
     if (is.null(obj) || !is.grob(obj)) {

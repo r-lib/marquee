@@ -1,6 +1,5 @@
 version_unavailable <- function(min_version) {
   function(...) {
-    fun <- as_label(current_call()[[1]])
     cli::cli_abort("This graphics feature is not available before R v{min_version}")
   }
 }
@@ -10,6 +9,15 @@ glyphFontList <- version_unavailable("4.3.0")
 glyphInfo <- version_unavailable("4.3.0")
 glyphAnchor <- version_unavailable("4.3.0")
 glyphGrob <- version_unavailable("4.3.0")
+as_gtable <- new_environment(list(fun = NULL))
+as_gtable$fun <- function(...) {
+  cli::cli_abort("The installed version of {.pkg gt} does not support conversion to gtable")
+}
+bind_as_gtable <- function() {
+  if ("as_gtable" %in% getNamespaceExports("gt")) {
+    as_gtable$fun <- gt::as_gtable
+  }
+}
 
 on_load({
   # Replace version unavailable functions if found
@@ -28,4 +36,7 @@ on_load({
   if ("glyphGrob" %in% getNamespaceExports("grid")) {
     glyphGrob <- grid::glyphGrob
   }
+  on_package_load("gt", {
+    bind_as_gtable()
+  })
 })
