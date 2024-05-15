@@ -9,3 +9,29 @@ template:
   includes:
     in_header: |
       <script defer data-domain="marquee.r-lib.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>
+
+reference:
+- title: Rendering
+  desc: >
+    These functions all help render markdown in various ways
+  contents:
+  - marquee_grob
+  - geom_marquee
+  - element_marquee
+- title: Styling
+  desc: >
+    These functions helps you specify the visual style used during rendering
+  contents:
+  - style
+  - style_set
+  - classic_style
+  - modify_style
+  - remove_style
+  - em
+- title: Parsing
+  desc: >
+    While often not needed, these functions helps you work with markdown text
+    before it is rendered
+  contents:
+  - marquee_parse
+  - marquee_glue
