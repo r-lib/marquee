@@ -2,7 +2,7 @@ Package: marquee
 Title: Markdown Parser and Renderer for R Graphics
 Version: 0.0.0.9000
 Authors@R: c(
-    person("Thomas Lin", "Pedersen", , "thomasp85@gmail.com", role = c("aut", "cre"),
+    person("Thomas Lin", "Pedersen", , "thomas.pedersen@posit.co", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5147-4711")),
     person("Martin", "Mitáš", role = "aut",
            comment = "Author of MD4C"),
@@ -23,8 +23,8 @@ Imports:
     jpeg,
     png,
     rlang (>= 1.1.0),
-    systemfonts,
-    textshaping,
+    systemfonts (>= 1.1.0),
+    textshaping (>= 0.4.0),
     utils,
     vctrs
 Suggests: 
@@ -36,9 +36,6 @@ Suggests:
     rmarkdown,
     rsvg,
     testthat (>= 3.0.0)
-Remotes: 
-    r-lib/systemfonts,
-    r-lib/textshaping
 URL: https://marquee.r-lib.org, https://github.com/r-lib/marquee
 BugReports: https://github.com/r-lib/marquee/issues
 Config/Needs/website: tidyverse/tidytemplate
