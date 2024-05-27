@@ -16,10 +16,11 @@ inside R graphics such as ggplot2 or other graphics build on grid
 
 ## Installation
 
-marquee is not yet on CRAN. In the meantime you can install the
-development version like so:
-
 ``` r
+# You can install marquee from CRAN
+install.packages("marquee")
+
+# Or get the development version from Github using pak
 pak::pak("r-lib/marquee")
 ```
 
