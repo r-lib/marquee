@@ -134,10 +134,10 @@ of some text, marquee provides a shortcut for this. If a style is not found
 for the tag in the provided style set, marquee will check if the tag matches
 a valid color (i.e. a string from \code{grDevices::colors()}, or a valid hex
 string, e.g. \verb{#53f2a9}). If it is a valid color it will set this as the font
-color of the style. This means that parsing "Color {.red this} red"
-automatically sets the color of "this" to red, even if no style is provided
-for the \code{red} tag. Likewise, parsing "Color {#00FF00 me} green" will
-automatically set the color of "me" to #00FF00 (fully satuared green).
+color of the style. This means that parsing \code{"Color {.red this} red"}
+automatically sets the color of \code{"this"} to red, even if no style is provided
+for the \code{red} tag. Likewise, parsing \code{"Color {#00FF00 me} green"} will
+automatically set the color of \code{"me"} to #00FF00 (fully saturated green).
 }
 
 \section{Additional parsing information}{

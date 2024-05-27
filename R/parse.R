@@ -124,10 +124,10 @@
 #' for the tag in the provided style set, marquee will check if the tag matches
 #' a valid color (i.e. a string from `grDevices::colors()`, or a valid hex
 #' string, e.g. `#53f2a9`). If it is a valid color it will set this as the font
-#' color of the style. This means that parsing "Color {.red this} red"
-#' automatically sets the color of "this" to red, even if no style is provided
-#' for the `red` tag. Likewise, parsing "Color {#00FF00 me} green" will
-#' automatically set the color of "me" to #00FF00 (fully satuared green).
+#' color of the style. This means that parsing `"Color {.red this} red"`
+#' automatically sets the color of `"this"` to red, even if no style is provided
+#' for the `red` tag. Likewise, parsing `"Color {#00FF00 me} green"` will
+#' automatically set the color of `"me"` to #00FF00 (fully saturated green).
 #'
 #' # Additional parsing information
 #' Apart from splitting the text up into tokens, `marquee_parse()` also provides
