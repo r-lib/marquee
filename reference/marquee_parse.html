@@ -16,7 +16,7 @@ more about the format."><meta property="og:image" content="https://marquee.r-lib
     
     <a class="navbar-brand me-2" href="../index.html">marquee</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -180,10 +180,10 @@ of some text, marquee provides a shortcut for this. If a style is not found
 for the tag in the provided style set, marquee will check if the tag matches
 a valid color (i.e. a string from <code><a href="https://rdrr.io/r/grDevices/colors.html" class="external-link">grDevices::colors()</a></code>, or a valid hex
 string, e.g. <code>#53f2a9</code>). If it is a valid color it will set this as the font
-color of the style. This means that parsing "Color .red this red"
-automatically sets the color of "this" to red, even if no style is provided
-for the <code>red</code> tag. Likewise, parsing "Color #00FF00 me green" will
-automatically set the color of "me" to #00FF00 (fully satuared green).</p>
+color of the style. This means that parsing <code>"Color {.red this} red"</code>
+automatically sets the color of <code>"this"</code> to red, even if no style is provided
+for the <code>red</code> tag. Likewise, parsing <code>"Color {#00FF00 me} green"</code> will
+automatically set the color of <code>"me"</code> to #00FF00 (fully saturated green).</p>
     </div>
     <div class="section level2">
     <h2 id="additional-parsing-information">Additional parsing information<a class="anchor" aria-label="anchor" href="#additional-parsing-information"></a></h2>
