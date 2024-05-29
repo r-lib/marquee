@@ -35,3 +35,8 @@ reference:
   contents:
   - marquee_parse
   - marquee_glue
+
+news:
+  releases:
+  - text: "Version 0.1.0"
+    href: https://www.tidyverse.org/blog/2024/05/marquee-0-1-0/
