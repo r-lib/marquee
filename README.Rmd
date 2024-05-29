@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 marquee is a markdown parser and renderer for the R graphics engine. It can be 
 used to render rich text formatted as markdown (CommonMark) inside R graphics
-such as ggplot2 or other graphics build on grid
+such as ggplot2 or other graphics built on grid.
 
 ## Installation
 
@@ -37,6 +37,7 @@ pak::pak("r-lib/marquee")
 ```
 
 ## Examples
+
 The main function of the package is `marquee_grob()` which creates a grob based
 on markdown text and a style that can be rendered with grid:
 
@@ -60,13 +61,15 @@ grob <- marquee_grob(readme, style = fancy_style)
 grid.draw(grob)
 ```
 
-(*The above is an image - go ahead and check*)
+(*The above is an image – go ahead and check*)
 
 ## Prior art
+
 I would be remiss to not mention [gridtext](https://github.com/wilkelab/gridtext) 
 and [ggtext](https://github.com/wilkelab/ggtext), both by Claus Wilke. These
-packages aims to solve much the same as marquee, but work in a different way and
-doesn't have the same powerful textshaping backend as marquee. Most notably from
+packages aim to solve much the same problem as marquee, but work in a different way
+and don't have the same powerful textshaping backend as marquee. Most notably from
 a user perspective is perhaps that gridtext understands HTML to some degree, 
-whereas marquee is oblivious to both HTML and CSS. Instead it supports the full
-CommonMark spec with the plan to add support for custom span elements as well.
+whereas marquee is oblivious to both HTML and CSS. Instead, it supports the [full
+CommonMark spec](https://spec.commonmark.org/) with the plan to add support for
+custom span elements as well.
