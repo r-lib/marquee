@@ -47,6 +47,10 @@ a blank element among its parents will cause this element to be blank as
 well. If \code{FALSE} any blank parent element will be ignored when
 calculating final element state.}
 }
+\value{
+An \code{element_marquee} object that can be used in place of
+\code{element_text} in ggplot2 theme specifications
+}
 \description{
 This theme element is a drop-in replacement for \code{ggplot2::element_text()}. It
 works by integrating the various style settings of the element into the base

@@ -24,7 +24,7 @@ ignored}
 lowercase and \code{tag} will be converted to lowercase before matching}
 }
 \value{
-A style set object
+A \code{marquee_style_set} object
 }
 \description{
 A style set contains information on how to style the various tags in a

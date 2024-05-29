@@ -15,7 +15,7 @@
 #' @param tag The name of a tag to modify or remove. Tags are internally all
 #' lowercase and `tag` will be converted to lowercase before matching
 #'
-#' @return A style set object
+#' @return A `marquee_style_set` object
 #'
 #' @export
 #'

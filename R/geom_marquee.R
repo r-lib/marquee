@@ -9,6 +9,8 @@
 #'
 #' @inheritParams ggplot2::geom_text
 #'
+#' @return A ggplot2 layer that can be added to a plot
+#'
 #' @details
 #' Styling of the text is based on a style set with the exception that the
 #' standard aesthetics such as family, size, colour, fill, etc. are recognized
@@ -74,9 +76,7 @@ geom_marquee <- function(mapping = NULL, data = NULL, stat = "identity",
 
 #' Geom class for geom_marquee
 #'
-#' This environment contains the Geom needed for [geom_marquee()] in the `geom`
-#' variable. It is set up like this to avoid ggplot2 to be a hard dependency of
-#' marquee
+#' This is the underlying Geom class that powers [geom_marquee()] layers.
 #'
 #' @usage
 #' GeomMarquee
@@ -86,6 +86,7 @@ geom_marquee <- function(mapping = NULL, data = NULL, stat = "identity",
 #' @export GeomMarquee
 #'
 #' @keywords internal
+#' @docType class
 #'
 NULL
 

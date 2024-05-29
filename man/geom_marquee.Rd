@@ -109,6 +109,9 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 }
+\value{
+A ggplot2 layer that can be added to a plot
+}
 \description{
 The geom is an extension of \code{geom_text()} and \code{geom_label()} that allows you
 to draw richly formatted text in marquee-markdown format in your plot. For

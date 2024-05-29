@@ -20,6 +20,9 @@
 #' caveats for this
 #' @inheritParams ggplot2::element_text
 #'
+#' @return An `element_marquee` object that can be used in place of
+#' `element_text` in ggplot2 theme specifications
+#'
 #' @export
 #'
 #' @examplesIf utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")
