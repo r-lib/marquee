@@ -13,17 +13,17 @@ extern "C" SEXP _marquee_marquee_c(SEXP text, SEXP styles, SEXP ignore_html) {
   END_CPP11
 }
 // marquee.cpp
-cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent, cpp11::logicals string_is_empty, cpp11::integers bullet_number, cpp11::list_of<cpp11::strings> bullets);
-extern "C" SEXP _marquee_place_bullets(SEXP type, SEXP indent, SEXP string_is_empty, SEXP bullet_number, SEXP bullets) {
+cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent, cpp11::integers block, cpp11::logicals string_is_empty, cpp11::integers bullet_number, cpp11::list_of<cpp11::strings> bullets);
+extern "C" SEXP _marquee_place_bullets(SEXP type, SEXP indent, SEXP block, SEXP string_is_empty, SEXP bullet_number, SEXP bullets) {
   BEGIN_CPP11
-    return cpp11::as_sexp(place_bullets(cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(type), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(indent), cpp11::as_cpp<cpp11::decay_t<cpp11::logicals>>(string_is_empty), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(bullet_number), cpp11::as_cpp<cpp11::decay_t<cpp11::list_of<cpp11::strings>>>(bullets)));
+    return cpp11::as_sexp(place_bullets(cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(type), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(indent), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(block), cpp11::as_cpp<cpp11::decay_t<cpp11::logicals>>(string_is_empty), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(bullet_number), cpp11::as_cpp<cpp11::decay_t<cpp11::list_of<cpp11::strings>>>(bullets)));
   END_CPP11
 }
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
     {"_marquee_marquee_c",     (DL_FUNC) &_marquee_marquee_c,     3},
-    {"_marquee_place_bullets", (DL_FUNC) &_marquee_place_bullets, 5},
+    {"_marquee_place_bullets", (DL_FUNC) &_marquee_place_bullets, 6},
     {NULL, NULL, 0}
 };
 }

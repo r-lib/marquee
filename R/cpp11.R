@@ -4,6 +4,6 @@ marquee_c <- function(text, styles, ignore_html) {
   .Call(`_marquee_marquee_c`, text, styles, ignore_html)
 }
 
-place_bullets <- function(type, indent, string_is_empty, bullet_number, bullets) {
-  .Call(`_marquee_place_bullets`, type, indent, string_is_empty, bullet_number, bullets)
+place_bullets <- function(type, indent, block, string_is_empty, bullet_number, bullets) {
+  .Call(`_marquee_place_bullets`, type, indent, block, string_is_empty, bullet_number, bullets)
 }

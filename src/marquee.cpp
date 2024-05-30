@@ -480,6 +480,7 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
 
 [[cpp11::register]]
 cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent,
+                                    cpp11::integers block,
                                     cpp11::logicals string_is_empty,
                                     cpp11::integers bullet_number,
                                     cpp11::list_of<cpp11::strings> bullets) {
@@ -494,6 +495,7 @@ cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent,
       continue;
     }
 
+    // Count the number of consecutive ul nestings
     int n_ind = 0;
     for (R_xlen_t k = stretch_start.size() - 1; k >= 0; --k) {
       if (i > stretch_end[k] || stretch_type[k] == "ol") break;
@@ -517,6 +519,8 @@ cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent,
         } else {
           bullet.push_back(ul_bullet);
         }
+        int li_block = block[j];
+        // Find the first non-empty line for bullet placement
         if (string_is_empty[j]) {
           j++;
           while (string_is_empty[j] && indent[j] > ind + 1) {
@@ -524,6 +528,8 @@ cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent,
           }
         }
         placement.push_back(j + 1);
+        // Move j to the start of the next block
+        while (j < block.size() - 2 && li_block == block[j + 1]) j++;
       }
     }
     stretch_end.push_back(end);

@@ -190,6 +190,7 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE, x = 
   bullets <- place_bullets(
     parsed$type,
     parsed$indentation,
+    parsed$block,
     parsed$text == "",
     parsed$ol_index,
     parsed$bullets
