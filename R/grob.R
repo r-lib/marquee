@@ -9,6 +9,8 @@
 #' @param text Either a character vector or a `marquee_parsed` object as created
 #' by [marquee_parse()]
 #' @inheritParams marquee_parse
+#' @param force_body_margin Should the body margin override margin collapsing
+#' calculations. See Details.
 #' @param x,y The location of the markdown text in the graphics. If numeric it
 #' will be converted to units using `default.units`
 #' @param width The width of each markdown text. If numeric it will be converted
@@ -57,7 +59,13 @@
 #' **Margin collapsing**
 #'
 #' Margin calculations follows the margin collapsing rules of HTML. Read more
-#' about these at [mdn](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_box_model/Mastering_margin_collapsing)
+#' about these at [mdn](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_box_model/Mastering_margin_collapsing).
+#' Margin collapsing means that elements with margin set to 0 might end up with
+#' a margin. Specifically for the body element this can be a problem if you want
+#' to enforce a tight box around your text. Because of this the
+#' `force_body_margin` argument allows you to overwrite the margins
+#' for the body element with the original values after collapsing has been
+#' performed.
 #'
 #' **Underline and strikethrough**
 #'
@@ -121,7 +129,8 @@
 #' first or last line respectively.
 #'
 #' @export
-marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE, x = 0,
+marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
+                         force_body_margin = FALSE, x = 0,
                          y = 1, width = NULL, default.units = "npc", hjust = "left",
                          vjust = "top", angle = 0, vp = NULL, name = NULL) {
   # Basic input checking
@@ -141,6 +150,7 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE, x = 
   } else if (!is.numeric(vjust) && !is.character(vjust)) {
     cli::cli_abort("{.arg vjust} must either be numeric or a character vector")
   }
+  check_bool(force_body_margin)
 
   if (!is.unit(x)) x <- unit(x, default.units)
   if (!is.unit(y)) y <- unit(y, default.units)
@@ -179,9 +189,18 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE, x = 
 
   # Perform margin collapsing
   collapsed_margins <- list(top = parsed$margin_top, bottom = parsed$margin_bottom)
+  has_background <- vapply(parsed$background, function(x) !(is.character(x) && is.na(x[1])), logical(1))
+  has_top <- !is.na(parsed$border) & parsed$border_size_top != 0
+  has_bottom <- !is.na(parsed$border) & parsed$border_size_bottom != 0
   for (root in blocks$start[blocks$indent == 1]) {
     block_tree <- collect_children(root, blocks$start, parsed$ends, parsed$indentation)
-    collapsed_margins <- set_margins(block_tree, collapsed_margins)
+    collapsed_margins <- set_margins(block_tree, collapsed_margins, has_background, has_top, has_bottom)
+  }
+  # Body margin wins over any collapsing
+  if (force_body_margin) {
+    roots <- parsed$indentation == 1
+    collapsed_margins$top[roots] <- parsed$margin_top[roots]
+    collapsed_margins$bottom[roots] <- parsed$margin_bottom[roots]
   }
   parsed$margin_top <- collapsed_margins$top
   parsed$margin_bottom <- collapsed_margins$bottom
@@ -916,29 +935,33 @@ collect_children <- function(elem, block_starts, block_ends, block_indent) {
     children = children
   )
 }
-get_first <- function(tree) {
-  if (length(tree$children) != 0) {
-    c(tree$element, get_first(tree$children[[1]]))
+get_first <- function(tree, background, border) {
+  if (background[tree$element] || border[tree$element]) {
+    tree$element
+  } else if (length(tree$children) != 0) {
+    c(tree$element, get_first(tree$children[[1]], background, border))
   } else {
     tree$element
   }
 }
-get_last <- function(tree) {
-  if (length(tree$children) != 0) {
-    c(tree$element, get_last(tree$children[[length(tree$children)]]))
+get_last <- function(tree, background, border) {
+  if (background[tree$element] || border[tree$element]) {
+    tree$element
+  } else if (length(tree$children) != 0) {
+    c(tree$element, get_last(tree$children[[length(tree$children)]], background, border))
   } else {
     tree$element
   }
 }
-set_margins <- function(tree, margins) {
-  tops <- get_first(tree)
+set_margins <- function(tree, margins, has_background, has_top, has_bottom) {
+  tops <- get_first(tree, has_background, has_top)
   margins$top[tops[1]] <- max(margins$top[tops])
   margins$top[tops[-1]] <- 0
-  bottoms <- get_last(tree)
+  bottoms <- get_last(tree, has_background, has_top)
   margins$bottom[bottoms[1]] <- max(margins$bottom[bottoms])
   margins$bottom[bottoms[-1]] <- 0
   for (child in tree$children) {
-    margins <- set_margins(child, margins)
+    margins <- set_margins(child, margins, has_background, has_top, has_bottom)
   }
   for (i in seq_along(tree$children)[-1]) {
     margins$bottom[tree$children[[i-1]]$element] <- max(margins$bottom[tree$children[[i-1]]$element], margins$top[tree$children[[i]]$element])

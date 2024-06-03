@@ -26,7 +26,7 @@ classic_style <- function(base_size = 12, body_font = "", header_font = "",
   base <- base_style(family = body_font, size = base_size, ...)
   style_set(
     base = base,
-    body = style(),
+    body = style(margin = skip_inherit(trbl(0))),
     ul   = style(padding = trbl(0, 0, 0, em(2)), background = NA, border = NA),
     ol   = style(padding = trbl(0, 0, 0, em(2)), background = NA, border = NA),
     li   = style(padding = trbl(0), background = NA, border = NA),

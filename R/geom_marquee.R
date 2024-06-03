@@ -143,7 +143,7 @@ make_marquee_geom <- function() {
       data$hjust <- compute_just(data$hjust, data$x, data$y, data$angle)
 
       grob <- marquee_grob(
-        text = lab, style = styles,
+        text = lab, style = styles, force_body_margin = TRUE,
         x = data$x, y = data$y, width = data$width,
         hjust = data$hjust, vjust = data$vjust,
         angle = data$angle

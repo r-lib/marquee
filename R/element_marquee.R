@@ -92,7 +92,7 @@ element_grob.element_marquee <- function(element, label = "", x = NULL, y = NULL
   y <- y %||% rep(just$vjust, n)
   width <- width %||% element$width %||% NA
   angle <- angle %||% element$angle %||% 0
-  marquee_grob(label, style, x = x, y = y, width = width,
+  marquee_grob(label, style, force_body_margin = TRUE, x = x, y = y, width = width,
                hjust = hjust %||% element$hjust, vjust = vjust %||% element$vjust, angle = angle)
 }
 
