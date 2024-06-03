@@ -8,6 +8,7 @@ marquee_grob(
   text,
   style = classic_style(),
   ignore_html = TRUE,
+  force_body_margin = FALSE,
   x = 0,
   y = 1,
   width = NULL,
@@ -27,6 +28,9 @@ by \code{\link[=marquee_parse]{marquee_parse()}}}
 should be rendered}
 
 \item{ignore_html}{Should HTML code be removed from the output}
+
+\item{force_body_margin}{Should the body margin override margin collapsing
+calculations. See Details.}
 
 \item{x, y}{The location of the markdown text in the graphics. If numeric it
 will be converted to units using \code{default.units}}
@@ -89,7 +93,13 @@ bottom border size and no size for the other sides.
 \strong{Margin collapsing}
 
 Margin calculations follows the margin collapsing rules of HTML. Read more
-about these at \href{https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_box_model/Mastering_margin_collapsing}{mdn}
+about these at \href{https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_box_model/Mastering_margin_collapsing}{mdn}.
+Margin collapsing means that elements with margin set to 0 might end up with
+a margin. Specifically for the body element this can be a problem if you want
+to enforce a tight box around your text. Because of this the
+\code{force_body_margin} argument allows you to overwrite the margins
+for the body element with the original values after collapsing has been
+performed.
 
 \strong{Underline and strikethrough}
 
