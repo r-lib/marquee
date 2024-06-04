@@ -126,16 +126,18 @@ make_marquee_geom <- function() {
           !all(vapply(data$fill, function(x) is.character(x) || inherits(x, "GridPattern"), logical(1)))) {
         stop_input_type(data$fill, "a character vector or a list of strings and patters", arg = "fill")
       }
-      for (i in seq_along(styles)) {
-        styles[[i]]$base$family <- data$family[[i]]
-        styles[[i]]$base$size <- size[[i]]
-        styles[[i]]$base$lineheight <- data$lineheight[[i]]
-        styles[[i]]$base$color <- colour[[i]]
-        if (!"body" %in% names(styles[[i]])) {
-          styles[[i]]$body <- style()
-        }
-        styles[[i]]$body$background <- skip_inherit(data$fill[[i]])
-      }
+
+      styles <- modify_style(styles,
+        "base",
+        family = data$family,
+        size = size,
+        lineheight = data$lineheight,
+        color = colour
+      )
+      styles <- modify_style(styles,
+        "body",
+        background = skip_inherit(data$fill)
+      )
 
       data <- coord$transform(data, panel_params)
 

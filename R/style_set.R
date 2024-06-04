@@ -10,10 +10,11 @@
 #' @param ... Named arguments providing a style for the specific tags. For
 #' `modify_style()` a number of style options to change. If the first argument
 #' is a marquee style it will overwrite the tag and subsequent arguments are
-#' ignored
-#' @param style_set A style set to modify
-#' @param tag The name of a tag to modify or remove. Tags are internally all
-#' lowercase and `tag` will be converted to lowercase before matching
+#' ignored. This only holds if `x` is a style set.
+#' @param x A style or style set to modify
+#' @param tag The name of the tag to modify or remove if `x` is a style set. Tags
+#' are internally all lowercase and `tag` will be converted to lowercase before
+#' matching
 #'
 #' @return A `marquee_style_set` object
 #'
@@ -71,67 +72,80 @@ format.marquee_style_set <- function(x, ...) {
 
 #' @rdname style_set
 #' @export
-modify_style <- function(style_set, tag, ...) {
-  tag <- tolower(tag)
-  if (!is_style_set(style_set)) {
-    stop_input_type(style_set, "a style set object")
-  }
-  check_character(tag)
-  tag <- vctrs::vec_recycle(tag, length(style_set))
-
+modify_style <- function(x, tag, ...) {
   opts <- list2(...)
-  for (i in seq_along(opts)) {
-    opt <- opts[[i]]
-    if (is.null(opt) || is_style(opt) || is_modifier(opt) ||
-        is_trbl(opt) || inherits(opt, "marquee_skip_inherit") ||
-        inherits(opt, "font_feature") || inherits(opt, "GridPattern")) {
-      opt <- list(opt)
-    }
-    opts[[i]] <- vctrs::vec_recycle(opt, length(style_set), x_arg = names(opts)[i])
-  }
-
   args <- names(opts)
   expand <- args %in% c("margin", "padding", "border_size")
   if (any(expand)) {
     args <- c(args[!expand], paste0(rep(args[expand], each = 4), "_", c("top", "right", "bottom", "left")))
   }
-  for (i in seq_along(style_set)) {
+
+  if (is_style(x)) {
+    new_style <- style(...)
+    cls <- class(x)
+    class(x) <- NULL
+    x[args] <- new_style[args]
+    class(x) <- cls
+    return(x)
+  }
+
+  tag <- tolower(tag)
+  if (!is_style_set(x)) {
+    stop_input_type(x, "a style set object")
+  }
+  check_character(tag)
+  tag <- vctrs::vec_recycle(tag, length(x))
+
+  for (i in seq_along(opts)) {
+    opt <- opts[[i]]
+    if (is.null(opt) || is_style(opt) || is_modifier(opt) ||
+        is_trbl(opt) || inherits(opt, "font_feature") ||
+        inherits(opt, "GridPattern")) {
+      opt <- list(opt)
+    }
+    opts[[i]] <- vctrs::vec_recycle(opt, length(x), x_arg = names(opts)[i])
+  }
+
+  for (i in seq_along(x)) {
     if (is_style(opts[[1]][[i]])) {
       if (tag[i] == "base" && any(vapply(opts[[1]][[i]], is.null, logical(1)))) {
         cli::cli_abort("The base tag must be set to a complete style")
       }
-      style_set[[i]][[tag[i]]] <- opts[[1]][[i]]
+      x[[i]][[tag[i]]] <- opts[[1]][[i]]
     } else {
       new_style <- inject(style(!!!lapply(opts, `[[`, i)))
-      old_style <- style_set[[i]][[tag[i]]]
+      old_style <- x[[i]][[tag[i]]]
       if (is.null(old_style)) {
-        style_set[[i]][[tag[i]]] <- new_style
+        x[[i]][[tag[i]]] <- new_style
       } else {
         if (tag[i] == "base" && any(vapply(new_style[args], is.null, logical(1)))) {
           cli::cli_abort("The base tag cannot have any styles set to {.val NULL}")
         }
-        style_set[[i]][[tag[i]]][args] <- new_style[args]
+        cls <- class(x[[i]][[tag[i]]])
+        class(x[[i]][[tag[i]]]) <- NULL
+        x[[i]][[tag[i]]][args] <- new_style[args]
+        class(x[[i]][[tag[i]]]) <- cls
       }
     }
   }
 
-  style_set
+  x
 }
 
 #' @rdname style_set
 #' @export
-remove_style <- function(style_set, tag) {
+remove_style <- function(x, tag) {
   tag <- tolower(tag)
-  if (!is_style_set(style_set)) {
-    stop_input_type(style_set, "a style set object")
+  if (!is_style_set(x)) {
+    stop_input_type(x, "a style set object")
   }
   check_character(tag)
   if (any(tag == "base")) {
     cli::cli_abort("The base style cannot be removed")
   }
-  tag <- vctrs::vec_recycle(tag, length(style_set))
-  for (i in seq_along(style_set)) {
-    style_set[[i]][tag[i]] <- NULL
+  tag <- vctrs::vec_recycle(tag, length(x))
+  for (i in seq_along(x)) {
+    x[[i]][tag[i]] <- NULL
   }
-  style_set
+  x
 }

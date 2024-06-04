@@ -8,20 +8,21 @@
 \usage{
 style_set(...)
 
-modify_style(style_set, tag, ...)
+modify_style(x, tag, ...)
 
-remove_style(style_set, tag)
+remove_style(x, tag)
 }
 \arguments{
 \item{...}{Named arguments providing a style for the specific tags. For
 \code{modify_style()} a number of style options to change. If the first argument
 is a marquee style it will overwrite the tag and subsequent arguments are
-ignored}
+ignored. This only holds if \code{x} is a style set.}
 
-\item{style_set}{A style set to modify}
+\item{x}{A style or style set to modify}
 
-\item{tag}{The name of a tag to modify or remove. Tags are internally all
-lowercase and \code{tag} will be converted to lowercase before matching}
+\item{tag}{The name of the tag to modify or remove if \code{x} is a style set. Tags
+are internally all lowercase and \code{tag} will be converted to lowercase before
+matching}
 }
 \value{
 A \code{marquee_style_set} object

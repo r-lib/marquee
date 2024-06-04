@@ -45,6 +45,15 @@ test_that("modify_style() does correct modification", {
   expect_snapshot_error(modify_style(ss, "body", size = 1:2))
 })
 
+test_that("modify_style works on style objects", {
+  s <- base_style()
+  s <- modify_style(s, size = 6, color = "grey", padding = trbl(em(3), 0))
+  expect_equal(s$size, 6)
+  expect_equal(s$color, "grey")
+  expect_equal(s$padding_top, em(3))
+  expect_equal(s$padding_right, 0)
+})
+
 test_that("remove_style() works", {
   ss <- style_set(base = base_style(), body = style())
 

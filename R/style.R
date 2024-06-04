@@ -207,6 +207,21 @@ str.marquee_style <- function(object, ...) {
   return(invisible(NULL))
 }
 
+#' @export
+`$<-.marquee_style` <- function(x, name, value) {
+  cli::cli_abort("Setting style values using {.arg $}, {.arg []}, or {.arg [[]]} are not permitted. Please use {.fun modify_style}")
+}
+
+#' @export
+`[[<-.marquee_style` <- function(x, ..., value) {
+  cli::cli_abort("Setting style values using {.arg $}, {.arg []}, or {.arg [[]]} are not permitted. Please use {.fun modify_style}")
+}
+
+#' @export
+`[<-.marquee_style` <- function(x, ..., value) {
+  cli::cli_abort("Setting style values using {.arg $}, {.arg []}, or {.arg [[]]} are not permitted. Please use {.fun modify_style}")
+}
+
 #' @rdname style
 #' @export
 base_style <- function(family = "", weight = "normal", italic = FALSE,

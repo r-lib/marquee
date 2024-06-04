@@ -127,6 +127,16 @@ format.marquee_skip_inherit <- function(x, ...) {
 }
 
 #' @export
+`[[.marquee_skip_inherit` <- function(x, ..., value) {
+  skip_inherit(NextMethod())
+}
+
+#' @export
+`[.marquee_skip_inherit` <- function(x, ..., value) {
+  skip_inherit(NextMethod())
+}
+
+#' @export
 print.marquee_skip_inherit <- print.marquee_relative
 
 #' @rdname style_helpers
