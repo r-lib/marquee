@@ -84,9 +84,9 @@ style set from an existing one rather than building one from scratch.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">style_set</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">modify_style</span><span class="op">(</span><span class="va">style_set</span>, <span class="va">tag</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">modify_style</span><span class="op">(</span><span class="va">x</span>, <span class="va">tag</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">remove_style</span><span class="op">(</span><span class="va">style_set</span>, <span class="va">tag</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remove_style</span><span class="op">(</span><span class="va">x</span>, <span class="va">tag</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -95,16 +95,17 @@ style set from an existing one rather than building one from scratch.</p>
 <dd><p>Named arguments providing a style for the specific tags. For
 <code>modify_style()</code> a number of style options to change. If the first argument
 is a marquee style it will overwrite the tag and subsequent arguments are
-ignored</p></dd>
+ignored. This only holds if <code>x</code> is a style set.</p></dd>
 
 
-<dt>style_set</dt>
-<dd><p>A style set to modify</p></dd>
+<dt>x</dt>
+<dd><p>A style or style set to modify</p></dd>
 
 
 <dt>tag</dt>
-<dd><p>The name of a tag to modify or remove. Tags are internally all
-lowercase and <code>tag</code> will be converted to lowercase before matching</p></dd>
+<dd><p>The name of the tag to modify or remove if <code>x</code> is a style set. Tags
+are internally all lowercase and <code>tag</code> will be converted to lowercase before
+matching</p></dd>
 
 </dl></div>
     <div class="section level2">
