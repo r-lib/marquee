@@ -1,3 +1,101 @@
+#' Marquee subtitle guide
+#'
+#' This legend appears similar to a subtitle and uses marquee syntax to typeset
+#' the text and interpolate legend glyphs.
+#'
+#' @param title A single character string indicating the text to display. If
+#'   `NULL` the title is not shown. If [`waiver()`][ggplot2::waiver()]
+#'   (default), the name of the scale or the name specified in
+#'   [`labs()`][ggplot2::labs()] is used for the tyle.
+#' @param style Either a [style_set][style_set()] to override style sets
+#'   inherited from the theme, or a [style][style()] for styling the labels
+#'   specifically. For `colour` or `fill` scales, the `color`, `background` and
+#'   `border` style properties are overridden when set as `NULL`, see examples.
+#' @param detect Either `FALSE` to typeset entirely through syntax or `TRUE` to
+#'   automatically detect labels and apply.
+#' @param override.aes A list specifying aesthetic parameters of the legend
+#'   keys. See details and examples in
+#'   [`?guide_legend`][ggplot2::guide_legend()].
+#' @inheritParams ggplot2::guide_legend
+#'
+#' @details
+#' # Text formatting
+#'
+#' In addition to standard [marquee syntax][marquee_parse()], there is
+#' additional syntax to make building a guide easier. In the text below, `n`
+#' marks the `n`-th break in the scale, `label` represents any of the scale's
+#' labels and `foo` represents arbitrary text.
+#'
+#' * `<<n>>` or `<<label>>` can be used to insert key glyphs into the text.
+#' * `![](n)` or `![](label)` can also be used to insert key glyphs into the
+#'   text.
+#' * `{.n foo}` or `{.label foo}` applies the `style` argument to `foo`,
+#'   including recoloring when the guide represents a `colour` or `fill` scale.
+#' * `!!n` or `!!label` translates to `{.label label}` to insert the label
+#'   verbatim with the application of the `style` argument.
+#'
+#' @return A GuideMarquee object that can be passed to the
+#'   [`guides()`][ggplot2::guides()] function or used as the `guide` argument in
+#'   a scale.
+#' @export
+#' @examplesIf utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2", version = "3.5.0")
+#' library(ggplot2)
+#' # A standard plot
+#' base <- ggplot(mpg, aes(displ, hwy)) +
+#'   geom_point()
+#'
+#' # Using key glyphs
+#' base + aes(shape = drv) +
+#'   scale_shape_discrete(
+#'     # Same as using <<1>>, <<2>> and <<3>>,
+#'     # or ![](1), ![](2) and ![](3)
+#'     # or ![](4), ![](f) and ![](r)
+#'     name = "Cars with four wheel <<4>>, forward <<f>> or reverse <<r>> drive.",
+#'     guide = "marquee"
+#'   )
+#'
+#' # Recolouring text
+#' base <- base +
+#'   aes(colour = drv) +
+#'   labs(
+#'     colour = "Cars with {.4 four wheel}, {.f forward} or {.r reverse} drive."
+#'   )
+#' base + guides(colour = "marquee")
+#'
+#' # Adjust display of labels
+#' st <- style(weight = "bold", italic = TRUE, background = NA)
+#' base + guides(colour = guide_marquee(style = st))
+#'
+#' # Using background instead of text colour by setting it to NULL
+#' st <- style(color = "black", background = NULL)
+#' base + guides(colour = guide_marquee(style = st))
+#'
+#' # Customising style of each label through style sets
+#' # Note: tag names must be universal per `vctrs::vec_as_names`
+#' st <- classic_style()
+#' st <- modify_style(st, tag = "f", background = NULL, color = "black")
+#' st <- modify_style(st, tag = "r", border_size = trbl(1),
+#'                    color = "black", background = NA)
+#' base + guides(colour = guide_marquee(style = st))
+#'
+#' # Alternatively:
+#' base + guides(colour = "marquee") +
+#'   theme(plot.subtitle = element_marquee(style = st))
+#'
+#' # Splicing in labels
+#' base + aes(colour = class) +
+#'   labs(colour = "Cars including !!2 and !!6 vehicles") +
+#'   guides(colour = "marquee")
+#'
+#' # Using automatic detection
+#' base + aes(colour = class) +
+#'   labs(colour = "Cars including suv and minivan vehicles") +
+#'   guides(colour = guide_marquee(detect = TRUE))
+#'
+#' # Automatic detection is not always a good idea
+#' base +
+#'   labs(colour = "Kerfuffles 4 the riffraff from frankfurt") +
+#'   guides(colour = guide_marquee(detect = TRUE))
 guide_marquee <- function(title = ggplot2::waiver(),
                           # Note: prefixing namespace prevents recursive default argument
                           style = marquee::style(background = NA),
@@ -28,6 +126,22 @@ guide_marquee <- function(title = ggplot2::waiver(),
     super = GuideMarquee
   )
 }
+
+#' Guide class for guide_marquee
+#'
+#'This is sthe underlying Guide class that powers [guide_marquee] legends.
+#'
+#' @usage
+#' GuideMarquee
+#'
+#' @name GuideMarquee
+#' @aliases GuideMarquee
+#' @export GuideMarquee
+#'
+#' @keywords internal
+#' @docType class
+#'
+NULL
 
 on_load(
   makeActiveBinding("GuideMarquee", function() guide_env$guide, environment(guide_marquee))
