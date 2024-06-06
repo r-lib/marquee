@@ -71,10 +71,11 @@
 #' base + guides(colour = guide_marquee(style = st))
 #'
 #' # Customising style of each label through style sets
-#' # Note: tag names must be universal per `vctrs::vec_as_names`
+#' # Note: tag names must be universal per `vctrs::vec_as_names` and
+#' # prefixed with `lab_`.
 #' st <- classic_style()
-#' st <- modify_style(st, tag = "f", background = NULL, color = "black")
-#' st <- modify_style(st, tag = "r", border_size = trbl(1),
+#' st <- modify_style(st, tag = "lab_f", background = NULL, color = "black")
+#' st <- modify_style(st, tag = "lab_r", border_size = trbl(1),
 #'                    color = "black", background = NA)
 #' base + guides(colour = guide_marquee(style = st))
 #'
@@ -298,6 +299,7 @@ replace_tags <- function(text, labels, detect) {
 
   n <- rev(seq_along(labels))
   tags <- vctrs::vec_as_names(labels, repair = "universal", quiet = TRUE)
+  tags <- paste0("lab_", tolower(tags))
 
   # Replace "!!1" and "!!labels" with "{.label label}
   relabel <- paste0("{.", tags, " ", labels, "}")
@@ -352,6 +354,7 @@ recolour_style <- function(style, text, params) {
   }
 
   tags <- vctrs::vec_as_names(key$.label, repair = "universal", quiet = TRUE)
+  tags <- paste0("lab_", tolower(tags))
   for (tag in setdiff(tags, names(style[[1]]))) {
     style <- modify_style(style, tag, label)
   }
