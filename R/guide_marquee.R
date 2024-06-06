@@ -214,9 +214,6 @@ make_marquee_guide <- function() {
       # TODO: this is a hack until #24 is solved
       f <- element_grob.element_marquee
       fn_env(f) <- list2env(glyphs)
-      for (i in names(glyphs)) {
-        environment(f)[[i]] <- glyphs[[i]]
-      }
       grob <- f(elems$title, label = text, width = width, margin_y = TRUE, style = style)
 
       gt <- gtable::gtable(widths = width, heights = grobHeight(grob))
