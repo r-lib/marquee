@@ -92,11 +92,6 @@
 #' base + aes(colour = class) +
 #'   labs(colour = "Cars including suv and minivan vehicles") +
 #'   guides(colour = guide_marquee(detect = TRUE))
-#'
-#' # Automatic detection is not always a good idea
-#' base +
-#'   labs(colour = "Kerfuffles 4 the riffraff from frankfurt") +
-#'   guides(colour = guide_marquee(detect = TRUE))
 guide_marquee <- function(title = ggplot2::waiver(),
                           # Note: prefixing namespace prevents recursive default argument
                           style = marquee::style(background = NA),
@@ -319,10 +314,12 @@ replace_tags <- function(text, labels, detect) {
   }
 
   if (isTRUE(detect)) {
-    # TODO: this is really naive and might match glyphs and tags
-    labels <- regescape(labels)
+    # Regex pattern searches for labels flanked by word breaks \b(label)\b and
+    # excludes matches within tags (?<!{.tags)
+    labels <- paste0("\\b(", regescape(labels), ")(?<!\\{\\.", regescape(tags), ")\\b")
+    replacement <- paste0("\\{\\.", regescape(tags), " \\1\\}")
     for (i in n) {
-      text <- gsub(x = text, labels[i], relabel[i])
+      text <- gsub(x = text, labels[i], replacement[i], ignore.case = TRUE, perl = TRUE)
     }
   }
 
