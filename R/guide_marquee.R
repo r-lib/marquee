@@ -83,9 +83,9 @@
 #' base + guides(colour = "marquee") +
 #'   theme(plot.subtitle = element_marquee(style = st))
 #'
-#' # Splicing in labels
+#' # Splicing in labels by number (!!2) or label (!!subcompact)
 #' base + aes(colour = class) +
-#'   labs(colour = "Cars including !!2 and !!6 vehicles") +
+#'   labs(colour = "Cars including !!2 and !!subcompact vehicles") +
 #'   guides(colour = "marquee")
 #'
 #' # Using automatic detection
