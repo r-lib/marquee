@@ -34,6 +34,9 @@
     <loc>https://marquee.r-lib.org/dev/reference/GeomMarquee.html</loc>
   </url>
   <url>
+    <loc>https://marquee.r-lib.org/dev/reference/GuideMarquee.html</loc>
+  </url>
+  <url>
     <loc>https://marquee.r-lib.org/dev/reference/classic_style.html</loc>
   </url>
   <url>
@@ -41,6 +44,9 @@
   </url>
   <url>
     <loc>https://marquee.r-lib.org/dev/reference/geom_marquee.html</loc>
+  </url>
+  <url>
+    <loc>https://marquee.r-lib.org/dev/reference/guide_marquee.html</loc>
   </url>
   <url>
     <loc>https://marquee.r-lib.org/dev/reference/index.html</loc>
