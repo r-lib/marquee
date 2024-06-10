@@ -30,6 +30,7 @@ Imports:
 Suggests: 
     ggplot2,
     gt,
+    gtable,
     knitr,
     patchwork,
     ragg,
