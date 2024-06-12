@@ -96,6 +96,9 @@ element_grob.element_marquee <- function(element, label = "", x = NULL, y = NULL
     margin_y <- margin_x
     margin_x <- tmp
   }
+
+  vjust <- vjust %||% element$vjust
+  if (all(as.numeric(margin)[c(1, 3)] == 0)) vjust <- ink(vjust)
   if (!is.null(margin)) {
     pad <- skip_inherit(trbl(
       if (margin_y) margin[1] else 0,
@@ -110,9 +113,9 @@ element_grob.element_marquee <- function(element, label = "", x = NULL, y = NULL
   x <- x %||% rep(just$hjust, n)
   y <- y %||% rep(just$vjust, n)
   width <- width %||% element$width %||% NA
-  angle <- angle %||% element$angle %||% 0
   marquee_grob(label, style, force_body_margin = TRUE, x = x, y = y, width = width,
-               hjust = hjust %||% element$hjust, vjust = vjust %||% element$vjust, angle = angle)
+               hjust = hjust %||% element$hjust, vjust = vjust,
+               angle = angle)
 }
 
 on_load({
