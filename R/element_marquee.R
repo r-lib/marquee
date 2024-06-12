@@ -122,6 +122,54 @@ on_load({
   on_package_load("ggplot2", registerS3method("element_grob", "element_marquee", element_grob.element_marquee, asNamespace("ggplot2")))
 })
 
+#' Convert all text elements in a theme to marquee elements
+#'
+#' While [element_marquee()] should behave similar to `ggplot2::element_text()`
+#' when used on plain text (i.e. text without any markdown markup), the reality
+#' can be different. This is because the text shaping engine used by marquee
+#' ([textshaping::shape_text()]) may differ from the one used by the graphics
+#' device (which is responsible for laying out text in `element_text()`).
+#' Differences can range from slight differences in letter spacing to using a
+#' different font altogether (this is because the font keywords `""`, `"sans"`,
+#' `"serif"`, `"mono"`, and `"symbol"` may be mapped to different fonts
+#' depending on the shaper). One way to handle this is to provide an explicit
+#' font name for the elements, but alternatively you can use this function to
+#' convert all text elements in a theme to [element_marquee()]
+#'
+#' @param theme A (complete) ggplot2 theme
+#'
+#' @return `theme` with all text elements substituted for marquee elements
+#'
+#' @export
+#'
+#' @examplesIf utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")
+#' library(ggplot2)
+#' ggplot(mtcars) +
+#'   geom_point(aes(disp, mpg)) +
+#'   ggtitle("How about that") +
+#'   marquefy_theme(theme_gray())
+#'
+marquefy_theme <- function(theme) {
+  theme[] <- lapply(theme, function(elem) {
+    if (!inherits(elem, "element_text")) return(elem)
+    style <- classic_style()
+    if (!is.null(elem$face)) {
+      if (elem$face %in% c("italic", "bold.italic")) {
+        style <- modify_style(style, "base", italic = TRUE)
+      }
+      if (elem$face %in% c("bold", "bold.italic")) {
+        style <- modify_style(style, "base", weight = "bold")
+      }
+    }
+    element_marquee(family = elem$family, colour = elem$colour, size = elem$size,
+                    hjust = elem$hjust, vjust = elem$vjust, angle = elem$angle,
+                    lineheight = elem$lineheight, margin = elem$margin,
+                    style = style, width = NA,
+                    inherit.blank = elem$inherit.blank)
+  })
+  theme
+}
+
 # Adaption of ggplot2:::rotate_just() to work with additional just keywords
 rotate_just <- function (angle, hjust, vjust) {
   angle <- (angle %||% 0)%%360
