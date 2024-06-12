@@ -34,7 +34,10 @@ element_marquee(
 
 \item{lineheight}{The lineheight of the base style}
 
-\item{margin}{The margin for the body tag}
+\item{margin}{The margin for the body tag. As margins in \code{element_text()}
+doesn't rotate along with \code{angle} we follow this behavior here as well so
+that the right margin becomes the bottom margin when rotating the text 90
+degrees and so forth.}
 
 \item{style}{A style set to base the rendering on}
 

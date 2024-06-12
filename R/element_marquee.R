@@ -14,7 +14,10 @@
 #' @param colour,color The font colour of the base style
 #' @param size The font size of the base style
 #' @param lineheight The lineheight of the base style
-#' @param margin The margin for the body tag
+#' @param margin The margin for the body tag. As margins in `element_text()`
+#' doesn't rotate along with `angle` we follow this behavior here as well so
+#' that the right margin becomes the bottom margin when rotating the text 90
+#' degrees and so forth.
 #' @param style A style set to base the rendering on
 #' @param width The maximum width of the text. See the description for some
 #' caveats for this
@@ -77,6 +80,22 @@ element_grob.element_marquee <- function(element, label = "", x = NULL, y = NULL
     lineheight = lineheight %||% element$lineheight %||% style$base$lineheight %||% 1
   )
   margin <- margin %||% element$margin
+  angle <- (angle %||% element$angle %||% 0) %% 360
+
+  # Make sure margin doesn't rotate with element as that is how it works for element_text
+  if (angle > 45 && angle <= 135) {
+    margin <- margin[c(4, 1, 2, 3)]
+    tmp <- margin_y
+    margin_y <- margin_x
+    margin_x <- tmp
+  } else if (angle > 135 && angle <= 225) {
+    margin <- margin[c(3, 4, 1, 2)]
+  } else if (angle > 225 && angle <= 315) {
+    margin <- margin[c(2, 3, 4, 1)]
+    tmp <- margin_y
+    margin_y <- margin_x
+    margin_x <- tmp
+  }
   if (!is.null(margin)) {
     pad <- skip_inherit(trbl(
       if (margin_y) margin[1] else 0,
