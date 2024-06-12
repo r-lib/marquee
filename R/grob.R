@@ -519,6 +519,7 @@ makeContext.marquee_grob <- function(x) {
 
   # Store info in object
   x$shape <- shape$shape
+  widths <- widths + rowSums(x$text[x$blocks$start, c("padding_left", "padding_right", "margin_left", "margin_right")])
   x$widths <- widths[x$blocks$indent == 1]
   x$heights <- heights[x$blocks$indent == 1]
   ## Adjust y so it is zero-justified
