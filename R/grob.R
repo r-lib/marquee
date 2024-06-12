@@ -139,7 +139,7 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
       "{.arg hjust} must be a valid justification",
       i = "Use either numerics or one of {.or {.val {c('left', 'left-ink', 'center', 'center-ink', 'right-ink', 'right')}}}"
     ))
-  } else if (!is.numeric(hjust) && !is.character(hjust)) {
+  } else if (!is.numeric(hjust) && !is.character(hjust) && !is_ink(hjust)) {
     cli::cli_abort("{.arg hjust} must either be numeric or a character vector")
   }
   if (is.character(vjust) && !all(vjust %in% c("bottom", "bottom-ink", "last-line", "center", "center-ink", "first-line", "top-ink", "top"))) {
@@ -147,7 +147,7 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
       "{.arg vjust} must be a valid justification",
       i = "Use either a numerics or one of {.or {.val {c('bottom', 'bottom-ink', 'last-line', 'center', 'center-ink', 'first-line', 'top-ink', 'top')}}}"
     ))
-  } else if (!is.numeric(vjust) && !is.character(vjust)) {
+  } else if (!is.numeric(vjust) && !is.character(vjust) && !is_ink(vjust)) {
     cli::cli_abort("{.arg vjust} must either be numeric or a character vector")
   }
   check_bool(force_body_margin)
@@ -546,6 +546,12 @@ makeContext.marquee_grob <- function(x) {
         "right" = 1
       )
     }, numeric(1))
+  } else if (inherits(x$hjust, "marquee_ink")) {
+    x$hjust <- ifelse(
+      vctrs::vec_data(x$hjust)$ink,
+      (ink_left + (ink_right - ink_left) * vctrs::vec_data(x$hjust)$val) / x$widths,
+      vctrs::vec_data(x$hjust)$val
+    )
   }
   if (is.character(x$vjust)) {
     x$vjust <- vapply(seq_along(x$vjust), function(i) {
@@ -562,6 +568,12 @@ makeContext.marquee_grob <- function(x) {
         "top" = 1
       )
     }, numeric(1))
+  } else if (inherits(x$vjust, "marquee_ink")) {
+    x$vjust <- ifelse(
+      vctrs::vec_data(x$vjust)$ink,
+      (ink_bottom + (ink_top - ink_bottom) * vctrs::vec_data(x$vjust)$val) / x$heights,
+      vctrs::vec_data(x$vjust)$val
+    )
   }
 
   # Perform justification

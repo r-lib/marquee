@@ -104,26 +104,29 @@ on_load({
 rotate_just <- function (angle, hjust, vjust) {
   angle <- (angle %||% 0)%%360
   if (is.character(hjust)) {
-    hjust <- switch(hjust, "left" = , "left-ink" = 0, "center" = , "center-ink" = 0.5, "right" = , "right-ink" = 1)
+    hjust <- switch(hjust, "left" = 0, "left-ink" = ink(0), "center" = 0.5, "center-ink" = ink(0.5), "right" = 1, "right-ink" = ink(1))
   }
   if (is.character(vjust)) {
-    vjust <- switch(vjust, "bottom" = , "bottom-ink" = ,"last-line" = 0, "center" = , "center-ink" = 0.5, "top" = , "top-ink" = , "first-line" = 1)
+    vjust <- switch(vjust, "bottom" = 0, "bottom-ink" = ink(0),"last-line" = 0, "center" = 0.5, "center-ink" = ink(0.5), "top" = 1, "top-ink" = ink(1), "first-line" = 1)
   }
   size <- vctrs::vec_size_common(angle, hjust, vjust)
   angle <- vctrs::vec_recycle(angle, size)
-  hjust <- vctrs::vec_recycle(hjust, size)
-  vjust <- vctrs::vec_recycle(vjust, size)
+  hjust <- vctrs::vec_cast(vctrs::vec_recycle(hjust, size), ink())
+  vjust <- vctrs::vec_cast(vctrs::vec_recycle(vjust, size), ink())
   case <- findInterval(angle, c(0, 90, 180, 270, 360))
-  hnew <- hjust
-  vnew <- vjust
+  hnew <- as.numeric(hjust)
+  vnew <- as.numeric(vjust)
   is_case <- which(case == 2)
-  hnew[is_case] <- 1 - vjust[is_case]
-  vnew[is_case] <- hjust[is_case]
+  hnew[is_case] <- 1 - as.numeric(vjust[is_case])
+  vnew[is_case] <- as.numeric(hjust[is_case])
   is_case <- which(case == 3)
-  hnew[is_case] <- 1 - hjust[is_case]
-  vnew[is_case] <- 1 - vjust[is_case]
+  hnew[is_case] <- 1 - as.numeric(hjust[is_case])
+  vnew[is_case] <- 1 - as.numeric(vjust[is_case])
   is_case <- which(case == 4)
-  hnew[is_case] <- vjust[is_case]
-  vnew[is_case] <- 1 - hjust[is_case]
-  list(hjust = hnew, vjust = vnew)
+  hnew[is_case] <- as.numeric(vjust[is_case])
+  vnew[is_case] <- 1 - as.numeric(hjust[is_case])
+  list(
+    hjust = ink(hnew, ifelse(case == 3, vctrs::vec_data(hjust)$ink, vctrs::vec_data(vjust)$ink)),
+    vjust = ink(vnew, ifelse(case == 3, vctrs::vec_data(vjust)$ink, vctrs::vec_data(hjust)$ink))
+  )
 }
