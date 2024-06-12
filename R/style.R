@@ -93,6 +93,7 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   }
 
   if (inherits(size, "marquee_em")) size <- relative(size[[1]])
+  if (is.unit(size)) size <- convertHeight(size, "bigpts", FALSE)
   if (!is_modifier(size)) check_number_decimal(size, allow_null = TRUE)
 
   check_string(color, allow_null = TRUE, allow_na = TRUE)
@@ -104,8 +105,10 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
 
   if (!is_relative(tracking)) check_number_decimal(tracking, allow_null = TRUE)
 
+  if (is.unit(indent)) indent <- convertWidth(indent, "bigpts", FALSE)
   if (!is_modifier(indent)) check_number_decimal(indent, allow_null = TRUE)
 
+  if (is.unit(hanging)) hanging <- convertWidth(hanging, "bigpts", FALSE)
   if (!is_modifier(hanging)) check_number_decimal(hanging, allow_null = TRUE)
 
   if (is.null(margin)) margin <- trbl()
@@ -125,6 +128,7 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   if (is.null(border_size)) border_size <- trbl()
   if (!is_trbl(border_size)) stop_input_type(border_size, "a marquee_trbl object", allow_null = TRUE)
 
+  if (is.unit(border_radius)) border_radius <- convertWidth(border_radius, "bigpts", FALSE)
   if (!is_modifier(border_radius)) check_number_decimal(border_radius, allow_null = TRUE)
 
   check_character(bullets, allow_null = TRUE)

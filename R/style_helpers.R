@@ -91,6 +91,10 @@ is_modifier <- function(x) inherits(x, c("marquee_relative", "marquee_em", "marq
 #' @rdname style_helpers
 #' @export
 trbl <- function(top = NULL, right = top, bottom = top, left = right) {
+  if (is.unit(top)) top <- convertHeight(top, "bigpts", TRUE)
+  if (is.unit(right)) right <- convertWidth(right, "bigpts", TRUE)
+  if (is.unit(bottom)) bottom <- convertHeight(bottom, "bigpts", TRUE)
+  if (is.unit(left)) left <- convertWidth(left, "bigpts", TRUE)
   if (!is.null(top) && !is_modifier(top)) check_number_decimal(top, allow_null = TRUE)
   if (!is.null(right) && !is_modifier(right)) check_number_decimal(right, allow_null = TRUE)
   if (!is.null(bottom) && !is_modifier(bottom)) check_number_decimal(bottom)
