@@ -138,7 +138,10 @@ small shifts in the visuals when going from <code>element_text()</code> to
 
 
 <dt>margin</dt>
-<dd><p>The margin for the body tag</p></dd>
+<dd><p>The margin for the body tag. As margins in <code><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text()</a></code>
+doesn't rotate along with <code>angle</code> we follow this behavior here as well so
+that the right margin becomes the bottom margin when rotating the text 90
+degrees and so forth.</p></dd>
 
 
 <dt>style</dt>

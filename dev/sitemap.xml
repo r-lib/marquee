@@ -52,6 +52,9 @@
     <loc>https://marquee.r-lib.org/dev/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://marquee.r-lib.org/dev/reference/ink.html</loc>
+  </url>
+  <url>
     <loc>https://marquee.r-lib.org/dev/reference/marquee-package.html</loc>
   </url>
   <url>
@@ -62,6 +65,9 @@
   </url>
   <url>
     <loc>https://marquee.r-lib.org/dev/reference/marquee_parse.html</loc>
+  </url>
+  <url>
+    <loc>https://marquee.r-lib.org/dev/reference/marquefy_theme.html</loc>
   </url>
   <url>
     <loc>https://marquee.r-lib.org/dev/reference/style.html</loc>
