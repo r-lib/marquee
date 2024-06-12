@@ -18,7 +18,9 @@ reference:
   - marquee_grob
   - geom_marquee
   - element_marquee
+  - marquefy_theme
   - guide_marquee
+  - ink
 - title: Styling
   desc: >
     These functions helps you specify the visual style used during rendering
