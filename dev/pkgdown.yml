@@ -1,12 +1,11 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   marquee_style: marquee_style.html
   marquee_syntax: marquee_syntax.html
   marquee: marquee.html
-last_built: 2024-06-12T11:33Z
+last_built: 2024-12-03T13:38Z
 urls:
   reference: https://marquee.r-lib.org/reference
   article: https://marquee.r-lib.org/articles
-
