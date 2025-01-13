@@ -15,7 +15,8 @@
 #' will be converted to units using `default.units`
 #' @param width The width of each markdown text. If numeric it will be converted
 #' to units using `default.units`. `NULL` is equivalent to the width of the
-#' parent container
+#' parent container. `NA` uses the width of the text as the full width of the
+#' grob and will thus avoid any soft breaking of lines.
 #' @param default.units A string giving the default units to apply to `x`, `y`,
 #' and `width`
 #' @param hjust The horizontal justification of the markdown with respect to

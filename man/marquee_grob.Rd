@@ -37,7 +37,8 @@ will be converted to units using \code{default.units}}
 
 \item{width}{The width of each markdown text. If numeric it will be converted
 to units using \code{default.units}. \code{NULL} is equivalent to the width of the
-parent container}
+parent container. \code{NA} uses the width of the text as the full width of the
+grob and will thus avoid any soft breaking of lines.}
 
 \item{default.units}{A string giving the default units to apply to \code{x}, \code{y},
 and \code{width}}

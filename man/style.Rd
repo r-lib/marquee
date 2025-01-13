@@ -104,9 +104,14 @@ parent hanging, \code{\link[=em]{em()}} in which case it is based on the font si
 style, or \code{\link[=rem]{rem()}} in which case it is based on the font size of the body
 element.}
 
-\item{margin}{The margin around the element, given as a call to \code{\link[=trbl]{trbl()}}}
+\item{margin}{The margin around the element, given as a call to \code{\link[=trbl]{trbl()}}.
+Margin refers to the area outside the box that text is placed in. If the
+element has a background, the margin area will not be colored.}
 
-\item{padding}{The padding around the element, given as a call to \code{\link[=trbl]{trbl()}}}
+\item{padding}{The padding around the element, given as a call to \code{\link[=trbl]{trbl()}}.
+Padding refers to the distance between the text and the border of the box it
+will be drawn in. If the element has a background, the padding area will be
+colored.}
 
 \item{background}{The color of the background fill. The background includes
 the padding but not the margin. Can be a solid color or a gradient or pattern

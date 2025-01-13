@@ -40,8 +40,13 @@
 #' parent hanging, [em()] in which case it is based on the font size in this
 #' style, or [rem()] in which case it is based on the font size of the body
 #' element.
-#' @param margin The margin around the element, given as a call to [trbl()]
-#' @param padding The padding around the element, given as a call to [trbl()]
+#' @param margin The margin around the element, given as a call to [trbl()].
+#' Margin refers to the area outside the box that text is placed in. If the
+#' element has a background, the margin area will not be colored.
+#' @param padding The padding around the element, given as a call to [trbl()].
+#' Padding refers to the distance between the text and the border of the box it
+#' will be drawn in. If the element has a background, the padding area will be
+#' colored.
 #' @param background The color of the background fill. The background includes
 #' the padding but not the margin. Can be a solid color or a gradient or pattern
 #' made with `grid::linearGradient()`/`grid::radialGradient()`/`grid::pattern()`
