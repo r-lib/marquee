@@ -147,7 +147,6 @@ verbatim with the application of the <code>style</code> argument.</p></li>
 <span class="r-in"><span>    name <span class="op">=</span> <span class="st">"Cars with four wheel &lt;&lt;4&gt;&gt;, forward &lt;&lt;f&gt;&gt; or reverse &lt;&lt;r&gt;&gt; drive."</span>,</span></span>
 <span class="r-in"><span>    guide <span class="op">=</span> <span class="st">"marquee"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Group definition failed</span>
 <span class="r-plt img"><img src="guide_marquee-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Recolouring text</span></span></span>
@@ -167,7 +166,6 @@ verbatim with the application of the <code>style</code> argument.</p></li>
 <span class="r-in"><span><span class="co"># Using background instead of text colour by setting it to NULL</span></span></span>
 <span class="r-in"><span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="style.html">style</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"black"</span>, background <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu">guide_marquee</span><span class="op">(</span>style <span class="op">=</span> <span class="va">st</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Group definition failed</span>
 <span class="r-plt img"><img src="guide_marquee-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Customising style of each label through style sets</span></span></span>
@@ -178,13 +176,11 @@ verbatim with the application of the <code>style</code> argument.</p></li>
 <span class="r-in"><span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="style_set.html">modify_style</a></span><span class="op">(</span><span class="va">st</span>, tag <span class="op">=</span> <span class="st">"lab_r"</span>, border_size <span class="op">=</span> <span class="fu"><a href="style_helpers.html">trbl</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                   color <span class="op">=</span> <span class="st">"black"</span>, background <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu">guide_marquee</span><span class="op">(</span>style <span class="op">=</span> <span class="va">st</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Group definition failed</span>
 <span class="r-plt img"><img src="guide_marquee-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Alternatively:</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"marquee"</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.subtitle <span class="op">=</span> <span class="fu"><a href="element_marquee.html">element_marquee</a></span><span class="op">(</span>style <span class="op">=</span> <span class="va">st</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Group definition failed</span>
 <span class="r-plt img"><img src="guide_marquee-6.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Splicing in labels by number (!!2) or label (!!subcompact)</span></span></span>
