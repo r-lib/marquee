@@ -765,6 +765,10 @@ yDetails.marquee_grob <- function(x, theta) {
 
 #' @export
 makeContent.marquee_grob <- function(x) {
+  if (inherits(grid::nullGrob(), what = c("null"))) {
+    # We may end here when creating precalculated grobs
+    return(x)
+  }
   # Create the font list of unique fonts
   if (nrow(x$shape) > 0) {
     font_id <- paste0(x$shape$font_path, "&", x$shape$font_index)
