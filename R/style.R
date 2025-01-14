@@ -62,6 +62,13 @@
 #' @param baseline The baseline shift to apply to the text
 #' @param img_asp The default aspect ratio for block level images if not
 #' provided by the image itself
+#' @param text_direction The directional flow of the text. Either `"auto"` to
+#' let it be determined by the content of the text, or `"ltr"`/`"rtl"` to
+#' hard-code it to either left-to-right or right-to-left. This setting will not
+#' change the order of glyphs within a span of text, but rather whether
+#' consequtive blocks of text are laid out left-to-right or right-to-left. It
+#' also affects to which side indentation is applied as well as the meaning of
+#' `"auto"`, and `"justified-auto"` aligment.
 #'
 #' @return A `marquee_style` object
 #'
@@ -80,7 +87,7 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
                   margin = NULL, padding = NULL, background = NULL, border = NULL,
                   border_size = NULL, border_radius = NULL, bullets = NULL,
                   underline = NULL, strikethrough = NULL, baseline = NULL,
-                  img_asp = NULL) {
+                  img_asp = NULL, text_direction = NULL) {
   check_string(family, allow_null = TRUE)
 
   if (is.character(weight)) weight <- systemfonts::as_font_weight(weight)
@@ -144,6 +151,8 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
 
   check_number_decimal(img_asp, allow_null = TRUE)
 
+  check_string(text_direction, allow_null = TRUE)
+
   if (!is_modifier(baseline)) check_number_decimal(baseline, allow_null = TRUE)
 
   structure(list(
@@ -178,7 +187,8 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
       underline = underline,
       strikethrough = strikethrough,
       baseline = baseline,
-      img_asp = img_asp
+      img_asp = img_asp,
+      text_direction = text_direction
     ),
     class = "marquee_style"
   )
@@ -236,12 +246,12 @@ str.marquee_style <- function(object, ...) {
 base_style <- function(family = "", weight = "normal", italic = FALSE,
                        width = "normal", features = systemfonts::font_feature(),
                        size = 12, color = "black", lineheight = 1.6,
-                       align = "left", tracking = 0, indent = 0, hanging = 0,
+                       align = "auto", tracking = 0, indent = 0, hanging = 0,
                        margin = trbl(0, 0, rem(1)), padding = trbl(0),
                        background = NA, border = NA, border_size = trbl(0),
                        border_radius = 0, bullets = marquee_bullets,
                        underline = FALSE, strikethrough = FALSE, baseline = 0,
-                       img_asp = 1.65) {
+                       img_asp = 1.65, text_direction = "auto") {
   style(
     family = family,
     weight = weight,
@@ -265,6 +275,7 @@ base_style <- function(family = "", weight = "normal", italic = FALSE,
     underline = underline,
     strikethrough = strikethrough,
     baseline = baseline,
-    img_asp = img_asp
+    img_asp = img_asp,
+    text_direction = text_direction
   )
 }

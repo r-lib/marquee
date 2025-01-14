@@ -28,7 +28,8 @@ style(
   underline = NULL,
   strikethrough = NULL,
   baseline = NULL,
-  img_asp = NULL
+  img_asp = NULL,
+  text_direction = NULL
 )
 
 base_style(
@@ -40,7 +41,7 @@ base_style(
   size = 12,
   color = "black",
   lineheight = 1.6,
-  align = "left",
+  align = "auto",
   tracking = 0,
   indent = 0,
   hanging = 0,
@@ -54,7 +55,8 @@ base_style(
   underline = FALSE,
   strikethrough = FALSE,
   baseline = 0,
-  img_asp = 1.65
+  img_asp = 1.65,
+  text_direction = "auto"
 )
 }
 \arguments{
@@ -136,6 +138,14 @@ to \code{\link[=trbl]{trbl()}}}
 
 \item{img_asp}{The default aspect ratio for block level images if not
 provided by the image itself}
+
+\item{text_direction}{The directional flow of the text. Either \code{"auto"} to
+let it be determined by the content of the text, or \code{"ltr"}/\code{"rtl"} to
+hard-code it to either left-to-right or right-to-left. This setting will not
+change the order of glyphs within a span of text, but rather whether
+consequtive blocks of text are laid out left-to-right or right-to-left. It
+also affects to which side indentation is applied as well as the meaning of
+\code{"auto"}, and \code{"justified-auto"} aligment.}
 }
 \value{
 A \code{marquee_style} object

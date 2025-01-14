@@ -39,8 +39,7 @@ marquee_glue_data(
 string(s) to format. Multiple inputs are concatenated together before formatting.
 Named arguments are taken to be temporary variables available for substitution.
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{For `glue_data()`, elements in `...` override the values in `.x`.
-}\if{html}{\out{</div>}}}
+For \code{glue_data()}, elements in \code{...} override the values in \code{.x}.}
 
 \item{.sep}{[\code{character(1)}: \sQuote{""}]\cr Separator used to separate elements.}
 
@@ -72,7 +71,7 @@ syntactic elements), when parsing the expression string. Setting \code{.literal 
 \code{.transformer}, as is the case with \code{glue_col()}. Regard this argument
 (especially, its name) as experimental.}
 
-\item{.transformer}{[\verb{function]}\cr A function taking two arguments, \code{text}
+\item{.transformer}{[\code{function}]\cr A function taking two arguments, \code{text}
 and \code{envir}, where \code{text} is the unparsed string inside the glue block and
 \code{envir} is the execution environment. A \code{.transformer} lets you modify a
 glue block before, during, or after evaluation, allowing you to create your

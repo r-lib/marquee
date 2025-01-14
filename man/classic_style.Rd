@@ -9,7 +9,8 @@ classic_style(
   body_font = "",
   header_font = "",
   code_font = "mono",
-  ...
+  ...,
+  ltr = TRUE
 )
 }
 \arguments{
@@ -54,8 +55,13 @@ measured in points. Can be \code{\link[=relative]{relative()}} in which case it 
 parent hanging, \code{\link[=em]{em()}} in which case it is based on the font size in this
 style, or \code{\link[=rem]{rem()}} in which case it is based on the font size of the body
 element.}
-    \item{\code{margin}}{The margin around the element, given as a call to \code{\link[=trbl]{trbl()}}}
-    \item{\code{padding}}{The padding around the element, given as a call to \code{\link[=trbl]{trbl()}}}
+    \item{\code{margin}}{The margin around the element, given as a call to \code{\link[=trbl]{trbl()}}.
+Margin refers to the area outside the box that text is placed in. If the
+element has a background, the margin area will not be colored.}
+    \item{\code{padding}}{The padding around the element, given as a call to \code{\link[=trbl]{trbl()}}.
+Padding refers to the distance between the text and the border of the box it
+will be drawn in. If the element has a background, the padding area will be
+colored.}
     \item{\code{background}}{The color of the background fill. The background includes
 the padding but not the margin. Can be a solid color or a gradient or pattern
 made with \code{grid::linearGradient()}/\code{grid::radialGradient()}/\code{grid::pattern()}}
@@ -71,7 +77,17 @@ to \code{\link[=trbl]{trbl()}}}
     \item{\code{baseline}}{The baseline shift to apply to the text}
     \item{\code{img_asp}}{The default aspect ratio for block level images if not
 provided by the image itself}
+    \item{\code{text_direction}}{The directional flow of the text. Either \code{"auto"} to
+let it be determined by the content of the text, or \code{"ltr"}/\code{"rtl"} to
+hard-code it to either left-to-right or right-to-left. This setting will not
+change the order of glyphs within a span of text, but rather whether
+consequtive blocks of text are laid out left-to-right or right-to-left. It
+also affects to which side indentation is applied as well as the meaning of
+\code{"auto"}, and \code{"justified-auto"} aligment.}
   }}
+
+\item{ltr}{Is the style intended for left-to-right text? This affects list
+indentation and citation border}
 }
 \value{
 A style set object

@@ -13,6 +13,8 @@
 #' @param header_font The font family to use for headers
 #' @param code_font The font family to use for code and code block text
 #' @inheritDotParams base_style -family -size
+#' @param ltr Is the style intended for left-to-right text? This affects list
+#' indentation and citation border
 #'
 #' @return A style set object
 #'
@@ -22,13 +24,13 @@
 #' classic_style(16, "serif", "sans")
 #'
 classic_style <- function(base_size = 12, body_font = "", header_font = "",
-                          code_font = "mono", ...) {
+                          code_font = "mono", ..., ltr = TRUE) {
   base <- base_style(family = body_font, size = base_size, ...)
   style_set(
     base = base,
     body = style(margin = skip_inherit(trbl(0))),
-    ul   = style(padding = trbl(0, 0, 0, em(2)), background = NA, border = NA),
-    ol   = style(padding = trbl(0, 0, 0, em(2)), background = NA, border = NA),
+    ul   = style(padding = if (ltr) trbl(0, 0, 0, em(2)) else trbl(0, em(2), 0, 0), background = NA, border = NA),
+    ol   = style(padding = if (ltr) trbl(0, 0, 0, em(2)) else trbl(0, em(2), 0, 0), background = NA, border = NA),
     li   = style(padding = trbl(0), background = NA, border = NA),
     hr   = style(padding = trbl(0, 0, rem(1/8)), border = "#eeeeee", border_size = trbl(0, 0, rem(1/16))),
     h1   = style(family = header_font, size = relative(2.25), weight = "bold", lineheight = 1.2, margin = trbl(em(1), NULL, NULL, NULL), padding = trbl(0, 0, em(0.3)), border = "#eeeeee", border_size = trbl(0, 0, rem(1/16))),
@@ -39,7 +41,7 @@ classic_style <- function(base_size = 12, body_font = "", header_font = "",
     h6   = style(family = header_font, weight = "bold", lineheight = 1.4, margin = trbl(em(1), NULL, NULL, NULL), color = "#777777"),
     cb   = style(family = code_font, size = relative(0.85), lineheight = 1.45, padding = trbl(rem(1)), background = "#f7f7f7", border_radius = rem(3/16)),
     p    = style(padding = trbl(0), background = NA, border = NA),
-    qb   = style(color = "#777777", padding = trbl(em(0.2), 0, em(0.2), em(1)), border = "#dddddd", border_size = trbl(0, 0, 0, rem(0.25))),
+    qb   = style(color = "#777777", padding = if (ltr) trbl(em(0.2), 0, em(0.2), em(1)) else trbl(em(0.2), em(1), em(0.2), 0), border = "#dddddd", border_size = if (ltr) trbl(0, 0, 0, rem(0.25)) else trbl(0, rem(0.25), 0, 0)),
     em   = style(italic = TRUE),
     str  = style(weight = "bold"),
     a    = style(color = "#4078c0"),

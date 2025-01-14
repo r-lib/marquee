@@ -225,9 +225,9 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
     features = parsed$features[bullets$index],
     size = parsed$size[bullets$index],
     res = 600,
-    align = "right",
     hjust = 1,
-    vjust = 1
+    vjust = 1,
+    direction = parsed$text_direction[bullets$index]
   )
   ## Inherit color and id from the relevant block
   bullets$shape$shape$col <- parsed$color[bullets$index[bullets$shape$shape$metric_id]]
@@ -384,7 +384,8 @@ makeContext.marquee_grob <- function(x) {
     indent = convertWidth(unit(x$text$indent, "bigpts"), "inches", TRUE),
     hanging = convertWidth(unit(x$text$hanging, "bigpts"), "inches", TRUE),
     space_before = 0,
-    space_after = 0
+    space_after = 0,
+    direction = x$text$text_direction
   )
   if (nrow(shape$shape) == 0) return(nullGrob())
 
@@ -439,6 +440,31 @@ makeContext.marquee_grob <- function(x) {
   y_adjustment <- rep(0, length(x$blocks$start))
   y_bullet_adjustment <- rep(0, length(bullet_blocks))
   x_bullet_adjustment <- rep(0, length(bullet_blocks))
+  if (any(bshape$metrics$ltr != shape$metrics$ltr[bullet_blocks])) {
+    # Redo bullet shaping with the correct direction
+    bshape <- textshaping::shape_text(
+      x$bullets$bullet,
+      family = x$text$family[x$bullets$index],
+      italic = x$text$italic[x$bullets$index],
+      weight = x$text$weight[x$bullets$index],
+      width = x$text$width[x$bullets$index],
+      features = x$text$features[x$bullets$index],
+      size = x$text$size[x$bullets$index],
+      res = 600,
+      hjust = ifelse(shape$metrics$ltr[bullet_blocks], 1, 0),
+      vjust = 1,
+      direction = ifelse(shape$metrics$ltr[bullet_blocks], "ltr", "rtl")
+    )
+    ## Inherit color and id from the relevant block
+    bshape$shape$col <- x$text$color[x$bullets$index[bshape$shape$metric_id]]
+    bshape$shape$id <- x$text$id[x$bullets$index[bshape$shape$metric_id]]
+  }
+  # make rtl bullets left-justified
+  bltr <- bshape$metrics$ltr[bshape$shape$metric_id]
+  bshape$shape$x_offset[!bltr] <- bshape$shape$x_offset[!bltr] + bshape$metrics$width[bshape$shape$metric_id[!bltr]]
+
+  # Add sizebased offset
+  bshape$shape$x_offset <- bshape$shape$x_offset + ifelse(bltr, -1, 1) * bshape$shape$font_size/4
 
   # Position blocks underneath each other, calculate justification info, and position bullets
   for (i in seq_along(x$blocks$start)) {
@@ -450,7 +476,9 @@ makeContext.marquee_grob <- function(x) {
     bullet_ind <- which(i == bullet_blocks)
     if (length(bullet_ind) != 0) {
       ### Determine if bullet is higher than text at first line
-      first <- match(i, shape$shape$metric_id)
+      first <- which(shape$shape$metric_id == i)
+      first <- first[shape$shape$y_offset[first] == max(shape$shape$y_offset[first])]
+      first <- first[if (shape$metrics$ltr[i]) which.min(shape$shape$glyph[first]) else which.max(shape$shape$glyph[first])]
       added_height <- shape$shape$y_offset[first] - bshape$shape$y_offset[match(bullet_ind, bshape$shape$metric_id)]
       if (added_height > 0) {
         #### If higher, adjust the height to make space and record adjustment for glyphs in block
@@ -460,7 +488,7 @@ makeContext.marquee_grob <- function(x) {
         #### Otherwise record negative adjustment to put it in line with the text in the list
         y_bullet_adjustment[bullet_ind] <- -1 * added_height
       }
-      x_bullet_adjustment[bullet_ind] <- shape$shape$x_offset[first]
+      x_bullet_adjustment[bullet_ind] <- shape$shape$x_offset[first] + if (shape$metrics$ltr[i]) 0 else shape$shape$advance[first]
     }
 
     ## calculate y offset and height
@@ -521,7 +549,7 @@ makeContext.marquee_grob <- function(x) {
   shape$shape$y_offset <- shape$shape$y_offset + x$text$baseline[shape$shape$string_id]
 
   ## Do the same for bullets
-  bshape$shape$x_offset <- bshape$shape$x_offset + left_offset[bullet_blocks[bshape$shape$metric_id]] - bshape$shape$font_size/4 + x_bullet_adjustment[bshape$shape$metric_id]
+  bshape$shape$x_offset <- bshape$shape$x_offset + left_offset[bullet_blocks[bshape$shape$metric_id]] + x_bullet_adjustment[bshape$shape$metric_id]
   bshape$shape$y_offset <- bshape$shape$y_offset + top_offset[bullet_blocks[bshape$shape$metric_id]] - y_bullet_adjustment[bshape$shape$metric_id]
 
   # Store info in object
@@ -637,7 +665,7 @@ makeContext.marquee_grob <- function(x) {
     id = x$text$id[x$blocks$start[block_bg]],
     x = left_offset[block_bg] - x$text$padding_left[x$blocks$start[block_bg]],
     y = top_offset[block_bg] + x$text$padding_top[x$blocks$start[block_bg]],
-    width = widths[block_bg] + x$text$padding_left[x$blocks$start[block_bg]] + x$text$padding_right[x$blocks$start[block_bg]],
+    width = widths[block_bg],
     height = heights[block_bg] - x$text$margin_top[x$blocks$start[block_bg]] - x$text$margin_bottom[x$blocks$start[block_bg]],
     fill = x$text$background[x$blocks$start[block_bg]],
     col = x$text$border[x$blocks$start[block_bg]],
