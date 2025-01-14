@@ -14,9 +14,9 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-LinkingTo: 
+LinkingTo:
     cpp11
-Imports: 
+Imports:
     cli,
     glue,
     grDevices,
@@ -24,11 +24,11 @@ Imports:
     jpeg,
     png,
     rlang (>= 1.1.0),
-    systemfonts (>= 1.1.0.9000),
+    systemfonts (>= 1.1.0),
     textshaping (>= 0.4.1.9000),
     utils,
     vctrs
-Suggests: 
+Suggests:
     ggplot2,
     gt,
     gtable,
@@ -43,6 +43,5 @@ BugReports: https://github.com/r-lib/marquee/issues
 Config/Needs/website: tidyverse/tidytemplate
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-Remotes:  
-    r-lib/textshaping,
-    r-lib/systemfonts
+Remotes:
+    r-lib/textshaping
