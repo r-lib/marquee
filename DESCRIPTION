@@ -19,11 +19,12 @@ LinkingTo:
 Imports: 
     cli,
     glue,
+    grDevices,
     grid,
     jpeg,
     png,
     rlang (>= 1.1.0),
-    systemfonts (>= 1.1.0),
+    systemfonts (>= 1.1.0.9000),
     textshaping (>= 0.4.1.9000),
     utils,
     vctrs
@@ -43,4 +44,5 @@ Config/Needs/website: tidyverse/tidytemplate
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Remotes:  
-    r-lib/textshaping
+    r-lib/textshaping,
+    r-lib/systemfonts

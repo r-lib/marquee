@@ -249,7 +249,7 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
 
 #' @export
 makeContext.marquee_grob <- function(x) {
-  if (grepl("quartz", names(dev.cur())) && utils::packageVersion("grDevices") < package_version("4.4.2")) {
+  if (grepl("quartz", names(grDevices::dev.cur())) && utils::packageVersion("grDevices") < package_version("4.4.2")) {
     cli::cli_abort(c(
       "The graphics device in use contains a bug that crashes R, when used with modern text features",
       i = "Consider using the graphics devices provided by the ragg package instead"
