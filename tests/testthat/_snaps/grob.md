@@ -69,7 +69,7 @@
       #   descender <dbl>, col <chr>, id <int>
       
       $shape$metrics
-      # A tibble: 7 x 11
+      # A tibble: 7 x 12
         string width height left_bearing right_bearing top_bearing bottom_bearing
         <chr>  <dbl>  <dbl>        <dbl>         <dbl>       <dbl>          <dbl>
       1 1.     10.0      12        1.15          1.08        0.885           2.76
@@ -79,8 +79,8 @@
       5 3.     10.0      12        0.287         1.08        0.838           2.53
       6 •       4.20     12        0.874         0.739       3.65            2.76
       7 1.     10.0      12        1.15          1.08        0.885           2.76
-      # i 4 more variables: left_border <dbl>, top_border <dbl>, pen_x <dbl>,
-      #   pen_y <dbl>
+      # i 5 more variables: left_border <dbl>, top_border <dbl>, pen_x <dbl>,
+      #   pen_y <dbl>, ltr <lgl>
       
       
 
