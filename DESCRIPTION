@@ -13,7 +13,7 @@ Description: Provides the mean to parse and render markdown text with grid along
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 LinkingTo: 
     cpp11
 Imports: 
@@ -24,7 +24,7 @@ Imports:
     png,
     rlang (>= 1.1.0),
     systemfonts (>= 1.1.0),
-    textshaping (>= 0.4.0),
+    textshaping (>= 0.4.1.9000),
     utils,
     vctrs
 Suggests: 
@@ -42,3 +42,5 @@ BugReports: https://github.com/r-lib/marquee/issues
 Config/Needs/website: tidyverse/tidytemplate
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Remotes:  
+    r-lib/textshaping
