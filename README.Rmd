@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/r-lib/marquee/branch/main/graph/badge.svg)](https://app.codecov.io/gh/r-lib/marquee?branch=main)
 <!-- badges: end -->
 
-marquee is a markdown parser and renderer for the R graphics engine. It can be 
+marquee is a markdown parser and renderer for the R graphics engine. It can be
 used to render rich text formatted as markdown (CommonMark) inside R graphics
 such as ggplot2 or other graphics built on grid.
 
@@ -49,10 +49,10 @@ library(marquee)
 library(grid)
 
 fancy_style <- classic_style(
-  body_font = "baskerville", 
+  body_font = "baskerville",
   header_font = "marker felt",
   code_font = "fira code"
-) |> 
+) |>
   modify_style("cb", background = linearGradient(
     colours = c("lightblue", "white"),
     x1 = 0, y1 = 1, x2 = 0, y2 = 0
@@ -65,11 +65,11 @@ grid.draw(grob)
 
 ## Prior art
 
-I would be remiss to not mention [gridtext](https://github.com/wilkelab/gridtext) 
+I would be remiss to not mention [gridtext](https://github.com/wilkelab/gridtext)
 and [ggtext](https://github.com/wilkelab/ggtext), both by Claus Wilke. These
 packages aim to solve much the same problem as marquee, but work in a different way
 and don't have the same powerful textshaping backend as marquee. Most notably from
-a user perspective is perhaps that gridtext understands HTML to some degree, 
+a user perspective is perhaps that gridtext understands HTML to some degree,
 whereas marquee is oblivious to both HTML and CSS. Instead, it supports the [full
 CommonMark spec](https://spec.commonmark.org/) with the plan to add support for
 custom span elements as well.
