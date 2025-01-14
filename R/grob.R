@@ -765,7 +765,7 @@ yDetails.marquee_grob <- function(x, theta) {
 
 #' @export
 makeContent.marquee_grob <- function(x) {
-  if (inherits(grid::nullGrob(), what = c("null"))) {
+  if (inherits(x, what = c("null"))) {
     # We may end here when creating precalculated grobs
     return(x)
   }
