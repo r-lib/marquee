@@ -1,5 +1,4 @@
 skip_if_not_installed("ggplot2", "3.5.0")
-skip_if(utils::packageVersion("base") < "4.3.0")
 
 test_that("guide_marquee can interpolate legend glyphs", {
 

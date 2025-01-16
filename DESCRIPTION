@@ -24,7 +24,7 @@ Imports:
     jpeg,
     png,
     rlang (>= 1.1.0),
-    systemfonts (>= 1.1.0),
+    systemfonts (>= 1.1.0.9000),
     textshaping (>= 0.4.1.9000),
     utils,
     vctrs
@@ -43,5 +43,6 @@ BugReports: https://github.com/r-lib/marquee/issues
 Config/Needs/website: tidyverse/tidytemplate
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-Remotes:
-    r-lib/textshaping
+Remotes: 
+    r-lib/textshaping,
+    r-lib/systemfonts

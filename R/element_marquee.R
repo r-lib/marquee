@@ -28,7 +28,7 @@
 #'
 #' @export
 #'
-#' @examplesIf utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")
+#' @examplesIf rlang::is_installed("ggplot2")
 #' library(ggplot2)
 #' p <- ggplot(mtcars) +
 #'   geom_point(aes(mpg, disp)) +
@@ -142,7 +142,7 @@ on_load({
 #'
 #' @export
 #'
-#' @examplesIf utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")
+#' @examplesIf rlang::is_installed("ggplot2")
 #' library(ggplot2)
 #' ggplot(mtcars) +
 #'   geom_point(aes(disp, mpg)) +

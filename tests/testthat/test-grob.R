@@ -1,7 +1,5 @@
 test_that("grobs gets correctly constructed", {
 
-  skip_if_not(getRversion() >= "4.3")
-
   grob1 <- marquee_grob(markdown_test, classic_style(lineheight = 1.1))
   expect_s3_class(grob1, "marquee_grob")
   expect_false(inherits(grob1, "marquee_precalculated_grob"))
@@ -42,8 +40,6 @@ test_that("grobs gets correctly constructed", {
 })
 
 test_that("grob looks as it should (sadly too complex to test other way)", {
-
-  skip_if_not(getRversion() >= "4.3")
 
   grob1 <- marquee_grob(markdown_test, classic_style(lineheight = 1.1))
 

@@ -38,7 +38,7 @@
 #'   [`guides()`][ggplot2::guides()] function or used as the `guide` argument in
 #'   a scale.
 #' @export
-#' @examplesIf utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2", version = "3.5.0")
+#' @examplesIf rlang::is_installed("ggplot2", version = "3.5.0")
 #' library(ggplot2)
 #' # A standard plot
 #' base <- ggplot(mpg, aes(displ, hwy)) +

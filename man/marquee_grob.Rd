@@ -68,6 +68,18 @@ the parsed text into rich text and (possibly) images. See \code{\link[=marquee_p
 for more information about how markdown is parsed and see details below for
 further information on how rendering proceeds.
 }
+\section{Rendering}{
+marquee is first and foremost developed with the new 'glyph' rendering
+features in 4.3.0 in mind. However, not all graphics devices supports this,
+and while some might eventually do, it is quite concievable that some never
+will. Because of this, marquee has a fallback where it will render text as a
+mix of polygons and rasters (depending on the font in use) if the device
+doesn't report 'glyphs' capabilities. The upside is that it works (almost)
+everywhere, but the downside is that the fallback is much slower. Because of
+this it is advisable to use a modern graphics device with glyphs support if
+at all possible.
+}
+
 \section{Rendering style}{
 The rendering more or less adheres to the styling provided by
 \code{\link[=marquee_parse]{marquee_parse()}}, but has some intricacies as detailed below:

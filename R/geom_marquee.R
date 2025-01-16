@@ -30,7 +30,7 @@
 #'
 #' @export
 #'
-#' @examplesIf utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")
+#' @examplesIf rlang::is_installed("ggplot2")
 #'
 #' library(ggplot2)
 #' # Standard use

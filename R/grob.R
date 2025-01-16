@@ -33,6 +33,16 @@
 #' @return A grob of class `marquee`
 #'
 #' @details
+#' # Rendering
+#' marquee is first and foremost developed with the new 'glyph' rendering
+#' features in 4.3.0 in mind. However, not all graphics devices supports this,
+#' and while some might eventually do, it is quite concievable that some never
+#' will. Because of this, marquee has a fallback where it will render text as a
+#' mix of polygons and rasters (depending on the font in use) if the device
+#' doesn't report 'glyphs' capabilities. The upside is that it works (almost)
+#' everywhere, but the downside is that the fallback is much slower and with
+#' poorer visual quality. Because of this it is advisable to use a modern
+#' graphics device with glyphs support if at all possible.
 #'
 #' # Rendering style
 #' The rendering more or less adheres to the styling provided by
@@ -249,12 +259,6 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
 
 #' @export
 makeContext.marquee_grob <- function(x) {
-  if (grepl("quartz", names(grDevices::dev.cur())) && utils::packageVersion("grDevices") < package_version("4.4.2")) {
-    cli::cli_abort(c(
-      "The graphics device in use contains a bug that crashes R, when used with modern text features",
-      i = "Consider using the graphics devices provided by the ragg package instead"
-    ))
-  }
   # Everything is calculated in bigpts (1 inch == 72 bigpts)
   # We inspect the angle, if it is more vertical we use the vertical direction
   # of the viewport for conversion
@@ -797,8 +801,11 @@ makeContent.marquee_grob <- function(x) {
     # We may end here when creating precalculated grobs
     return(x)
   }
+
+  has_glyphs <- isTRUE(dev.capabilities("glyphs")$glyphs)
+
   # Create the font list of unique fonts
-  if (nrow(x$shape) > 0) {
+  if (has_glyphs && nrow(x$shape) > 0) {
     font_id <- paste0(x$shape$font_path, "&", x$shape$font_index)
     font_match <- match(font_id, unique(font_id))
     unique_font <- !duplicated(font_id)
@@ -815,26 +822,47 @@ makeContent.marquee_grob <- function(x) {
     ## Construct glyph grob
     i <- indices[[grob]]
     if (length(i) > 0) {
-      glyphs <- glyphInfo(
-        id = x$shape$index[i],
-        x = x$shape$x_offset[i],
-        y = x$shape$y_offset[i],
-        font = font_match[i],
-        size = x$shape$font_size[i],
-        fontList = fonts,
-        width = x$widths[grob],
-        height = -x$heights[grob],
-        hAnchor = glyphAnchor(0, "left"),
-        vAnchor = glyphAnchor(0, "bottom"),
-        col = x$shape$col[i]
-      )
-      glyphs <- glyphGrob(
-        glyphs,
-        x = 0,
-        y = 0,
-        hjust = 0,
-        vjust = 0
-      )
+      if (has_glyphs) {
+        glyphs <- glyphInfo(
+          id = x$shape$index[i],
+          x = x$shape$x_offset[i],
+          y = x$shape$y_offset[i],
+          font = font_match[i],
+          size = x$shape$font_size[i],
+          fontList = fonts,
+          width = x$widths[grob],
+          height = -x$heights[grob],
+          hAnchor = glyphAnchor(0, "left"),
+          vAnchor = glyphAnchor(0, "bottom"),
+          col = x$shape$col[i]
+        )
+        glyphs <- glyphGrob(
+          glyphs,
+          x = 0,
+          y = 0,
+          hjust = 0,
+          vjust = 0
+        )
+      } else {
+        glyphs <- systemfonts::glyph_outline(x$shape$index[i], x$shape$font_path[i], x$shape$font_index[i], x$shape$font_size[i])
+        need_bitmap <- i[attr(glyphs, "missing")]
+        glyphs <- pathGrob(
+          x = glyphs$x + x$shape$x_offset[i][glyphs$glyph],
+          y = glyphs$y + x$shape$y_offset[i][glyphs$glyph],
+          id = glyphs$contour,
+          pathId = glyphs$glyph,
+          default.units = "bigpts",
+          gp = gpar(fill = x$shape$col[i][vctrs::vec_unique(glyphs$glyph)], col = NA)
+        )
+        raster_glyphs <- systemfonts::glyph_raster(x$shape$index[need_bitmap], x$shape$font_path[need_bitmap], x$shape$font_index[need_bitmap], x$shape$font_size[need_bitmap], col = x$shape$col[need_bitmap])
+        raster_glyphs <- Map(
+          function(glyph, x, y) systemfonts::glyph_raster_grob(glyph, x, y, interpolate = TRUE),
+          glyph = raster_glyphs,
+          x = x$shape$x_offset[need_bitmap],
+          y = x$shape$y_offset[need_bitmap]
+        )
+        glyphs <- inject(grobTree(glyphs, !!!raster_glyphs))
+      }
     } else {
       glyphs <- NULL
     }

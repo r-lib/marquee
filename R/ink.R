@@ -19,7 +19,7 @@
 #'
 #' @export
 #'
-#' @examplesIf utils::packageVersion("base") > "4.3"
+#' @examples
 #' # Plot to illustrate the difference in vertical alignment
 #' library(grid)
 #' grid.newpage()
