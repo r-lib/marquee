@@ -988,7 +988,7 @@ makeContent.marquee_grob <- function(x) {
   })
 
   # Combine all separate texts into one grob
-  if (TRUE || (length(x$images$id) == 0 && length(x$rects$id) == 0)) {
+  if (length(x$images$id) == 0 && length(x$rects$id) == 0) {
     ## If there are no rects and images we can draw directly on the main surface
     children <- inject(gList(!!!grobs))
   } else {
