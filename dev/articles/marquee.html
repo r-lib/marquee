@@ -102,7 +102,7 @@ will likely diminish or completely disappear with time.</p>
 <h2 id="an-example">An example<a class="anchor" aria-label="anchor" href="#an-example"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">md_text</span> <span class="op">&lt;-</span> </span>
+<code class="sourceCode R"><span><span class="va">md_text</span> <span class="op">&lt;-</span></span>
 <span><span class="st">"# Lorem Ipsum</span></span>
 <span><span class="st">Lorem ipsum dolor sit amet, *consectetur* adipiscing elit, sed do eiusmod tempor incididunt ut</span></span>
 <span><span class="st">labore et dolore magna **aliqua**. Ut enim ad minim veniam, quis nostrud exercitation ullamco</span></span>
@@ -113,7 +113,7 @@ will likely diminish or completely disappear with time.</p>
 <span><span class="va">grob</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="va">grob</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-3-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-2-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>From this small example you can see that markdown behaves as you’d
 expect. We have emphasis, strong, underline, and strikethrough, and
 stuff like headings etc. In fact, the full markdown (CommonMark) spec is
@@ -131,23 +131,23 @@ to create a completely new style:</p>
 <code class="sourceCode R"><span><span class="va">new_style</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span>body_font <span class="op">=</span> <span class="st">"serif"</span>, header_font <span class="op">=</span> <span class="st">"mono"</span>, hanging <span class="op">=</span> <span class="fu"><a href="../reference/style_helpers.html">em</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">new_style</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/style_set.html">modify_style</a></span><span class="op">(</span></span>
-<span>  <span class="va">new_style</span>, </span>
-<span>  <span class="st">"str"</span>, </span>
-<span>  background <span class="op">=</span> <span class="st">"lightgrey"</span>, </span>
-<span>  border_radius <span class="op">=</span> <span class="fl">3</span>, </span>
+<span>  <span class="va">new_style</span>,</span>
+<span>  <span class="st">"str"</span>,</span>
+<span>  background <span class="op">=</span> <span class="st">"lightgrey"</span>,</span>
+<span>  border_radius <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fu"><a href="../reference/style_helpers.html">trbl</a></span><span class="op">(</span><span class="fu"><a href="../reference/style_helpers.html">em</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text</span>, <span class="va">new_style</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-4-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-3-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>Besides standard markdown, marquee also allows you to create custom
 span classes. These span classes can be styled to anything, but marquee
 contains a nifty feature where, if the class matches a recognized color
 name or hex-code, it will be automatically coloured.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">md_text_custom</span> <span class="op">&lt;-</span> </span>
+<code class="sourceCode R"><span><span class="va">md_text_custom</span> <span class="op">&lt;-</span></span>
 <span><span class="st">"# Lorem Ipsum</span></span>
 <span><span class="st">Lorem ipsum dolor {.red sit amet, *consectetur* adipiscing elit, sed do} eiusmod tempor</span></span>
 <span><span class="st">incididunt ut labore et dolore magna **aliqua**. Ut enim ad minim {#2af veniam}, quis nostrud</span></span>
@@ -159,14 +159,14 @@ name or hex-code, it will be automatically coloured.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_custom</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-5-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-4-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>If you provide a styling for the custom class it takes precedence
 over any matching color name</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_custom</span>, <span class="fu"><a href="../reference/style_set.html">modify_style</a></span><span class="op">(</span><span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"red"</span>, tracking <span class="op">=</span> <span class="fl">400</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-6-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-5-1.png" width="98%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="use-in-ggplot2">Use in ggplot2<a class="anchor" aria-label="anchor" href="#use-in-ggplot2"></a>
@@ -192,9 +192,9 @@ much more capable:</p>
 <span>    letters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stylistic"</span>, <span class="st">"swash"</span>, <span class="st">"historical"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>style <span class="op">=</span> <span class="va">fancy_font</span>, size <span class="op">=</span> <span class="fl">2.5</span>, family <span class="op">=</span> <span class="st">"spectral"</span><span class="op">)</span> <span class="co"># You may not have this font</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-7-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-6-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>However, the main use will probably be to mix in italicized, bold, or
 colored fonts in labels, which marquee makes very easy</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -217,9 +217,9 @@ colored fonts in labels, which marquee makes very easy</p>
 <span><span class="co">#&gt; [29] "{.red ***Ford***} Pantera L"      "{.red ***Ferrari***} Dino"       </span></span>
 <span><span class="co">#&gt; [31] "{.red ***Maserati***} Bora"       "{.red ***Volvo***} 142E"</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span> </span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-8-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-7-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>Another use of the geom, where rich text may come more into play, is
 in annotations. Let’s make a textbox style and add some lorem ipsum to
 our plot</p>
@@ -231,20 +231,20 @@ our plot</p>
 <span>  border_radius <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="va">GeomMarquee</span>, </span>
-<span>    label <span class="op">=</span> <span class="va">md_text</span>, </span>
-<span>    x <span class="op">=</span> <span class="fl">450</span>, </span>
-<span>    y <span class="op">=</span> <span class="fl">35</span>, </span>
-<span>    style <span class="op">=</span> <span class="va">text_box_style</span>, </span>
-<span>    size <span class="op">=</span> <span class="fl">2</span>, </span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="va">GeomMarquee</span>,</span>
+<span>    label <span class="op">=</span> <span class="va">md_text</span>,</span>
+<span>    x <span class="op">=</span> <span class="fl">450</span>,</span>
+<span>    y <span class="op">=</span> <span class="fl">35</span>,</span>
+<span>    style <span class="op">=</span> <span class="va">text_box_style</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>    fill <span class="op">=</span> <span class="st">"lightgrey"</span>,</span>
-<span>    width <span class="op">=</span> <span class="fl">0.3</span>, </span>
+<span>    width <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>    hjust <span class="op">=</span> <span class="st">"right"</span>,</span>
 <span>    vjust <span class="op">=</span> <span class="st">"top"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-9-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-8-1.png" width="98%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="the-marquee-element">The marquee element<a class="anchor" aria-label="anchor" href="#the-marquee-element"></a>
@@ -257,11 +257,11 @@ text and would want full control of the styling. Enter
 <code><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text()</a></code> which will format and style any non-plotting
 text.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="va">md_text</span><span class="op">)</span> <span class="op">+</span> </span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="va">md_text</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="../reference/element_marquee.html">element_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">9</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-10-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-9-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>As can be seen, the defaults will let the text run for as long as it
 needs without doing any text wrapping. This is because it makes
 alignment behave in the same way as <code><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text()</a></code>.
@@ -271,11 +271,11 @@ is equivalent to the width of the area the element occupies so that is a
 natural value here, but you can set it to any <code><a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit()</a></code>
 value you wish.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="va">md_text</span><span class="op">)</span> <span class="op">+</span> </span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="va">md_text</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="../reference/element_marquee.html">element_marquee</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">9</span>, width <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-11-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-10-1.png" width="98%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -292,7 +292,7 @@ an image is placed by itself, it expands to fill the provided width,
 width the height being calculated to match the aspect ratio of the
 image.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">md_text_fig</span> <span class="op">&lt;-</span> </span>
+<code class="sourceCode R"><span><span class="va">md_text_fig</span> <span class="op">&lt;-</span></span>
 <span><span class="st">"# Lorem Ipsum ![](https://cran.r-project.org/Rlogo.svg)</span></span>
 <span><span class="st">Lorem ipsum dolor {.red sit amet, *consectetur* adipiscing elit, sed do} eiusmod tempor</span></span>
 <span><span class="st">incididunt ut labore et dolore magna **aliqua**. Ut enim ad minim {#2af veniam}, quis nostrud</span></span>
@@ -302,11 +302,11 @@ image.</p>
 <span><span class="st">laborum."</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_fig</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-12-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-11-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>Compare that to</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">md_text_fig2</span> <span class="op">&lt;-</span> </span>
-<span><span class="st">"# Lorem Ipsum </span></span>
+<code class="sourceCode R"><span><span class="va">md_text_fig2</span> <span class="op">&lt;-</span></span>
+<span><span class="st">"# Lorem Ipsum</span></span>
 <span><span class="st"></span></span>
 <span><span class="st">![](https://cran.r-project.org/Rlogo.svg)</span></span>
 <span><span class="st"></span></span>
@@ -318,18 +318,18 @@ image.</p>
 <span><span class="st">laborum."</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_fig2</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-13-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-12-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>However, marquee has a pretty unique trick up it’s sleeve compared to
 other markdown formats. It doesn’t just accept paths to images — it also
 accepts R graphic objects (currently grid grobs, ggplot2 plots and
 patchwork plots). It all works as you’d expect:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> </span>
+<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">gear</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">md_text_plot</span> <span class="op">&lt;-</span> </span>
-<span><span class="st">"# Lorem Ipsum </span></span>
+<span><span class="va">md_text_plot</span> <span class="op">&lt;-</span></span>
+<span><span class="st">"# Lorem Ipsum</span></span>
 <span><span class="st"></span></span>
 <span><span class="st">![](p)</span></span>
 <span><span class="st"></span></span>
@@ -342,7 +342,7 @@ patchwork plots). It all works as you’d expect:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_plot</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-14-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-13-1.png" width="98%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="a-bit-about-tables">A bit about tables<a class="anchor" aria-label="anchor" href="#a-bit-about-tables"></a>
@@ -359,11 +359,11 @@ specification taken from the <a href="https://gt.rstudio.com/articles/gt.html" c
 <span><span class="va">airquality_m</span> <span class="op">&lt;-</span> <span class="va">airquality</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="op">]</span></span>
 <span><span class="va">airquality_m</span><span class="op">$</span><span class="va">Year</span> <span class="op">&lt;-</span> <span class="fl">1973L</span></span>
 <span><span class="va">table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="va">airquality_m</span><span class="op">)</span></span>
-<span><span class="va">table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gt.rstudio.com/reference/tab_header.html" class="external-link">tab_header</a></span><span class="op">(</span><span class="va">table</span>, </span>
+<span><span class="va">table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gt.rstudio.com/reference/tab_header.html" class="external-link">tab_header</a></span><span class="op">(</span><span class="va">table</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"New York Air Quality Measurements"</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="st">"Daily measurements in New York City (May 1-10, 1973)"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gt.rstudio.com/reference/tab_spanner.html" class="external-link">tab_spanner</a></span><span class="op">(</span><span class="va">table</span>, </span>
+<span><span class="va">table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gt.rstudio.com/reference/tab_spanner.html" class="external-link">tab_spanner</a></span><span class="op">(</span><span class="va">table</span>,</span>
 <span>  label <span class="op">=</span> <span class="st">"Time"</span>,</span>
 <span>  columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Year</span>, <span class="va">Month</span>, <span class="va">Day</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -372,8 +372,8 @@ specification taken from the <a href="https://gt.rstudio.com/articles/gt.html" c
 <span>  columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Ozone</span>, <span class="va">Solar.R</span>, <span class="va">Wind</span>, <span class="va">Temp</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">md_text_table</span> <span class="op">&lt;-</span> </span>
-<span><span class="st">"# Lorem Ipsum </span></span>
+<code class="sourceCode R"><span><span class="va">md_text_table</span> <span class="op">&lt;-</span></span>
+<span><span class="st">"# Lorem Ipsum</span></span>
 <span><span class="st">Below we have a table created with gt</span></span>
 <span><span class="st"></span></span>
 <span><span class="st">![](table)</span></span>
@@ -381,7 +381,7 @@ specification taken from the <a href="https://gt.rstudio.com/articles/gt.html" c
 <span><span class="st">*Such tables, much cells*"</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_table</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="marquee_files/figure-html/unnamed-chunk-17-1.png" width="98%" style="display: block; margin: auto;"></p>
+<p><img src="marquee_files/figure-html/unnamed-chunk-16-1.png" width="98%" style="display: block; margin: auto;"></p>
 <p>The support is still somewhat experimental as gt-to-grob conversion
 is getting build out. Some gt features rely on HTML formatting still and
 will end up looking weird, but standard table inclusion works as

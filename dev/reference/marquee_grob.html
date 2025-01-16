@@ -149,6 +149,18 @@ and <code>width</code></p></dd>
     <p>A grob of class <code>marquee</code></p>
     </div>
     <div class="section level2">
+    <h2 id="rendering">Rendering<a class="anchor" aria-label="anchor" href="#rendering"></a></h2>
+    <p>marquee is first and foremost developed with the new 'glyph' rendering
+features in 4.3.0 in mind. However, not all graphics devices supports this,
+and while some might eventually do, it is quite concievable that some never
+will. Because of this, marquee has a fallback where it will render text as a
+mix of polygons and rasters (depending on the font in use) if the device
+doesn't report 'glyphs' capabilities. The upside is that it works (almost)
+everywhere, but the downside is that the fallback is much slower. Because of
+this it is advisable to use a modern graphics device with glyphs support if
+at all possible.</p>
+    </div>
+    <div class="section level2">
     <h2 id="rendering-style">Rendering style<a class="anchor" aria-label="anchor" href="#rendering-style"></a></h2>
     <p>The rendering more or less adheres to the styling provided by
 <code><a href="marquee_parse.html">marquee_parse()</a></code>, but has some intricacies as detailed below:</p>

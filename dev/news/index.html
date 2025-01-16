@@ -49,6 +49,7 @@
 <li>code spans gains a slight horizontal padding to let the background breathe a bit. Currently padding around spans doesn’t affect shaping (i.e. it doesn’t move text further from it’s neighbors).</li>
 <li>Better adherence to margin collapsing rules of CSS. Any background or border will now prevent further collapsing</li>
 <li>Add <code>force_body_margin</code> argument to enforce that the body margin is not influenced by collapsing (allowing you to turn it off completely). This setting is turned on for <code><a href="../reference/geom_marquee.html">geom_marquee()</a></code> and <code><a href="../reference/element_marquee.html">element_marquee()</a></code> (<a href="https://github.com/r-lib/marquee/issues/23" class="external-link">#23</a>)</li>
+<li>Add support for rendering on graphics devices that doesn’t support the new <code>glyphs</code> capabilities</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="marquee-010">marquee 0.1.0<a class="anchor" aria-label="anchor" href="#marquee-010"></a></h2><p class="text-muted">CRAN release: 2024-05-28</p>

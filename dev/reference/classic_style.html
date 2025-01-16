@@ -70,7 +70,8 @@ markdown doesn't provide a syntax for these formats.</p>
 <span>  body_font <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  header_font <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  code_font <span class="op">=</span> <span class="st">"mono"</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  ltr <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -146,10 +147,15 @@ style, or <code><a href="style_helpers.html">rem()</a></code> in which case it i
 element.</p></dd>
 
     <dt><code>margin</code></dt>
-<dd><p>The margin around the element, given as a call to <code><a href="style_helpers.html">trbl()</a></code></p></dd>
+<dd><p>The margin around the element, given as a call to <code><a href="style_helpers.html">trbl()</a></code>.
+Margin refers to the area outside the box that text is placed in. If the
+element has a background, the margin area will not be colored.</p></dd>
 
     <dt><code>padding</code></dt>
-<dd><p>The padding around the element, given as a call to <code><a href="style_helpers.html">trbl()</a></code></p></dd>
+<dd><p>The padding around the element, given as a call to <code><a href="style_helpers.html">trbl()</a></code>.
+Padding refers to the distance between the text and the border of the box it
+will be drawn in. If the element has a background, the padding area will be
+colored.</p></dd>
 
     <dt><code>background</code></dt>
 <dd><p>The color of the background fill. The background includes
@@ -184,8 +190,22 @@ to <code><a href="style_helpers.html">trbl()</a></code></p></dd>
 <dd><p>The default aspect ratio for block level images if not
 provided by the image itself</p></dd>
 
+    <dt><code>text_direction</code></dt>
+<dd><p>The directional flow of the text. Either <code>"auto"</code> to
+let it be determined by the content of the text, or <code>"ltr"</code>/<code>"rtl"</code> to
+hard-code it to either left-to-right or right-to-left. This setting will not
+change the order of glyphs within a span of text, but rather whether
+consequtive blocks of text are laid out left-to-right or right-to-left. It
+also affects to which side indentation is applied as well as the meaning of
+<code>"auto"</code>, and <code>"justified-auto"</code> aligment.</p></dd>
+
 
 </dl></dd>
+
+
+<dt id="arg-ltr">ltr<a class="anchor" aria-label="anchor" href="#arg-ltr"></a></dt>
+<dd><p>Is the style intended for left-to-right text? This affects list
+indentation and citation border</p></dd>
 
 </dl></div>
     <div class="section level2">

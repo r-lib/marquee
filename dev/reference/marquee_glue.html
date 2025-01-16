@@ -97,7 +97,7 @@ glue. This function let's you use both together.</p>
 <dd><p>[<code>expressions</code>]<br> Unnamed arguments are taken to be expression
 string(s) to format. Multiple inputs are concatenated together before formatting.
 Named arguments are taken to be temporary variables available for substitution.</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>For <span class="st">`</span><span class="at">glue_data()</span><span class="st">`</span>, elements <span class="cf">in</span> <span class="st">`</span><span class="at">...</span><span class="st">`</span> override the values <span class="cf">in</span> <span class="st">`</span><span class="at">.x</span><span class="st">`</span>.</span></code></pre><p></p></div></dd>
+<p>For <code>glue_data()</code>, elements in <code>...</code> override the values in <code>.x</code>.</p></dd>
 
 
 <dt id="arg--sep">.sep<a class="anchor" aria-label="anchor" href="#arg--sep"></a></dt>
@@ -147,7 +147,7 @@ syntactic elements), when parsing the expression string. Setting <code>.literal 
 
 
 <dt id="arg--transformer">.transformer<a class="anchor" aria-label="anchor" href="#arg--transformer"></a></dt>
-<dd><p>[<code>function]</code><br> A function taking two arguments, <code>text</code>
+<dd><p>[<code>function</code>]<br> A function taking two arguments, <code>text</code>
 and <code>envir</code>, where <code>text</code> is the unparsed string inside the glue block and
 <code>envir</code> is the execution environment. A <code>.transformer</code> lets you modify a
 glue block before, during, or after evaluation, allowing you to create your
