@@ -5,7 +5,7 @@ articles:
   marquee_style: marquee_style.html
   marquee_syntax: marquee_syntax.html
   marquee: marquee.html
-last_built: 2025-01-16T13:17Z
+last_built: 2025-01-16T20:22Z
 urls:
   reference: https://marquee.r-lib.org/reference
   article: https://marquee.r-lib.org/articles
