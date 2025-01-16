@@ -9,6 +9,10 @@ glyphFontList <- version_unavailable("4.3.0")
 glyphInfo <- version_unavailable("4.3.0")
 glyphAnchor <- version_unavailable("4.3.0")
 glyphGrob <- version_unavailable("4.3.0")
+groupGrob <- function(...) {
+  cli::cli_warn("R 4.2 or higher is required to ensure correct clipping when background is present")
+  gList(...)
+}
 
 as_gtable <- new_environment(list(fun = NULL))
 bind_as_gtable <- function() {
@@ -35,6 +39,9 @@ on_load({
   }
   if ("glyphGrob" %in% getNamespaceExports("grid")) {
     glyphGrob <- grid::glyphGrob
+  }
+  if ("groupGrob" %in% getNamespaceExports("grid")) {
+    groupGrob <- grid::groupGrob
   }
   on_package_load("gt", {
     bind_as_gtable()

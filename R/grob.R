@@ -960,7 +960,7 @@ makeContent.marquee_grob <- function(x) {
         }
       }
       ### Combine it all in a single grob clipped to the bounds of the rect
-      inject(grobTree(!!!grobs, vp = viewport(clip = rect)))
+      inject(grobTree(!!!grobs, vp = viewport(clip = if (packageVersion("grid") < package_version("4.1.0")) "on" else rect)))
     })
     ## Extract the relevant image grobs
     images <- lapply(which(x$images$id == grob), function(i) x$images$grobs[[i]])
@@ -988,7 +988,7 @@ makeContent.marquee_grob <- function(x) {
   })
 
   # Combine all separate texts into one grob
-  if (length(x$images$id) == 0 && length(x$rects$id) == 0) {
+  if (TRUE || (length(x$images$id) == 0 && length(x$rects$id) == 0)) {
     ## If there are no rects and images we can draw directly on the main surface
     children <- inject(gList(!!!grobs))
   } else {
