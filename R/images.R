@@ -59,7 +59,7 @@ missing_grob <- function() {
     rectGrob(
       gp = gpar(col = "black", fill = NA, lwd = 4)
     ),
-    vp = viewport(clip = if (packageVersion("grid") < package_version("4.1.0")) "on" else rectGrob()),
+    vp = viewport(clip = if (utils::packageVersion("grid") < package_version("4.1.0")) "on" else rectGrob()),
     cl = "missing_grob"
   )
 }

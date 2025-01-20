@@ -798,7 +798,7 @@ makeContent.marquee_grob <- function(x) {
     return(x)
   }
 
-  has_glyphs <- isTRUE(dev.capabilities("glyphs")$glyphs)
+  has_glyphs <- isTRUE(grDevices::dev.capabilities("glyphs")$glyphs)
 
   # Create the font list of unique fonts
   if (has_glyphs && nrow(x$shape) > 0) {
@@ -956,7 +956,7 @@ makeContent.marquee_grob <- function(x) {
         }
       }
       ### Combine it all in a single grob clipped to the bounds of the rect
-      inject(grobTree(!!!grobs, vp = viewport(clip = if (packageVersion("grid") < package_version("4.1.0")) "on" else rect)))
+      inject(grobTree(!!!grobs, vp = viewport(clip = if (utils::packageVersion("grid") < package_version("4.1.0")) "on" else rect)))
     })
     ## Extract the relevant image grobs
     images <- lapply(which(x$images$id == grob), function(i) x$images$grobs[[i]])
