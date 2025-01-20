@@ -324,7 +324,7 @@ makeContext.marquee_grob <- function(x) {
         }
       } else {
         ### Not inline. Use block width
-        width <- widths[x$text$block[images$index[i]]]
+        width <- widths[x$text$block[images$index[i]]] %|% 0
       }
     } else {
       ### Grob has a width. Use that unless it exceeds the block width
@@ -842,7 +842,7 @@ makeContent.marquee_grob <- function(x) {
       } else {
         glyphs <- systemfonts::glyph_outline(x$shape$index[i], x$shape$font_path[i], x$shape$font_index[i], x$shape$font_size[i])
         need_bitmap <- i[attr(glyphs, "missing")]
-        glyphs <- pathGrob(
+        glyphs <- if (nrow(glyphs) == 0) nullGrob() else pathGrob(
           x = glyphs$x + x$shape$x_offset[i][glyphs$glyph],
           y = glyphs$y + x$shape$y_offset[i][glyphs$glyph],
           id = glyphs$contour,
