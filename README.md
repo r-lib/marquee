@@ -37,10 +37,10 @@ library(marquee)
 library(grid)
 
 fancy_style <- classic_style(
-  body_font = "baskerville", 
+  body_font = "baskerville",
   header_font = "marker felt",
   code_font = "fira code"
-) |> 
+) |>
   modify_style("cb", background = linearGradient(
     colours = c("lightblue", "white"),
     x1 = 0, y1 = 1, x2 = 0, y2 = 0
