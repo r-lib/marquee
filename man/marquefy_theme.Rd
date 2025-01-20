@@ -26,7 +26,7 @@ font name for the elements, but alternatively you can use this function to
 convert all text elements in a theme to \code{\link[=element_marquee]{element_marquee()}}
 }
 \examples{
-\dontshow{if (utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(ggplot2)
 ggplot(mtcars) +
   geom_point(aes(disp, mpg)) +

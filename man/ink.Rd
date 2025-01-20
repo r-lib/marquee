@@ -28,7 +28,6 @@ justification depending on the presence of ascenders and descenders in the
 rendered glyphs.
 }
 \examples{
-\dontshow{if (utils::packageVersion("base") > "4.3") (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # Plot to illustrate the difference in vertical alignment
 library(grid)
 grid.newpage()
@@ -86,5 +85,5 @@ grid.draw(
     width = NA
   )
 )
-\dontshow{\}) # examplesIf}
+
 }

@@ -138,7 +138,7 @@ most that amount of space. You can use grid units to set it to an absolute
 amount.
 }
 \examples{
-\dontshow{if (utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 
 library(ggplot2)
 # Standard use

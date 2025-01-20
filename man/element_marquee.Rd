@@ -66,7 +66,7 @@ small shifts in the visuals when going from \code{element_text()} to
 \code{element_marquee()} as size reporting may differ between the two elements.
 }
 \examples{
-\dontshow{if (utils::packageVersion("base") > "4.3" && rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(ggplot2)
 p <- ggplot(mtcars) +
   geom_point(aes(mpg, disp)) +

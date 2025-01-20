@@ -12,6 +12,8 @@
   setting is turned on for `geom_marquee()` and `element_marquee()` (#23)
 * Add support for rendering on graphics devices that doesn't support the new
   `glyphs` capabilities
+* Inline padding now reserves space on the left and right side during shaping if
+  the inline tag has decoration (background or border)
 
 # marquee 0.1.0
 

@@ -88,13 +88,13 @@
 #'
 #' Consecutive spans with the same background and border settings are merged
 #' into a single rectangle. The padding of the span defines the size of the
-#' background but will not modify the placement of glyph (i.e. having a left
-#' padding will not move the first glyph further away from it's left neighbor).
+#' background.
 #'
 #' **Bullet position**
 #'
 #' Bullets are placed, right-aligned, 0.25em to the left of the first line in
-#' the li element.
+#' the li element if the text direction is ltr. For rtl text it is placed,
+#' left-aligned, 0.25 em to the right of the first line.
 #'
 #' **Border with border radius**
 #'
@@ -102,11 +102,12 @@
 #' case the border radius is ignored.
 #'
 #' # Image rendering
-#' The image tag can be used to place images. There are support for both png and
-#' jpeg images. If the path instead names a grob, ggplot, or patchwork object
-#' then this is rendered instead. If the file cannot be read, if it doesn't
-#' exist, or if the path names an object that is not a grob, ggplot or patchwork,
-#' a placeholder is rendered in it's place (black square with red cross).
+#' The image tag can be used to place images. There are support for both png,
+#' jpeg, and svg images. If the path instead names a grob, ggplot, or patchwork
+#' object then this is rendered instead. If the file cannot be read, if it d
+#' oesn't exist, or if the path names an object that is not a grob, ggplot or
+#' patchwork, a placeholder is rendered in it's place (black square with red
+#' cross).
 #'
 #' **Image sizing**
 #'
@@ -170,6 +171,9 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
 
   # Parse input
   parsed <- if (!is_parsed(text)) marquee_parse(text, style, ignore_html) else text
+
+  # Add spacing for inline padding
+  parsed <- add_inline_padding(parsed)
 
   # Set bottom margin for tight list `li` elements to match the lineheight
   is_tight <- parsed$type == "li" & parsed$tight
@@ -506,7 +510,7 @@ makeContext.marquee_grob <- function(x) {
     ### Init height as sum of top and bottom margin+padding
     heights[i] <- x$text$margin_top[j] + x$text$padding_top[j] + x$text$padding_bottom[j] + x$text$margin_bottom[j]
     ### If block has content of it's own, add it to the height
-    if (x$text$text[j] != "" || x$blocks$length[i] != 1) {
+    if (nzchar(x$text$text[j]) || x$blocks$length[i] != 1) {
       heights[i] <- heights[i] + shape$metrics$height[i]
     }
 
@@ -687,15 +691,7 @@ makeContext.marquee_grob <- function(x) {
   span_bg <- as.list(span_bg)
   for (j in rev(span_bg_may_merge)) {
     i <- span_bg[[j]]
-    if (identical(x$text$block[i], x$text$block[i+1]) &&
-        identical(x$text$background[[i]], x$text$background[[i+1]]) &&
-        identical(x$text$border[i], x$text$border[i+1]) &&
-        is.na(x$text$border[i]) || (
-          identical(x$text$border_size_bottom[i], x$text$border_size_bottom[i+1]) &&
-          identical(x$text$border_size_top[i], x$text$border_size_top[i+1]) &&
-          identical(x$text$border_size_left[i], x$text$border_size_left[i+1]) &&
-          identical(x$text$border_size_right[i], x$text$border_size_right[i+1]
-          ))) {
+    if (has_identical_background(i, i + 1, x$text)) {
       span_bg[[j]] <- c(span_bg[[j]], span_bg[[j + 1]])
       span_bg[j + 1] <- NULL
     }
@@ -1048,4 +1044,47 @@ set_margins <- function(tree, margins, has_background, has_top, has_bottom) {
     margins$top[tree$children[[i]]$element] <- 0
   }
   margins
+}
+
+has_identical_background <- function(a, b, style) {
+  mapply(function(a, b) {
+    identical(style$block[a], style$block[b]) &&
+    identical(style$background[[a]], style$background[[b]]) &&
+    identical(style$border[a], style$border[b]) &&
+    (is.na(style$border[a]) || (
+      identical(style$border_size_bottom[a], style$border_size_bottom[b]) &&
+      identical(style$border_size_top[a], style$border_size_top[b]) &&
+      identical(style$border_size_left[a], style$border_size_left[b]) &&
+      identical(style$border_size_right[a], style$border_size_right[b])
+    ))
+  }, a = a, b = b)
+}
+
+add_inline_padding <- function(parsed) {
+  has_background <- which(
+    parsed$block == c(0, parsed$block[seq_len(nrow(parsed) - 1)]) &
+      parsed$padding_right != 0 & parsed$padding_left != 0
+  )
+  needs_padding <- parsed$block[has_background] != parsed$block[has_background - 1] |
+    !has_identical_background(has_background, has_background - 1, parsed)
+  needs_padding <- has_background[needs_padding]
+
+  if (length(needs_padding) == 0) {
+    return(parsed)
+  }
+
+  padding <- data.frame(
+    loc = c(needs_padding, parsed$ends[needs_padding]),
+    width = c(parsed$padding_left[needs_padding], parsed$padding_right[needs_padding]),
+    offset = rep(c(0, 1), each = length(needs_padding))
+  )
+  padding <- unique(padding[padding$width != 0, ])
+  padding <- padding[order(padding$loc), ]
+  parsed$ends <- parsed$ends + rowSums(outer(parsed$ends, padding$loc, `>=`))
+  n_reps <- vctrs::vec_count(c(seq_len(nrow(parsed)), padding$loc), "key")
+  parsed <- parsed[rep(n_reps$key, n_reps$count), ]
+  padding$loc <- padding$loc + seq_len(nrow(padding)) - 1 + padding$offset
+  parsed$text[padding$loc] <- NA
+  parsed$tracking[padding$loc] <- padding$width
+  parsed
 }
