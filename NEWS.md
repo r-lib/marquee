@@ -1,4 +1,4 @@
-# marquee (development version)
+# marquee 1.0.0
 
 * Fixed a bug in bullet placement that affected tight lists with multiple spans
   (#18)
