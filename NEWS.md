@@ -16,6 +16,8 @@
   `glyphs` capabilities
 * Inline padding now reserves space on the left and right side during shaping if
   the inline tag has decoration (background or border)
+* Added `guide_marquee()` to make allow legends with keys mixed into free text
+  descriptions
 
 # marquee 0.1.0
 
