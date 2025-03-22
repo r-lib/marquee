@@ -55,6 +55,8 @@
 #' @param border_size The line width of the background stroke, given as a call
 #' to [trbl()]
 #' @param border_radius The corner radius of the background, given in points
+#' @param outline The color of the outline stroke.
+#' @param outline_size The line width of the outline stroke.
 #' @param bullets A vector of strings to use for bullets in unordered lists.
 #' `marquee_bullets` provides a selection
 #' @param underline Should text be underlined
@@ -85,7 +87,8 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
                   features = NULL, size = NULL, color = NULL, lineheight = NULL,
                   align = NULL, tracking = NULL, indent = NULL, hanging = NULL,
                   margin = NULL, padding = NULL, background = NULL, border = NULL,
-                  border_size = NULL, border_radius = NULL, bullets = NULL,
+                  border_size = NULL, border_radius = NULL,
+                  outline = NULL, outline_size = NULL, bullets = NULL,
                   underline = NULL, strikethrough = NULL, baseline = NULL,
                   img_asp = NULL, text_direction = NULL) {
   check_string(family, allow_null = TRUE)
@@ -143,6 +146,11 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   if (is.unit(border_radius)) border_radius <- convertWidth(border_radius, "bigpts", FALSE)
   if (!is_modifier(border_radius)) check_number_decimal(border_radius, allow_null = TRUE)
 
+  check_string(outline, allow_null = TRUE, allow_na = TRUE)
+  if (!is.null(outline) && is.na(outline)) outline[] <- NA_character_
+
+  if (is.unit(outline_size)) outline_size <- convertHeight(size, "bigpts", FALSE)
+
   check_character(bullets, allow_null = TRUE)
 
   check_bool(underline, allow_null = TRUE)
@@ -183,6 +191,8 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
       border_size_bottom = border_size[[3]],
       border_size_left = border_size[[4]],
       border_radius = border_radius,
+      outline = outline,
+      outline_size = outline_size,
       bullets = bullets,
       underline = underline,
       strikethrough = strikethrough,
@@ -249,7 +259,7 @@ base_style <- function(family = "", weight = "normal", italic = FALSE,
                        align = "auto", tracking = 0, indent = 0, hanging = 0,
                        margin = trbl(0, 0, rem(1)), padding = trbl(0),
                        background = NA, border = NA, border_size = trbl(0),
-                       border_radius = 0, bullets = marquee_bullets,
+                       border_radius = 0, outline = NA, outline_size = 1, bullets = marquee_bullets,
                        underline = FALSE, strikethrough = FALSE, baseline = 0,
                        img_asp = 1.65, text_direction = "auto") {
   style(
@@ -271,6 +281,8 @@ base_style <- function(family = "", weight = "normal", italic = FALSE,
     border = border,
     border_size = border_size,
     border_radius = border_radius,
+    outline = outline,
+    outline_size = outline_size,
     bullets = bullets,
     underline = underline,
     strikethrough = strikethrough,

@@ -70,6 +70,8 @@ the padding but not the margin}
     \item{\code{border_size}}{The line width of the background stroke, given as a call
 to \code{\link[=trbl]{trbl()}}}
     \item{\code{border_radius}}{The corner radius of the background, given in points}
+    \item{\code{outline}}{The color of the outline stroke.}
+    \item{\code{outline_size}}{The line width of the outline stroke.}
     \item{\code{bullets}}{A vector of strings to use for bullets in unordered lists.
 \code{marquee_bullets} provides a selection}
     \item{\code{underline}}{Should text be underlined}
