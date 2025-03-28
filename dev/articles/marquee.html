@@ -200,22 +200,38 @@ colored fonts in labels, which marquee makes very easy</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"(\\w+)"</span>, <span class="st">"{.red ***\\1***}"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cars</span></span>
-<span><span class="co">#&gt;  [1] "{.red ***Mazda***} RX4"           "{.red ***Mazda***} RX4 Wag"      </span></span>
-<span><span class="co">#&gt;  [3] "{.red ***Datsun***} 710"          "{.red ***Hornet***} 4 Drive"     </span></span>
-<span><span class="co">#&gt;  [5] "{.red ***Hornet***} Sportabout"   "{.red ***Valiant***}"            </span></span>
-<span><span class="co">#&gt;  [7] "{.red ***Duster***} 360"          "{.red ***Merc***} 240D"          </span></span>
-<span><span class="co">#&gt;  [9] "{.red ***Merc***} 230"            "{.red ***Merc***} 280"           </span></span>
-<span><span class="co">#&gt; [11] "{.red ***Merc***} 280C"           "{.red ***Merc***} 450SE"         </span></span>
-<span><span class="co">#&gt; [13] "{.red ***Merc***} 450SL"          "{.red ***Merc***} 450SLC"        </span></span>
-<span><span class="co">#&gt; [15] "{.red ***Cadillac***} Fleetwood"  "{.red ***Lincoln***} Continental"</span></span>
-<span><span class="co">#&gt; [17] "{.red ***Chrysler***} Imperial"   "{.red ***Fiat***} 128"           </span></span>
-<span><span class="co">#&gt; [19] "{.red ***Honda***} Civic"         "{.red ***Toyota***} Corolla"     </span></span>
-<span><span class="co">#&gt; [21] "{.red ***Toyota***} Corona"       "{.red ***Dodge***} Challenger"   </span></span>
-<span><span class="co">#&gt; [23] "{.red ***AMC***} Javelin"         "{.red ***Camaro***} Z28"         </span></span>
-<span><span class="co">#&gt; [25] "{.red ***Pontiac***} Firebird"    "{.red ***Fiat***} X1-9"          </span></span>
-<span><span class="co">#&gt; [27] "{.red ***Porsche***} 914-2"       "{.red ***Lotus***} Europa"       </span></span>
-<span><span class="co">#&gt; [29] "{.red ***Ford***} Pantera L"      "{.red ***Ferrari***} Dino"       </span></span>
-<span><span class="co">#&gt; [31] "{.red ***Maserati***} Bora"       "{.red ***Volvo***} 142E"</span></span>
+<span><span class="co">#&gt;  [1] "{.red ***Mazda***} RX4"          </span></span>
+<span><span class="co">#&gt;  [2] "{.red ***Mazda***} RX4 Wag"      </span></span>
+<span><span class="co">#&gt;  [3] "{.red ***Datsun***} 710"         </span></span>
+<span><span class="co">#&gt;  [4] "{.red ***Hornet***} 4 Drive"     </span></span>
+<span><span class="co">#&gt;  [5] "{.red ***Hornet***} Sportabout"  </span></span>
+<span><span class="co">#&gt;  [6] "{.red ***Valiant***}"            </span></span>
+<span><span class="co">#&gt;  [7] "{.red ***Duster***} 360"         </span></span>
+<span><span class="co">#&gt;  [8] "{.red ***Merc***} 240D"          </span></span>
+<span><span class="co">#&gt;  [9] "{.red ***Merc***} 230"           </span></span>
+<span><span class="co">#&gt; [10] "{.red ***Merc***} 280"           </span></span>
+<span><span class="co">#&gt; [11] "{.red ***Merc***} 280C"          </span></span>
+<span><span class="co">#&gt; [12] "{.red ***Merc***} 450SE"         </span></span>
+<span><span class="co">#&gt; [13] "{.red ***Merc***} 450SL"         </span></span>
+<span><span class="co">#&gt; [14] "{.red ***Merc***} 450SLC"        </span></span>
+<span><span class="co">#&gt; [15] "{.red ***Cadillac***} Fleetwood" </span></span>
+<span><span class="co">#&gt; [16] "{.red ***Lincoln***} Continental"</span></span>
+<span><span class="co">#&gt; [17] "{.red ***Chrysler***} Imperial"  </span></span>
+<span><span class="co">#&gt; [18] "{.red ***Fiat***} 128"           </span></span>
+<span><span class="co">#&gt; [19] "{.red ***Honda***} Civic"        </span></span>
+<span><span class="co">#&gt; [20] "{.red ***Toyota***} Corolla"     </span></span>
+<span><span class="co">#&gt; [21] "{.red ***Toyota***} Corona"      </span></span>
+<span><span class="co">#&gt; [22] "{.red ***Dodge***} Challenger"   </span></span>
+<span><span class="co">#&gt; [23] "{.red ***AMC***} Javelin"        </span></span>
+<span><span class="co">#&gt; [24] "{.red ***Camaro***} Z28"         </span></span>
+<span><span class="co">#&gt; [25] "{.red ***Pontiac***} Firebird"   </span></span>
+<span><span class="co">#&gt; [26] "{.red ***Fiat***} X1-9"          </span></span>
+<span><span class="co">#&gt; [27] "{.red ***Porsche***} 914-2"      </span></span>
+<span><span class="co">#&gt; [28] "{.red ***Lotus***} Europa"       </span></span>
+<span><span class="co">#&gt; [29] "{.red ***Ford***} Pantera L"     </span></span>
+<span><span class="co">#&gt; [30] "{.red ***Ferrari***} Dino"       </span></span>
+<span><span class="co">#&gt; [31] "{.red ***Maserati***} Bora"      </span></span>
+<span><span class="co">#&gt; [32] "{.red ***Volvo***} 142E"</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">disp</span>, <span class="va">mpg</span>, label <span class="op">=</span> <span class="va">cars</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_marquee.html">geom_marquee</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -341,7 +357,8 @@ patchwork plots). It all works as you’d expect:</p>
 <span><span class="st">laborum."</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_text_plot</span>, <span class="fu"><a href="../reference/classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre></div>
+<span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with</span></span>
+<span><span class="co">#&gt; `binwidth`.</span></span></code></pre></div>
 <p><img src="marquee_files/figure-html/unnamed-chunk-13-1.png" width="98%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
