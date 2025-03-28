@@ -50,6 +50,7 @@ classic_style <- function(base_size = 12, body_font = "", header_font = "",
     del  = style(strikethrough = TRUE),
     img  = style(align = "center", border = NA),
     sub  = style(size = em(0.5), baseline = em(-0.2)),
-    sup  = style(size = em(0.5), baseline = em(1))
+    sup  = style(size = em(0.5), baseline = em(1)),
+    out  = style(color = "#ffffff", outline = "#000000")
   )
 }

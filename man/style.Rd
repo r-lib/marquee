@@ -24,6 +24,8 @@ style(
   border = NULL,
   border_size = NULL,
   border_radius = NULL,
+  outline = NULL,
+  outline_size = NULL,
   bullets = NULL,
   underline = NULL,
   strikethrough = NULL,
@@ -51,6 +53,8 @@ base_style(
   border = NA,
   border_size = trbl(0),
   border_radius = 0,
+  outline = NA,
+  outline_size = 1,
   bullets = marquee_bullets,
   underline = FALSE,
   strikethrough = FALSE,
@@ -126,6 +130,10 @@ the padding but not the margin}
 to \code{\link[=trbl]{trbl()}}}
 
 \item{border_radius}{The corner radius of the background, given in points}
+
+\item{outline}{The color of the outline stroke.}
+
+\item{outline_size}{The line width of the outline stroke.}
 
 \item{bullets}{A vector of strings to use for bullets in unordered lists.
 \code{marquee_bullets} provides a selection}
