@@ -189,7 +189,6 @@ inline void push_info(MARQUEE_DATA* userdata, std::string type, bool block = fal
     if (is_color(type)) {
       last_style[2] = cpp11::writable::strings({type});
     } else if (is_size(type)) {
-      Rprintf("Yay\n");
       last_style[0] = cpp11::writable::doubles({double(std::stoi(type))});
     }
     userdata->style_stack.push(last_style);
