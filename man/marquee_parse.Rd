@@ -138,6 +138,13 @@ color of the style. This means that parsing \code{"Color {.red this} red"}
 automatically sets the color of \code{"this"} to red, even if no style is provided
 for the \code{red} tag. Likewise, parsing \code{"Color {#00FF00 me} green"} will
 automatically set the color of \code{"me"} to #00FF00 (fully saturated green).
+
+\strong{Automatic sizing}
+Like the automatic coloring described above, marquee also offers a shortcut
+for changing the size of text on the fly. Any class consisting solely of
+numbers will (if the class is not explicitly defined) by considered a text
+sizing class. So, parsing \code{"This {.50 text} is big"} automatically sets the
+font size of \code{"text"} to \code{50}.
 }
 
 \section{Additional parsing information}{

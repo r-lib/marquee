@@ -1,5 +1,8 @@
 # marquee (development version)
 
+* You can now change the size by using a {.size ...} shortcut, e.g. {.30 BIG} to
+  render `BIG` with font size 30
+
 # marquee 1.0.0
 
 * Fixed a bug in bullet placement that affected tight lists with multiple spans
