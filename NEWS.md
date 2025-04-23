@@ -1,5 +1,7 @@
 # marquee (development version)
 
+* Size of `element_marquee()` is communicated similar to `element_text()` (#57)
+
 # marquee 1.0.0
 
 * Fixed a bug in bullet placement that affected tight lists with multiple spans
