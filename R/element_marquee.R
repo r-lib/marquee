@@ -113,9 +113,17 @@ element_grob.element_marquee <- function(element, label = "", x = NULL, y = NULL
   x <- x %||% rep(just$hjust, n)
   y <- y %||% rep(just$vjust, n)
   width <- width %||% element$width %||% NA
-  marquee_grob(label, style, force_body_margin = TRUE, x = x, y = y, width = width,
-               hjust = hjust %||% element$hjust, vjust = vjust,
-               angle = angle)
+  grob <- marquee_grob(
+    label, style, force_body_margin = TRUE, x = x, y = y, width = width,
+    hjust = hjust %||% element$hjust,
+    vjust = vjust,
+    angle = angle
+  )
+  if (xor(margin_x, margin_y)) {
+    if (margin_x) grob$full_height <- unit(1, "null")
+    if (margin_y) grob$full_width  <- unit(1, "null")
+  }
+  grob
 }
 
 on_load({
