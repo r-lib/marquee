@@ -62,14 +62,27 @@
 #' red_bold_names <- sub("(\\w+)", "{.red **\\1**}", rownames(mtcars))
 #' p + geom_marquee(aes(label = red_bold_names))
 #'
-geom_marquee <- function(mapping = NULL, data = NULL, stat = "identity",
-                         position = "identity", ..., size.unit = "mm",
-                         na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) {
+geom_marquee <- function(
+  mapping = NULL,
+  data = NULL,
+  stat = "identity",
+  position = "identity",
+  ...,
+  size.unit = "mm",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE
+) {
   check_installed("ggplot2")
 
   ggplot2::layer(
-    data = data, mapping = mapping, stat = stat, geom = GeomMarquee,
-    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    geom = GeomMarquee,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
     params = list2(size.unit = size.unit, na.rm = na.rm, ...)
   )
 }
@@ -91,24 +104,43 @@ geom_marquee <- function(mapping = NULL, data = NULL, stat = "identity",
 NULL
 
 on_load(
-  makeActiveBinding("GeomMarquee", function() geom_env$geom, environment(geom_marquee))
+  makeActiveBinding(
+    "GeomMarquee",
+    function() geom_env$geom,
+    environment(geom_marquee)
+  )
 )
 
 geom_env <- new_environment(list(geom = NULL))
 
 make_marquee_geom <- function() {
   geom_env$geom <- ggplot2::ggproto(
-    "GeomMarquee", ggplot2::Geom,
+    "GeomMarquee",
+    ggplot2::Geom,
 
     required_aes = c("x", "y", "label"),
 
     default_aes = ggplot2::aes(
-      colour = "black", fill = NA, size = 3.88, angle = 0,
-      hjust = 0.5, vjust = 0.5, alpha = NA, family = "", lineheight = 1.2,
-      style = classic_style(), width = NA
+      colour = "black",
+      fill = NA,
+      size = 3.88,
+      angle = 0,
+      hjust = 0.5,
+      vjust = 0.5,
+      alpha = NA,
+      family = "",
+      lineheight = 1.2,
+      style = classic_style(),
+      width = NA
     ),
 
-    draw_panel = function(data, panel_params, coord, na.rm = FALSE, size.unit = "mm") {
+    draw_panel = function(
+      data,
+      panel_params,
+      coord,
+      na.rm = FALSE,
+      size.unit = "mm"
+    ) {
       lab <- as.character(data$label)
 
       styles <- data$style
@@ -121,20 +153,32 @@ make_marquee_geom <- function() {
       check_numeric(data$lineheight)
       colour <- ggplot2::alpha(data$colour, data$alpha)
       check_character(colour, arg = "colour")
-      if (!is.character(data$fill) &&
+      if (
+        !is.character(data$fill) &&
           !(is.logical(data$fill) && all(is.na(data$fill))) &&
-          !all(vapply(data$fill, function(x) is.character(x) || inherits(x, "GridPattern"), logical(1)))) {
-        stop_input_type(data$fill, "a character vector or a list of strings and patters", arg = "fill")
+          !all(vapply(
+            data$fill,
+            function(x) is.character(x) || inherits(x, "GridPattern"),
+            logical(1)
+          ))
+      ) {
+        stop_input_type(
+          data$fill,
+          "a character vector or a list of strings and patters",
+          arg = "fill"
+        )
       }
 
-      styles <- modify_style(styles,
+      styles <- modify_style(
+        styles,
         "base",
         family = data$family,
         size = size,
         lineheight = data$lineheight,
         color = colour
       )
-      styles <- modify_style(styles,
+      styles <- modify_style(
+        styles,
         "body",
         background = skip_inherit(data$fill)
       )
@@ -145,9 +189,14 @@ make_marquee_geom <- function() {
       data$hjust <- compute_just(data$hjust, data$x, data$y, data$angle)
 
       grob <- marquee_grob(
-        text = lab, style = styles, force_body_margin = TRUE,
-        x = data$x, y = data$y, width = data$width,
-        hjust = data$hjust, vjust = data$vjust,
+        text = lab,
+        style = styles,
+        force_body_margin = TRUE,
+        x = data$x,
+        y = data$y,
+        width = data$width,
+        hjust = data$hjust,
+        vjust = data$vjust,
         angle = data$angle
       )
       grob$name <- grobName(grob, "geom_marquee")
@@ -159,11 +208,18 @@ make_marquee_geom <- function() {
 }
 
 on_load(on_package_load("ggplot2", {
- make_marquee_geom()
+  make_marquee_geom()
 }))
 
 combine_styles <- function(style, family, size, lineheight, color, background) {
-  style <- modify_style(style, "base", family = family, size = size, color = color, lineheight = lineheight)
+  style <- modify_style(
+    style,
+    "base",
+    family = family,
+    size = size,
+    color = color,
+    lineheight = lineheight
+  )
   modify_style(style, "body", background = skip_inherit(background))
 }
 
@@ -180,16 +236,18 @@ resolve_text_unit <- function(unit) {
   )
 }
 
-compute_just <- function (just, a = 0.5, b = a, angle = 0) {
+compute_just <- function(just, a = 0.5, b = a, angle = 0) {
   if (!is.character(just)) {
     return(just)
   }
   if (any(grepl("outward|inward", just))) {
-    angle <- angle%%360
+    angle <- angle %% 360
     angle <- ifelse(angle > 180, angle - 360, angle)
     angle <- ifelse(angle < -180, angle + 360, angle)
-    rotated_forward <- grepl("outward|inward", just) & (angle > 45 & angle < 135)
-    rotated_backwards <- grepl("outward|inward", just) & (angle < -45 & angle > -135)
+    rotated_forward <- grepl("outward|inward", just) &
+      (angle > 45 & angle < 135)
+    rotated_backwards <- grepl("outward|inward", just) &
+      (angle < -45 & angle > -135)
     ab <- ifelse(rotated_forward | rotated_backwards, b, a)
     just_swap <- rotated_backwards | abs(angle) > 135
     inward <- (just == "inward" & !just_swap | just == "outward" & just_swap)
@@ -200,7 +258,7 @@ compute_just <- function (just, a = 0.5, b = a, angle = 0) {
   just
 }
 
-just_dir <- function (x, tol = 0.001) {
+just_dir <- function(x, tol = 0.001) {
   out <- rep(2L, length(x))
   out[x < 0.5 - tol] <- 1L
   out[x > 0.5 + tol] <- 3L

@@ -43,7 +43,8 @@ NULL
 
 #' @rdname style_helpers
 #' @export
-relative <- function(x) structure(list(as.numeric(x)[1]), class = "marquee_relative")
+relative <- function(x)
+  structure(list(as.numeric(x)[1]), class = "marquee_relative")
 
 is_relative <- function(x) inherits(x, "marquee_relative")
 
@@ -86,7 +87,8 @@ format.marquee_rem <- function(x, ...) {
 #' @export
 print.marquee_rem <- print.marquee_relative
 
-is_modifier <- function(x) inherits(x, c("marquee_relative", "marquee_em", "marquee_rem"))
+is_modifier <- function(x)
+  inherits(x, c("marquee_relative", "marquee_em", "marquee_rem"))
 
 #' @rdname style_helpers
 #' @export
@@ -95,10 +97,13 @@ trbl <- function(top = NULL, right = top, bottom = top, left = right) {
   if (is.unit(right)) right <- convertWidth(right, "bigpts", TRUE)
   if (is.unit(bottom)) bottom <- convertHeight(bottom, "bigpts", TRUE)
   if (is.unit(left)) left <- convertWidth(left, "bigpts", TRUE)
-  if (!is.null(top) && !is_modifier(top)) check_number_decimal(top, allow_null = TRUE)
-  if (!is.null(right) && !is_modifier(right)) check_number_decimal(right, allow_null = TRUE)
+  if (!is.null(top) && !is_modifier(top))
+    check_number_decimal(top, allow_null = TRUE)
+  if (!is.null(right) && !is_modifier(right))
+    check_number_decimal(right, allow_null = TRUE)
   if (!is.null(bottom) && !is_modifier(bottom)) check_number_decimal(bottom)
-  if (!is.null(left) && !is_modifier(left)) check_number_decimal(left, allow_null = TRUE)
+  if (!is.null(left) && !is_modifier(left))
+    check_number_decimal(left, allow_null = TRUE)
   structure(list(top, right, bottom, left), class = "marquee_trbl")
 }
 
@@ -106,7 +111,10 @@ is_trbl <- function(x) inherits(x, "marquee_trbl")
 
 #' @export
 format.marquee_trbl <- function(x, ...) {
-  paste0(c("   top: ", " right: ", "bottom: ", "  left: "), vapply(x, format, character(1), ...))
+  paste0(
+    c("   top: ", " right: ", "bottom: ", "  left: "),
+    vapply(x, format, character(1), ...)
+  )
 }
 
 #' @export
@@ -119,8 +127,8 @@ print.marquee_trbl <- function(x, ...) {
 #' @rdname style_helpers
 #' @export
 skip_inherit <- function(x) {
-  if (is_trbl(x)) x[] <- lapply(x[], skip_inherit)
-  else class(x) <- c("marquee_skip_inherit", class(x))
+  if (is_trbl(x)) x[] <- lapply(x[], skip_inherit) else
+    class(x) <- c("marquee_skip_inherit", class(x))
   x
 }
 
