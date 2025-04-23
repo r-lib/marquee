@@ -7,7 +7,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r}
+#| include: false
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -20,7 +21,8 @@ knitr::opts_chunk$set(
 has_gt_gtable <- "as_gtable" %in% getNamespaceExports("gt")
 ```
 
-```{r setup}
+```{r}
+#| label: setup
 library(marquee)
 library(grid)
 library(ggplot2)
@@ -161,7 +163,8 @@ ggplot(mtcars) + aes(disp, mpg, label = cars) +
 
 As can be seen, the defaults will let the text run for as long as it needs without doing any text wrapping. This is because it makes alignment behave in the same way as `element_text()`. However, if you have a lot of text like we do above, you certainly want to turn on that feature. You do that by setting a width. `1` is equivalent to the width of the area the element occupies so that is a natural value here, but you can set it to any `grid::unit()` value you wish.
 
-```{r, fig.asp=0.8}
+```{r}
+#| fig-asp: 0.8
 ggplot(mtcars) + aes(disp, mpg, label = cars) +
   geom_marquee(size = 2) +
   ggtitle(md_text) +
@@ -187,7 +190,8 @@ grid.draw(marquee_grob(md_text_fig, classic_style()))
 
 Compare that to
 
-```{r, fig.asp=1.3}
+```{r}
+#| fig-asp: 1.3
 md_text_fig2 <-
 "# Lorem Ipsum
 
@@ -205,7 +209,8 @@ grid.draw(marquee_grob(md_text_fig2, classic_style()))
 
 However, marquee has a pretty unique trick up it's sleeve compared to other markdown formats. It doesn't just accept paths to images — it also accepts R graphic objects (currently grid grobs, ggplot2 plots and patchwork plots). It all works as you'd expect:
 
-```{r, fig.asp=1.1}
+```{r}
+#| fig-asp: 1.1
 p <- ggplot(mtcars) +
   geom_histogram(aes(x = gear))
 
@@ -229,7 +234,8 @@ grid.draw(marquee_grob(md_text_plot, classic_style()))
 
 The table markdown syntax is not supported in marquee. However, you can still include tables in marquee, and with much more styling support than standard markdown table syntax provide. This magic is an extension of what was talked about above. More to the point, gt table objects are recognized as valid objects in the image tag path and can thus be included directly in the output. We show the power here with a table specification taken from the [gt introduction](https://gt.rstudio.com/articles/gt.html):
 
-```{r, collapse=TRUE}
+```{r}
+#| collapse: true
 library(gt)
 airquality_m <- airquality[1:10, ]
 airquality_m$Year <- 1973L
@@ -248,11 +254,13 @@ table <- tab_spanner(table,
 )
 ```
 
-```{block, include=!has_gt_gtable}
+```{block}
+#| include: !expr '!has_gt_gtable'
 > This vignette has been rendered with an older version of gt that does not support converting gt objects to gtables. Because of this you will see a "missing grob" in the example below
 ```
 
-```{r, fig.asp=1.1}
+```{r}
+#| fig-asp: 1.1
 md_text_table <-
 "# Lorem Ipsum
 Below we have a table created with gt
