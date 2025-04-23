@@ -165,7 +165,11 @@ marquee_parse <- function(text, style = classic_style(), ignore_html = TRUE) {
   ignore_html[is.na(ignore_html)] <- TRUE
   parsed <- marquee_c(text, style, ignore_html)
   # Remove terminal line end from code blocks
-  parsed$text[parsed$type == "cb"] <- sub("\n$", "", parsed$text[parsed$type == "cb"])
+  parsed$text[parsed$type == "cb"] <- sub(
+    "\n$",
+    "",
+    parsed$text[parsed$type == "cb"]
+  )
   class(parsed) <- c("marquee_parsed", class(parsed))
   parsed
 }

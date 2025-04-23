@@ -47,7 +47,11 @@ style_set <- function(...) {
     names(styles) <- tolower(names(styles))
     for (i in seq_along(styles)) {
       if (!is_style(styles[[i]])) {
-        stop_input_type(styles[[i]], "a marquee style object", arg = names(styles)[i])
+        stop_input_type(
+          styles[[i]],
+          "a marquee style object",
+          arg = names(styles)[i]
+        )
       }
     }
     if (is.null(styles$base)) {
@@ -65,9 +69,13 @@ is_style_set <- function(x) inherits(x, "marquee_style_set")
 
 #' @export
 format.marquee_style_set <- function(x, ...) {
-  vapply(vctrs::vec_data(x), function(x) {
-    paste0("<", paste0(names(x), collapse = ", "), ">")
-  }, character(1))
+  vapply(
+    vctrs::vec_data(x),
+    function(x) {
+      paste0("<", paste0(names(x), collapse = ", "), ">")
+    },
+    character(1)
+  )
 }
 
 #' @rdname style_set
@@ -77,7 +85,14 @@ modify_style <- function(x, tag, ...) {
   args <- names(opts)
   expand <- args %in% c("margin", "padding", "border_size")
   if (any(expand)) {
-    args <- c(args[!expand], paste0(rep(args[expand], each = 4), "_", c("top", "right", "bottom", "left")))
+    args <- c(
+      args[!expand],
+      paste0(
+        rep(args[expand], each = 4),
+        "_",
+        c("top", "right", "bottom", "left")
+      )
+    )
   }
 
   if (is_style(x)) {
@@ -98,9 +113,14 @@ modify_style <- function(x, tag, ...) {
 
   for (i in seq_along(opts)) {
     opt <- opts[[i]]
-    if (is.null(opt) || is_style(opt) || is_modifier(opt) ||
-        is_trbl(opt) || inherits(opt, "font_feature") ||
-        inherits(opt, "GridPattern")) {
+    if (
+      is.null(opt) ||
+        is_style(opt) ||
+        is_modifier(opt) ||
+        is_trbl(opt) ||
+        inherits(opt, "font_feature") ||
+        inherits(opt, "GridPattern")
+    ) {
       opt <- list(opt)
     }
     opts[[i]] <- vctrs::vec_recycle(opt, length(x), x_arg = names(opts)[i])
@@ -108,7 +128,9 @@ modify_style <- function(x, tag, ...) {
 
   for (i in seq_along(x)) {
     if (is_style(opts[[1]][[i]])) {
-      if (tag[i] == "base" && any(vapply(opts[[1]][[i]], is.null, logical(1)))) {
+      if (
+        tag[i] == "base" && any(vapply(opts[[1]][[i]], is.null, logical(1)))
+      ) {
         cli::cli_abort("The base tag must be set to a complete style")
       }
       x[[i]][[tag[i]]] <- opts[[1]][[i]]
@@ -118,8 +140,12 @@ modify_style <- function(x, tag, ...) {
       if (is.null(old_style)) {
         x[[i]][[tag[i]]] <- new_style
       } else {
-        if (tag[i] == "base" && any(vapply(new_style[args], is.null, logical(1)))) {
-          cli::cli_abort("The base tag cannot have any styles set to {.val NULL}")
+        if (
+          tag[i] == "base" && any(vapply(new_style[args], is.null, logical(1)))
+        ) {
+          cli::cli_abort(
+            "The base tag cannot have any styles set to {.val NULL}"
+          )
         }
         cls <- class(x[[i]][[tag[i]]])
         class(x[[i]][[tag[i]]]) <- NULL

@@ -47,52 +47,102 @@
 #'   marquee_glue("This will be black and {.{part}avender this text will be {col}}!")
 #' )
 #'
-marquee_glue <- function(..., .sep = "", .envir = parent.frame(), .open = "{",
-                         .close = "}", .na = "NA", .null = character(),
-                         .comment = character(), .literal = FALSE, .transformer = NULL,
-                         .trim = TRUE) {
+marquee_glue <- function(
+  ...,
+  .sep = "",
+  .envir = parent.frame(),
+  .open = "{",
+  .close = "}",
+  .na = "NA",
+  .null = character(),
+  .comment = character(),
+  .literal = FALSE,
+  .transformer = NULL,
+  .trim = TRUE
+) {
   if (.open != "{" && .close != "}") {
     .transformer <- .transformer %||% glue::identity_transformer
   } else {
     if (!is.null(.transformer)) {
-      cli::cli_warn("Ignoring supplied {.arg .transformer} when using {.val {'{'}} and  {.val {'}'}} as delimiters")
+      cli::cli_warn(
+        "Ignoring supplied {.arg .transformer} when using {.val {'{'}} and  {.val {'}'}} as delimiters"
+      )
     }
     .transformer <- marquee_transformer(.na, .null, .comment, .literal)
   }
 
-  glue::glue(..., .sep = .sep, .envir = .envir, .open = .open, .close = .close,
-             .na = .na, .null = .null, .comment = .comment, .literal = .literal,
-             .transformer = .transformer, .trim = .trim)
+  glue::glue(
+    ...,
+    .sep = .sep,
+    .envir = .envir,
+    .open = .open,
+    .close = .close,
+    .na = .na,
+    .null = .null,
+    .comment = .comment,
+    .literal = .literal,
+    .transformer = .transformer,
+    .trim = .trim
+  )
 }
 #' @rdname marquee_glue
 #' @export
-marquee_glue_data <- function(.x, ..., .sep = "", .envir = parent.frame(), .open = "{",
-                              .close = "}", .na = "NA", .null = character(),
-                              .comment = character(), .literal = FALSE, .transformer = NULL,
-                              .trim = TRUE) {
+marquee_glue_data <- function(
+  .x,
+  ...,
+  .sep = "",
+  .envir = parent.frame(),
+  .open = "{",
+  .close = "}",
+  .na = "NA",
+  .null = character(),
+  .comment = character(),
+  .literal = FALSE,
+  .transformer = NULL,
+  .trim = TRUE
+) {
   if (.open != "{" && .close != "}") {
     .transformer <- .transformer %||% glue::identity_transformer
   } else {
     if (!is.null(.transformer)) {
-      cli::cli_warn("Ignoring supplied {.arg .transformer} when using {.val {'{'}} and  {.val {'}'}} as delimiters")
+      cli::cli_warn(
+        "Ignoring supplied {.arg .transformer} when using {.val {'{'}} and  {.val {'}'}} as delimiters"
+      )
     }
     .transformer <- marquee_transformer(.na, .null, .comment, .literal)
   }
 
-  glue::glue_data(.x, ..., .sep = .sep, .envir = .envir, .open = .open, .close = .close,
-                  .na = .na, .null = .null, .comment = .comment, .literal = .literal,
-                  .transformer = .transformer, .trim = .trim)
+  glue::glue_data(
+    .x,
+    ...,
+    .sep = .sep,
+    .envir = .envir,
+    .open = .open,
+    .close = .close,
+    .na = .na,
+    .null = .null,
+    .comment = .comment,
+    .literal = .literal,
+    .transformer = .transformer,
+    .trim = .trim
+  )
 }
 
-marquee_transformer <- function(.na = "NA", .null = character(), .comment = character(),
-                                .literal = FALSE) {
+marquee_transformer <- function(
+  .na = "NA",
+  .null = character(),
+  .comment = character(),
+  .literal = FALSE
+) {
   function(text, envir) {
     first <- substr(text, 1, 1)
     if (first %in% c(".", "#")) {
       if (substr(text, 2, 2) == "{") {
         tag_ends <- regexec("}", text, fixed = TRUE)[[1]]
         if (substr(text, tag_ends + 1L, tag_ends + 1L) != " ") {
-          cli::cli_abort("Malformed marquee interpolation block. When interpolating a tag name it must be followed by a space")
+          cli::cli_abort(
+            "Malformed marquee interpolation block. When interpolating a tag name it must be followed by a space"
+          )
         }
         tag <- glue::identity_transformer(substr(text, 2, tag_ends), envir)
         if (grepl("\\s", tag)) {
@@ -104,10 +154,15 @@ marquee_transformer <- function(.na = "NA", .null = character(), .comment = char
         tag_ends <- tag_ends - 1L
         tag <- substr(text, 2, tag_ends)
       }
-      body <- glue::glue(substr(text, tag_ends + 2L, nchar(text)),
-                         .envir = envir, .na = .na, .null = .null,
-                         .comment = .comment, .literal = .literal,
-                         .transformer = caller_fn(n = 0))
+      body <- glue::glue(
+        substr(text, tag_ends + 2L, nchar(text)),
+        .envir = envir,
+        .na = .na,
+        .null = .null,
+        .comment = .comment,
+        .literal = .literal,
+        .transformer = caller_fn(n = 0)
+      )
       paste0("{", first, tag, " ", body, "}")
     } else {
       glue::identity_transformer(text, envir)

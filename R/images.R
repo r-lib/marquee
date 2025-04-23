@@ -16,7 +16,10 @@ images_as_grobs <- function(paths, env = caller_env()) {
       )
     } else if (is_svg[i]) {
       check_installed("rsvg")
-      svg <- suppressWarnings(charToRaw(paste0(trimws(readLines(paths[i])), collapse = "")))
+      svg <- suppressWarnings(charToRaw(paste0(
+        trimws(readLines(paths[i])),
+        collapse = ""
+      )))
       obj <- try_fetch(
         rsvg::rsvg_nativeraster(svg, width = 500),
         error = function(...) NULL
@@ -59,16 +62,41 @@ missing_grob <- function() {
     rectGrob(
       gp = gpar(col = "black", fill = NA, lwd = 4)
     ),
-    vp = viewport(clip = if (utils::packageVersion("grid") < package_version("4.1.0")) "on" else rectGrob()),
+    vp = viewport(
+      clip = if (utils::packageVersion("grid") < package_version("4.1.0"))
+        "on" else rectGrob()
+    ),
     cl = "missing_grob"
   )
 }
 
-svg_grob <- function(path, asp = NULL, x = unit(0.5, "npc"), y = unit(0.5, "npc"),
-                     just = "centre", hjust = NULL, vjust = NULL,
-                     default.units = "npc", name = NULL, gp = gpar(), vp = NULL) {
-  gTree(path = path, asp = asp, x = x, y = y, just = just, hjust = hjust, vjust = vjust,
-        default.units = default.units, name = name, gp = gp, vp = vp, cl = "svg_grob")
+svg_grob <- function(
+  path,
+  asp = NULL,
+  x = unit(0.5, "npc"),
+  y = unit(0.5, "npc"),
+  just = "centre",
+  hjust = NULL,
+  vjust = NULL,
+  default.units = "npc",
+  name = NULL,
+  gp = gpar(),
+  vp = NULL
+) {
+  gTree(
+    path = path,
+    asp = asp,
+    x = x,
+    y = y,
+    just = just,
+    hjust = hjust,
+    vjust = vjust,
+    default.units = default.units,
+    name = name,
+    gp = gp,
+    vp = vp,
+    cl = "svg_grob"
+  )
 }
 
 #' @export
@@ -77,4 +105,3 @@ makeContent.svg_grob <- function(x) {
   raster <- rsvg::rsvg_nativeraster(x$path, width = width)
   setChildren(x, gList(rasterGrob(raster, width = unit(1, "npc"))))
 }
-
