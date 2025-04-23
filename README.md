@@ -8,6 +8,8 @@
 [![R-CMD-check](https://github.com/r-lib/marquee/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/marquee/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/r-lib/marquee/branch/main/graph/badge.svg)](https://app.codecov.io/gh/r-lib/marquee?branch=main)
+[![Codecov test
+coverage](https://codecov.io/gh/r-lib/marquee/graph/badge.svg)](https://app.codecov.io/gh/r-lib/marquee)
 <!-- badges: end -->
 
 marquee is a markdown parser and renderer for the R graphics engine. It
