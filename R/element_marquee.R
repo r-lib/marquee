@@ -48,36 +48,85 @@
 #' What more could you _possibly_ want?") +
 #'   theme(title = element_marquee())
 #'
-element_marquee <- function(family = NULL, colour = NULL, size = NULL, hjust = NULL,
-                            vjust = NULL, angle = NULL, lineheight = NULL,
-                            color = NULL, margin = NULL, style = NULL, width = NULL,
-                            inherit.blank = FALSE) {
-  if (!is.null(color))
-    colour <- color
-  n <- max(length(family), length(colour), length(size),
-           length(hjust), length(vjust), length(angle), length(lineheight))
+element_marquee <- function(
+  family = NULL,
+  colour = NULL,
+  size = NULL,
+  hjust = NULL,
+  vjust = NULL,
+  angle = NULL,
+  lineheight = NULL,
+  color = NULL,
+  margin = NULL,
+  style = NULL,
+  width = NULL,
+  inherit.blank = FALSE
+) {
+  if (!is.null(color)) colour <- color
+  n <- max(
+    length(family),
+    length(colour),
+    length(size),
+    length(hjust),
+    length(vjust),
+    length(angle),
+    length(lineheight)
+  )
   if (n > 1) {
-    cli::cli_warn(c("Vectorized input to {.fn element_text} is not officially supported.",
-                    i = "Results may be unexpected or may change in future versions of ggplot2."))
+    cli::cli_warn(c(
+      "Vectorized input to {.fn element_text} is not officially supported.",
+      i = "Results may be unexpected or may change in future versions of ggplot2."
+    ))
   }
-  structure(list(family = family, colour = colour, size = size, hjust = hjust,
-                 vjust = vjust, angle = angle, lineheight = lineheight,
-                 margin = margin, style = style, width = width,
-                 inherit.blank = inherit.blank),
-            class = c("element_marquee", "element_text", "element"))
+  structure(
+    list(
+      family = family,
+      colour = colour,
+      size = size,
+      hjust = hjust,
+      vjust = vjust,
+      angle = angle,
+      lineheight = lineheight,
+      margin = margin,
+      style = style,
+      width = width,
+      inherit.blank = inherit.blank
+    ),
+    class = c("element_marquee", "element_text", "element")
+  )
 }
 
-element_grob.element_marquee <- function(element, label = "", x = NULL, y = NULL, family = NULL,
-                                         colour = NULL, size = NULL, hjust = NULL, vjust = NULL,
-                                         angle = NULL, lineheight = NULL, margin = NULL, margin_x = FALSE,
-                                         margin_y = FALSE, style = NULL, width = NULL, ...) {
+element_grob.element_marquee <- function(
+  element,
+  label = "",
+  x = NULL,
+  y = NULL,
+  family = NULL,
+  colour = NULL,
+  size = NULL,
+  hjust = NULL,
+  vjust = NULL,
+  angle = NULL,
+  lineheight = NULL,
+  margin = NULL,
+  margin_x = FALSE,
+  margin_y = FALSE,
+  style = NULL,
+  width = NULL,
+  ...
+) {
   if (is.null(label)) return(ggplot2::zeroGrob())
   style <- style %||% element$style %||% classic_style()
-  style <- modify_style(style, "base",
+  style <- modify_style(
+    style,
+    "base",
     family = family %||% element$family %||% style$base$family %||% "",
     color = colour %||% element$colour %||% style$base$color %||% "black",
     size = size %||% element$size %||% style$base$size %||% 12,
-    lineheight = lineheight %||% element$lineheight %||% style$base$lineheight %||% 1
+    lineheight = lineheight %||%
+      element$lineheight %||%
+      style$base$lineheight %||%
+      1
   )
   margin <- margin %||% element$margin
   angle <- (angle %||% element$angle %||% 0) %% 360
@@ -108,26 +157,46 @@ element_grob.element_marquee <- function(element, label = "", x = NULL, y = NULL
     ))
     style <- modify_style(style, "body", padding = pad)
   }
-  just <- rotate_just(angle %||% element$angle, hjust %||% element$hjust, vjust %||% element$vjust)
+  just <- rotate_just(
+    angle %||% element$angle,
+    hjust %||% element$hjust,
+    vjust %||% element$vjust
+  )
   n <- max(length(x), length(y), 1)
   x <- x %||% rep(just$hjust, n)
   y <- y %||% rep(just$vjust, n)
   width <- width %||% element$width %||% NA
-  grob <- marquee_grob(
-    label, style, force_body_margin = TRUE, x = x, y = y, width = width,
+
+  grob <-  marquee_grob(
+    label,
+    style,
+    force_body_margin = TRUE,
+    x = x,
+    y = y,
+    width = width,
     hjust = hjust %||% element$hjust,
     vjust = vjust,
     angle = angle
   )
+
   if (xor(margin_x, margin_y)) {
     if (margin_x) grob$full_height <- unit(1, "null")
     if (margin_y) grob$full_width  <- unit(1, "null")
   }
+      
   grob
 }
 
 on_load({
-  on_package_load("ggplot2", registerS3method("element_grob", "element_marquee", element_grob.element_marquee, asNamespace("ggplot2")))
+  on_package_load(
+    "ggplot2",
+    registerS3method(
+      "element_grob",
+      "element_marquee",
+      element_grob.element_marquee,
+      asNamespace("ggplot2")
+    )
+  )
 })
 
 #' Convert all text elements in a theme to marquee elements
@@ -169,23 +238,49 @@ marquefy_theme <- function(theme) {
         style <- modify_style(style, "base", weight = "bold")
       }
     }
-    element_marquee(family = elem$family, colour = elem$colour, size = elem$size,
-                    hjust = elem$hjust, vjust = elem$vjust, angle = elem$angle,
-                    lineheight = elem$lineheight, margin = elem$margin,
-                    style = style, width = NA,
-                    inherit.blank = elem$inherit.blank)
+    element_marquee(
+      family = elem$family,
+      colour = elem$colour,
+      size = elem$size,
+      hjust = elem$hjust,
+      vjust = elem$vjust,
+      angle = elem$angle,
+      lineheight = elem$lineheight,
+      margin = elem$margin,
+      style = style,
+      width = NA,
+      inherit.blank = elem$inherit.blank
+    )
   })
   theme
 }
 
 # Adaption of ggplot2:::rotate_just() to work with additional just keywords
-rotate_just <- function (angle, hjust, vjust) {
-  angle <- (angle %||% 0)%%360
+rotate_just <- function(angle, hjust, vjust) {
+  angle <- (angle %||% 0) %% 360
   if (is.character(hjust)) {
-    hjust <- switch(hjust, "left" = 0, "left-ink" = ink(0), "center" = 0.5, "center-ink" = ink(0.5), "right" = 1, "right-ink" = ink(1))
+    hjust <- switch(
+      hjust,
+      "left" = 0,
+      "left-ink" = ink(0),
+      "center" = 0.5,
+      "center-ink" = ink(0.5),
+      "right" = 1,
+      "right-ink" = ink(1)
+    )
   }
   if (is.character(vjust)) {
-    vjust <- switch(vjust, "bottom" = 0, "bottom-ink" = ink(0),"last-line" = 0, "center" = 0.5, "center-ink" = ink(0.5), "top" = 1, "top-ink" = ink(1), "first-line" = 1)
+    vjust <- switch(
+      vjust,
+      "bottom" = 0,
+      "bottom-ink" = ink(0),
+      "last-line" = 0,
+      "center" = 0.5,
+      "center-ink" = ink(0.5),
+      "top" = 1,
+      "top-ink" = ink(1),
+      "first-line" = 1
+    )
   }
   size <- vctrs::vec_size_common(angle, hjust, vjust)
   angle <- vctrs::vec_recycle(angle, size)
@@ -204,7 +299,13 @@ rotate_just <- function (angle, hjust, vjust) {
   hnew[is_case] <- as.numeric(vjust[is_case])
   vnew[is_case] <- 1 - as.numeric(hjust[is_case])
   list(
-    hjust = ink(hnew, ifelse(case == 3, vctrs::vec_data(hjust)$ink, vctrs::vec_data(vjust)$ink)),
-    vjust = ink(vnew, ifelse(case == 3, vctrs::vec_data(vjust)$ink, vctrs::vec_data(hjust)$ink))
+    hjust = ink(
+      hnew,
+      ifelse(case == 3, vctrs::vec_data(hjust)$ink, vctrs::vec_data(vjust)$ink)
+    ),
+    vjust = ink(
+      vnew,
+      ifelse(case == 3, vctrs::vec_data(vjust)$ink, vctrs::vec_data(hjust)$ink)
+    )
   )
 }

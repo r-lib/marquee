@@ -1,11 +1,13 @@
 test_that("grobs gets correctly constructed", {
-
   grob1 <- marquee_grob(markdown_test, classic_style(lineheight = 1.1))
   expect_s3_class(grob1, "marquee_grob")
   expect_false(inherits(grob1, "marquee_precalculated_grob"))
 
-
-  grob2 <- marquee_grob(markdown_test, classic_style(lineheight = 1.1), width = unit(10, "cm"))
+  grob2 <- marquee_grob(
+    markdown_test,
+    classic_style(lineheight = 1.1),
+    width = unit(10, "cm")
+  )
   expect_s3_class(grob2, "marquee_grob")
   expect_s3_class(grob2, "marquee_precalculated_grob")
 
@@ -22,7 +24,10 @@ test_that("grobs gets correctly constructed", {
   expect_s3_class(grob1$width, "unit")
 
   # Are tight lists handled
-  expect_equal(grob1$text$margin_bottom[grob1$text$tight & grob1$text$type == "li"], c(1.2, 0))
+  expect_equal(
+    grob1$text$margin_bottom[grob1$text$tight & grob1$text$type == "li"],
+    c(1.2, 0)
+  )
 
   # Are images handled
   expect_equal(grob1$images$index, c(12, 19))
@@ -40,7 +45,6 @@ test_that("grobs gets correctly constructed", {
 })
 
 test_that("grob looks as it should (sadly too complex to test other way)", {
-
   grob1 <- marquee_grob(markdown_test, classic_style(lineheight = 1.1))
 
   skip_on_os("windows")

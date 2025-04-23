@@ -86,7 +86,10 @@ ink <- function(x = numeric(), use_ink = TRUE) {
       paste0(x, "-ink")
     }
   } else if (!is_ink(x)) {
-    vctrs::new_rcrd(list(val = x, ink = rep_along(x, use_ink)), class = "marquee_ink")
+    vctrs::new_rcrd(
+      list(val = x, ink = rep_along(x, use_ink)),
+      class = "marquee_ink"
+    )
   } else {
     x
   }
@@ -115,4 +118,5 @@ vec_cast.marquee_ink.double <- function(x, to, ...) ink(x, FALSE)
 vec_cast.double.marquee_ink <- function(x, to, ...) vctrs::vec_data(x)$val
 
 #' @export
-format.marquee_ink <- function(x, ...) paste0(format(as.numeric(x), ...), ifelse(vctrs::vec_data(x)$ink, "-ink", ""))
+format.marquee_ink <- function(x, ...)
+  paste0(format(as.numeric(x), ...), ifelse(vctrs::vec_data(x)$ink, "-ink", ""))

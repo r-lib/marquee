@@ -157,7 +157,7 @@ p + geom_marquee(aes(label = rownames(mtcars)), width = unit(2, "cm"))
 
 # Style like label
 label_style <- modify_style(
-  classic_style(),
+  classic_style(margin = trbl(0)),
   "body",
   padding = skip_inherit(trbl(4)),
   border = "black",

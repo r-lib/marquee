@@ -141,12 +141,29 @@
 #' first or last line respectively.
 #'
 #' @export
-marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
-                         force_body_margin = FALSE, x = 0,
-                         y = 1, width = NULL, default.units = "npc", hjust = "left",
-                         vjust = "top", angle = 0, vp = NULL, name = NULL) {
+marquee_grob <- function(
+  text,
+  style = classic_style(),
+  ignore_html = TRUE,
+  force_body_margin = FALSE,
+  x = 0,
+  y = 1,
+  width = NULL,
+  default.units = "npc",
+  hjust = "left",
+  vjust = "top",
+  angle = 0,
+  vp = NULL,
+  name = NULL
+) {
   # Basic input checking
-  if (is.character(hjust) && !all(hjust %in% c("left", "left-ink", "center", "center-ink", "right-ink", "right"))) {
+  if (
+    is.character(hjust) &&
+      !all(
+        hjust %in%
+          c("left", "left-ink", "center", "center-ink", "right-ink", "right")
+      )
+  ) {
     cli::cli_abort(c(
       "{.arg hjust} must be a valid justification",
       i = "Use either numerics or one of {.or {.val {c('left', 'left-ink', 'center', 'center-ink', 'right-ink', 'right')}}}"
@@ -154,7 +171,22 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
   } else if (!is.numeric(hjust) && !is.character(hjust) && !is_ink(hjust)) {
     cli::cli_abort("{.arg hjust} must either be numeric or a character vector")
   }
-  if (is.character(vjust) && !all(vjust %in% c("bottom", "bottom-ink", "last-line", "center", "center-ink", "first-line", "top-ink", "top"))) {
+  if (
+    is.character(vjust) &&
+      !all(
+        vjust %in%
+          c(
+            "bottom",
+            "bottom-ink",
+            "last-line",
+            "center",
+            "center-ink",
+            "first-line",
+            "top-ink",
+            "top"
+          )
+      )
+  ) {
     cli::cli_abort(c(
       "{.arg vjust} must be a valid justification",
       i = "Use either a numerics or one of {.or {.val {c('bottom', 'bottom-ink', 'last-line', 'center', 'center-ink', 'first-line', 'top-ink', 'top')}}}"
@@ -170,7 +202,8 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
   if (!is.unit(width)) width <- unit(width, default.units)
 
   # Parse input
-  parsed <- if (!is_parsed(text)) marquee_parse(text, style, ignore_html) else text
+  parsed <- if (!is_parsed(text)) marquee_parse(text, style, ignore_html) else
+    text
 
   # Add spacing for inline padding
   parsed <- add_inline_padding(parsed)
@@ -178,7 +211,8 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
   # Set bottom margin for tight list `li` elements to match the lineheight
   is_tight <- parsed$type == "li" & parsed$tight
   parsed$margin_top[is_tight] <- 0
-  parsed$margin_bottom[is_tight] <- parsed$size[is_tight] * (parsed$lineheight[is_tight] - 1)
+  parsed$margin_bottom[is_tight] <- parsed$size[is_tight] *
+    (parsed$lineheight[is_tight] - 1)
 
   # Handle image tags
   images <- list(
@@ -187,12 +221,19 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
   images$path <- parsed$text[images$index]
   parsed$text[images$index] <- NA
   ## Determine if tag is inline or on it's own
-  images$inline <- vapply(images$index, function(i) {
-    block <- parsed$block == parsed$block[i]
-    sum(block) != 3 || any(nchar(parsed$text[block]) > 0, na.rm = TRUE)
-  }, logical(1))
+  images$inline <- vapply(
+    images$index,
+    function(i) {
+      block <- parsed$block == parsed$block[i]
+      sum(block) != 3 || any(nchar(parsed$text[block]) > 0, na.rm = TRUE)
+    },
+    logical(1)
+  )
   ## If not inline, the prior p tag inherits the image styling so you can center it or add padding
-  parsed[images$index[!images$inline] - 1, names(style[[1]][[1]])] <- parsed[images$index[!images$inline], names(style[[1]][[1]])]
+  parsed[images$index[!images$inline] - 1, names(style[[1]][[1]])] <- parsed[
+    images$index[!images$inline],
+    names(style[[1]][[1]])
+  ]
   ## Convert all "paths" to grobs
   env <- caller_env()
   images$grobs <- images_as_grobs(images$path, env)
@@ -203,13 +244,31 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
   blocks <- list(length = bl, start = bs, indent = parsed$indentation[bs])
 
   # Perform margin collapsing
-  collapsed_margins <- list(top = parsed$margin_top, bottom = parsed$margin_bottom)
-  has_background <- vapply(parsed$background, function(x) !(is.character(x) && is.na(x[1])), logical(1))
+  collapsed_margins <- list(
+    top = parsed$margin_top,
+    bottom = parsed$margin_bottom
+  )
+  has_background <- vapply(
+    parsed$background,
+    function(x) !(is.character(x) && is.na(x[1])),
+    logical(1)
+  )
   has_top <- !is.na(parsed$border) & parsed$border_size_top != 0
   has_bottom <- !is.na(parsed$border) & parsed$border_size_bottom != 0
   for (root in blocks$start[blocks$indent == 1]) {
-    block_tree <- collect_children(root, blocks$start, parsed$ends, parsed$indentation)
-    collapsed_margins <- set_margins(block_tree, collapsed_margins, has_background, has_top, has_bottom)
+    block_tree <- collect_children(
+      root,
+      blocks$start,
+      parsed$ends,
+      parsed$indentation
+    )
+    collapsed_margins <- set_margins(
+      block_tree,
+      collapsed_margins,
+      has_background,
+      has_top,
+      has_bottom
+    )
   }
   # Body margin wins over any collapsing
   if (force_body_margin) {
@@ -244,17 +303,35 @@ marquee_grob <- function(text, style = classic_style(), ignore_html = TRUE,
     direction = parsed$text_direction[bullets$index]
   )
   ## Inherit color and id from the relevant block
-  bullets$shape$shape$col <- parsed$color[bullets$index[bullets$shape$shape$metric_id]]
-  bullets$shape$shape$id <- parsed$id[bullets$index[bullets$shape$shape$metric_id]]
+  bullets$shape$shape$col <- parsed$color[bullets$index[
+    bullets$shape$shape$metric_id
+  ]]
+  bullets$shape$shape$id <- parsed$id[bullets$index[
+    bullets$shape$shape$metric_id
+  ]]
 
   grob <- gTree(
-    text = parsed, blocks = blocks, bullets = bullets, images = images,
-    x = rep_along(text, x), y = rep_along(text, y), width = rep_along(text, width),
-    hjust = rep_along(text, hjust), vjust = rep_along(text, vjust),
-    angle = rep_along(text, angle), vp = vp, name = name, cl = "marquee_grob"
+    text = parsed,
+    blocks = blocks,
+    bullets = bullets,
+    images = images,
+    x = rep_along(text, x),
+    y = rep_along(text, y),
+    width = rep_along(text, width),
+    hjust = rep_along(text, hjust),
+    vjust = rep_along(text, vjust),
+    angle = rep_along(text, angle),
+    vp = vp,
+    name = name,
+    cl = "marquee_grob"
   )
   # Check if we can do all calculations upfront
-  if (all(is.na(grob$width) | !unitType(absolute.size(grob$width)) %in% c("null", "sum", "min", "max"))) {
+  if (
+    all(
+      is.na(grob$width) |
+        !unitType(absolute.size(grob$width)) %in% c("null", "sum", "min", "max")
+    )
+  ) {
     grob <- makeContent.marquee_grob(makeContext.marquee_grob(grob))
     class(grob) <- c("marquee_precalculated_grob", class(grob))
   }
@@ -283,12 +360,22 @@ makeContext.marquee_grob <- function(x) {
     indent <- x$blocks$indent[i]
     if (indent == 1) {
       ### This is the body tag. start fresh
-      widths[i] <- width[x$text$id[j]] - x$text$margin_left[j] - x$text$padding_left[j] - x$text$padding_right[j] - x$text$margin_right[j]
+      widths[i] <- width[x$text$id[j]] -
+        x$text$margin_left[j] -
+        x$text$padding_left[j] -
+        x$text$padding_right[j] -
+        x$text$margin_right[j]
       left_offset[i] <- x$text$margin_left[j] + x$text$padding_left[j]
     } else {
       ### Find width and offset of parent and base calc on that
-      widths[i] <- widths[indent_stack[indent - 1]] - x$text$margin_left[j] - x$text$padding_left[j] - x$text$padding_right[j] - x$text$margin_right[j]
-      left_offset[i] <- left_offset[indent_stack[indent - 1]] + x$text$margin_left[j] + x$text$padding_left[j]
+      widths[i] <- widths[indent_stack[indent - 1]] -
+        x$text$margin_left[j] -
+        x$text$padding_left[j] -
+        x$text$padding_right[j] -
+        x$text$margin_right[j]
+      left_offset[i] <- left_offset[indent_stack[indent - 1]] +
+        x$text$margin_left[j] +
+        x$text$padding_left[j]
     }
     ### Set the index of the current indent to this
     indent_stack[indent] <- i
@@ -301,9 +388,14 @@ makeContext.marquee_grob <- function(x) {
   images$y_adjust <- rep(0, length(images$inline))
   if (sum(images$inline) > 0) {
     # Some fonts are much higher than their point size. We move the image baseline up half the difference
-    image_font <- systemfonts::font_info(x$text$family[images$index[images$inline]], size = size[images$index[images$inline]])
+    image_font <- systemfonts::font_info(
+      x$text$family[images$index[images$inline]],
+      size = size[images$index[images$inline]]
+    )
     actual_size <- image_font$max_ascend - image_font$max_descend
-    images$y_adjust[images$inline] <- (actual_size - size[images$index[images$inline]]) / 2
+    images$y_adjust[images$inline] <- (actual_size -
+      size[images$index[images$inline]]) /
+      2
   }
 
   for (i in seq_along(images$index)) {
@@ -387,7 +479,10 @@ makeContext.marquee_grob <- function(x) {
     align = x$text$align,
     hjust = 0,
     vjust = 1,
-    max_width = rep(convertWidth(unit(widths, "bigpts"), "inches", TRUE), x$blocks$length),
+    max_width = rep(
+      convertWidth(unit(widths, "bigpts"), "inches", TRUE),
+      x$blocks$length
+    ),
     tracking = tracking,
     indent = convertWidth(unit(x$text$indent, "bigpts"), "inches", TRUE),
     hanging = convertWidth(unit(x$text$hanging, "bigpts"), "inches", TRUE),
@@ -399,14 +494,25 @@ makeContext.marquee_grob <- function(x) {
 
   # If any widths are not defined we grab the text widths from the shaping and start again
   if (anyNA(widths)) {
-    added_width <- rowSums(x$text[x$blocks$start, c("padding_left", "padding_right", "margin_left", "margin_right")])
+    added_width <- rowSums(x$text[
+      x$blocks$start,
+      c("padding_left", "padding_right", "margin_left", "margin_right")
+    ])
     ## We go back from the most indented to the least and compound the widths
     for (i in rev(seq_len(max(x$blocks$indent)))) {
       blocks <- which(x$blocks$indent == i)
-      widths[blocks] <- vapply(blocks, function(j) {
-        k <- which(x$blocks$start > x$blocks$start[j] & x$blocks$start <= x$text$ends[x$blocks$start[j]])
-        max(shape$metrics$width[j], widths[j], widths[k], na.rm = TRUE) + added_width[j]
-      }, numeric(1))
+      widths[blocks] <- vapply(
+        blocks,
+        function(j) {
+          k <- which(
+            x$blocks$start > x$blocks$start[j] &
+              x$blocks$start <= x$text$ends[x$blocks$start[j]]
+          )
+          max(shape$metrics$width[j], widths[j], widths[k], na.rm = TRUE) +
+            added_width[j]
+        },
+        numeric(1)
+      )
     }
     if (anyNA(widths)) {
       cli::cli_abort("Could not resolve width of text")
@@ -418,11 +524,18 @@ makeContext.marquee_grob <- function(x) {
 
   # Set correct height for block images
   if (any(!x$images$inline)) {
-    block_glyph_match <- match(shape$shape$string_id, x$images$index[!x$images$inline])
+    block_glyph_match <- match(
+      shape$shape$string_id,
+      x$images$index[!x$images$inline]
+    )
     block_glyphs <- !is.na(block_glyph_match)
-    shape$shape$y_offset[block_glyphs] <- -size[x$images$index[!x$images$inline][block_glyph_match[block_glyphs]]]
+    shape$shape$y_offset[block_glyphs] <- -size[x$images$index[
+      !x$images$inline
+    ][block_glyph_match[block_glyphs]]]
     shape$shape$descender[block_glyphs] <- 0
-    shape$metrics$height[x$text$block[x$images$index[!x$images$inline]]] <- size[x$images$index[!x$images$inline]]
+    shape$metrics$height[x$text$block[x$images$index[
+      !x$images$inline
+    ]]] <- size[x$images$index[!x$images$inline]]
   }
 
   # Inherit color and id from parsed text
@@ -469,10 +582,12 @@ makeContext.marquee_grob <- function(x) {
   }
   # make rtl bullets left-justified
   bltr <- bshape$metrics$ltr[bshape$shape$metric_id]
-  bshape$shape$x_offset[!bltr] <- bshape$shape$x_offset[!bltr] + bshape$metrics$width[bshape$shape$metric_id[!bltr]]
+  bshape$shape$x_offset[!bltr] <- bshape$shape$x_offset[!bltr] +
+    bshape$metrics$width[bshape$shape$metric_id[!bltr]]
 
   # Add sizebased offset
-  bshape$shape$x_offset <- bshape$shape$x_offset + ifelse(bltr, -1, 1) * bshape$shape$font_size/4
+  bshape$shape$x_offset <- bshape$shape$x_offset +
+    ifelse(bltr, -1, 1) * bshape$shape$font_size / 4
 
   # Position blocks underneath each other, calculate justification info, and position bullets
   for (i in seq_along(x$blocks$start)) {
@@ -485,9 +600,15 @@ makeContext.marquee_grob <- function(x) {
     if (length(bullet_ind) != 0) {
       ### Determine if bullet is higher than text at first line
       first <- which(shape$shape$metric_id == i)
-      first <- first[shape$shape$y_offset[first] == max(shape$shape$y_offset[first])]
-      first <- first[if (shape$metrics$ltr[i]) which.min(shape$shape$glyph[first]) else which.max(shape$shape$glyph[first])]
-      added_height <- shape$shape$y_offset[first] - bshape$shape$y_offset[match(bullet_ind, bshape$shape$metric_id)]
+      first <- first[
+        shape$shape$y_offset[first] == max(shape$shape$y_offset[first])
+      ]
+      first <- first[
+        if (shape$metrics$ltr[i]) which.min(shape$shape$glyph[first]) else
+          which.max(shape$shape$glyph[first])
+      ]
+      added_height <- shape$shape$y_offset[first] -
+        bshape$shape$y_offset[match(bullet_ind, bshape$shape$metric_id)]
       if (added_height > 0) {
         #### If higher, adjust the height to make space and record adjustment for glyphs in block
         y_adjustment[i] <- added_height
@@ -496,7 +617,8 @@ makeContext.marquee_grob <- function(x) {
         #### Otherwise record negative adjustment to put it in line with the text in the list
         y_bullet_adjustment[bullet_ind] <- -1 * added_height
       }
-      x_bullet_adjustment[bullet_ind] <- shape$shape$x_offset[first] + if (shape$metrics$ltr[i]) 0 else shape$shape$advance[first]
+      x_bullet_adjustment[bullet_ind] <- shape$shape$x_offset[first] +
+        if (shape$metrics$ltr[i]) 0 else shape$shape$advance[first]
     }
 
     ## calculate y offset and height
@@ -508,7 +630,10 @@ makeContext.marquee_grob <- function(x) {
     ### Record offset based on top padding and margin
     top_offset[i] <- cur_offset - x$text$margin_top[j] - x$text$padding_top[j]
     ### Init height as sum of top and bottom margin+padding
-    heights[i] <- x$text$margin_top[j] + x$text$padding_top[j] + x$text$padding_bottom[j] + x$text$margin_bottom[j]
+    heights[i] <- x$text$margin_top[j] +
+      x$text$padding_top[j] +
+      x$text$padding_bottom[j] +
+      x$text$margin_bottom[j]
     ### If block has content of it's own, add it to the height
     if (nzchar(x$text$text[j]) || x$blocks$length[i] != 1) {
       heights[i] <- heights[i] + shape$metrics$height[i]
@@ -518,19 +643,24 @@ makeContext.marquee_grob <- function(x) {
     cur_offset <- cur_offset - heights[i]
 
     ### Increase height of parents
-    for (k in seq_len(indent-1)) {
+    for (k in seq_len(indent - 1)) {
       heights[indent_stack[k]] <- heights[indent_stack[k]] + heights[i]
     }
 
-    next_indent <- if (i == length(x$blocks$start)) 1 else x$blocks$indent[i + 1]
+    next_indent <- if (i == length(x$blocks$start)) 1 else
+      x$blocks$indent[i + 1]
     if (indent > next_indent) {
       ### If exiting a block, add parent blocks bottom padding + margin to offset
       for (k in next_indent + seq_len(indent - next_indent) - 1) {
-        cur_offset <- cur_offset - x$text$padding_bottom[x$blocks$start[indent_stack[k]]] - x$text$margin_bottom[x$blocks$start[indent_stack[k]]]
+        cur_offset <- cur_offset -
+          x$text$padding_bottom[x$blocks$start[indent_stack[k]]] -
+          x$text$margin_bottom[x$blocks$start[indent_stack[k]]]
       }
     } else if (indent < next_indent) {
       ### If block has children, move up offset so it doesn't include bottom margin and padding
-      cur_offset <- cur_offset + x$text$padding_bottom[j] + x$text$margin_bottom[j]
+      cur_offset <- cur_offset +
+        x$text$padding_bottom[j] +
+        x$text$margin_bottom[j]
     }
     indent_stack[indent] <- i
 
@@ -542,27 +672,59 @@ makeContext.marquee_grob <- function(x) {
         ink_top[text_ind] <- top_offset[i] - shape$metrics$top_bearing[i]
         first_line[text_ind] <- top_offset[i] + max(y_offsets)
       }
-      ink_left[text_ind] <- min(ink_left[text_ind], left_offset[i] + shape$metrics$left_bearing[i], na.rm = TRUE)
-      ink_right[text_ind] <- max(ink_right[text_ind], left_offset[i] + shape$metrics$width[i] - shape$metrics$right_bearing[i], na.rm = TRUE)
-      ink_bottom[text_ind] <- min(ink_bottom[text_ind], top_offset[i] - shape$metrics$height[i] + shape$metrics$bottom_bearing[i], na.rm = TRUE)
-      last_line[text_ind] <- min(last_line[text_ind], top_offset[i] + min(y_offsets), na.rm = TRUE)
+      ink_left[text_ind] <- min(
+        ink_left[text_ind],
+        left_offset[i] + shape$metrics$left_bearing[i],
+        na.rm = TRUE
+      )
+      ink_right[text_ind] <- max(
+        ink_right[text_ind],
+        left_offset[i] +
+          shape$metrics$width[i] -
+          shape$metrics$right_bearing[i],
+        na.rm = TRUE
+      )
+      ink_bottom[text_ind] <- min(
+        ink_bottom[text_ind],
+        top_offset[i] -
+          shape$metrics$height[i] +
+          shape$metrics$bottom_bearing[i],
+        na.rm = TRUE
+      )
+      last_line[text_ind] <- min(
+        last_line[text_ind],
+        top_offset[i] + min(y_offsets),
+        na.rm = TRUE
+      )
     }
   }
 
   # Update offsets based on calculated width and heights
-  shape$shape$x_offset <- shape$shape$x_offset + left_offset[shape$shape$metric_id]
-  shape$shape$y_offset <- shape$shape$y_offset + top_offset[shape$shape$metric_id] - y_adjustment[shape$shape$metric_id]
+  shape$shape$x_offset <- shape$shape$x_offset +
+    left_offset[shape$shape$metric_id]
+  shape$shape$y_offset <- shape$shape$y_offset +
+    top_offset[shape$shape$metric_id] -
+    y_adjustment[shape$shape$metric_id]
 
   # Apply baseline shift
-  shape$shape$y_offset <- shape$shape$y_offset + x$text$baseline[shape$shape$string_id]
+  shape$shape$y_offset <- shape$shape$y_offset +
+    x$text$baseline[shape$shape$string_id]
 
   ## Do the same for bullets
-  bshape$shape$x_offset <- bshape$shape$x_offset + left_offset[bullet_blocks[bshape$shape$metric_id]] + x_bullet_adjustment[bshape$shape$metric_id]
-  bshape$shape$y_offset <- bshape$shape$y_offset + top_offset[bullet_blocks[bshape$shape$metric_id]] - y_bullet_adjustment[bshape$shape$metric_id]
+  bshape$shape$x_offset <- bshape$shape$x_offset +
+    left_offset[bullet_blocks[bshape$shape$metric_id]] +
+    x_bullet_adjustment[bshape$shape$metric_id]
+  bshape$shape$y_offset <- bshape$shape$y_offset +
+    top_offset[bullet_blocks[bshape$shape$metric_id]] -
+    y_bullet_adjustment[bshape$shape$metric_id]
 
   # Store info in object
   x$shape <- shape$shape
-  widths <- widths + rowSums(x$text[x$blocks$start, c("padding_left", "padding_right", "margin_left", "margin_right")])
+  widths <- widths +
+    rowSums(x$text[
+      x$blocks$start,
+      c("padding_left", "padding_right", "margin_left", "margin_right")
+    ])
   x$widths <- widths[x$blocks$indent == 1]
   x$heights <- heights[x$blocks$indent == 1]
   ## Adjust y so it is zero-justified
@@ -578,44 +740,56 @@ makeContext.marquee_grob <- function(x) {
   ink_bottom <- ink_bottom + x$heights
   last_line <- last_line + x$heights
   if (is.character(x$hjust)) {
-    x$hjust <- vapply(seq_along(x$hjust), function(i) {
-      just <- x$hjust[i]
-      w <- x$widths[i]
-      switch(just,
-        "left" = 0,
-        "left-ink" = ink_left[i] / w,
-        "center" = 0.5,
-        "center-ink" = mean(c(ink_left[i], ink_right[i])) / w,
-        "right-ink" = ink_right[i] / w,
-        "right" = 1
-      )
-    }, numeric(1))
+    x$hjust <- vapply(
+      seq_along(x$hjust),
+      function(i) {
+        just <- x$hjust[i]
+        w <- x$widths[i]
+        switch(
+          just,
+          "left" = 0,
+          "left-ink" = ink_left[i] / w,
+          "center" = 0.5,
+          "center-ink" = mean(c(ink_left[i], ink_right[i])) / w,
+          "right-ink" = ink_right[i] / w,
+          "right" = 1
+        )
+      },
+      numeric(1)
+    )
   } else if (inherits(x$hjust, "marquee_ink")) {
     x$hjust <- ifelse(
       vctrs::vec_data(x$hjust)$ink,
-      (ink_left + (ink_right - ink_left) * vctrs::vec_data(x$hjust)$val) / x$widths,
+      (ink_left + (ink_right - ink_left) * vctrs::vec_data(x$hjust)$val) /
+        x$widths,
       vctrs::vec_data(x$hjust)$val
     )
   }
   if (is.character(x$vjust)) {
-    x$vjust <- vapply(seq_along(x$vjust), function(i) {
-      just <- x$vjust[i]
-      h <- x$heights[i]
-      switch(just,
-        "bottom" = 0,
-        "bottom-ink" = ink_bottom[i] / h,
-        "last-line" = last_line[i] / h,
-        "center" = 0.5,
-        "center-ink" = mean(c(ink_bottom[i], ink_top[i])) / h,
-        "first-line" = first_line[i] / h,
-        "top-ink" = ink_top[i] / h,
-        "top" = 1
-      )
-    }, numeric(1))
+    x$vjust <- vapply(
+      seq_along(x$vjust),
+      function(i) {
+        just <- x$vjust[i]
+        h <- x$heights[i]
+        switch(
+          just,
+          "bottom" = 0,
+          "bottom-ink" = ink_bottom[i] / h,
+          "last-line" = last_line[i] / h,
+          "center" = 0.5,
+          "center-ink" = mean(c(ink_bottom[i], ink_top[i])) / h,
+          "first-line" = first_line[i] / h,
+          "top-ink" = ink_top[i] / h,
+          "top" = 1
+        )
+      },
+      numeric(1)
+    )
   } else if (inherits(x$vjust, "marquee_ink")) {
     x$vjust <- ifelse(
       vctrs::vec_data(x$vjust)$ink,
-      (ink_bottom + (ink_top - ink_bottom) * vctrs::vec_data(x$vjust)$val) / x$heights,
+      (ink_bottom + (ink_top - ink_bottom) * vctrs::vec_data(x$vjust)$val) /
+        x$heights,
       vctrs::vec_data(x$vjust)$val
     )
   }
@@ -634,22 +808,24 @@ makeContext.marquee_grob <- function(x) {
   rad <- x$angle * 2 * pi / 360
   crad <- cos(rad)
   srad <- sin(rad)
-  blx <- x0*crad - y0*srad
-  bly <- x0*srad + y0*crad
-  brx <- x1*crad - y0*srad
-  bry <- x1*srad + y0*crad
-  trx <- x1*crad - y1*srad
-  try <- x1*srad + y1*crad
-  tlx <- x0*crad - y1*srad
-  tly <- x0*srad + y1*crad
+  blx <- x0 * crad - y0 * srad
+  bly <- x0 * srad + y0 * crad
+  brx <- x1 * crad - y0 * srad
+  bry <- x1 * srad + y0 * crad
+  trx <- x1 * crad - y1 * srad
+  try <- x1 * srad + y1 * crad
+  tlx <- x0 * crad - y1 * srad
+  tly <- x0 * srad + y1 * crad
 
   x$bbox <- list(
     x = rep(x$x, 4) + unit(c(blx, brx, trx, tlx), "bigpts"),
     y = rep(x$y, 4) + unit(c(bly, bry, try, tly), "bigpts")
   )
   if (length(x$x) > 1) {
-    x$full_width <- max(x$x + unit(pmax(blx, brx, trx, tlx), "bigpts")) - min(x$x + unit(pmin(blx, brx, trx, tlx), "bigpts"))
-    x$full_height <- max(x$y + unit(pmax(bly, bry, try, tly), "bigpts")) - min(x$y + unit(pmin(bly, bry, try, tly), "bigpts"))
+    x$full_width <- max(x$x + unit(pmax(blx, brx, trx, tlx), "bigpts")) -
+      min(x$x + unit(pmin(blx, brx, trx, tlx), "bigpts"))
+    x$full_height <- max(x$y + unit(pmax(bly, bry, try, tly), "bigpts")) -
+      min(x$y + unit(pmin(bly, bry, try, tly), "bigpts"))
   } else {
     # If we are dealing with a single text (we often are), we can simplify this
     x$full_width <- unit(diff(range(blx, brx, trx, tlx)), "bigpts")
@@ -658,14 +834,16 @@ makeContext.marquee_grob <- function(x) {
 
   # Extract info about decoration (background, border, underline, etc)
   ## Figure out which blocks has backgrounds or borders
-  has_deco <- !vapply(x$text$background, function(x) is.character(x) && is.na(x), logical(1)) |
+  has_deco <- !vapply(
+    x$text$background,
+    function(x) is.character(x) && is.na(x),
+    logical(1)
+  ) |
     (!is.na(x$text$border) &
-       (x$text$border_size_bottom > 0 |
-          x$text$border_size_top > 0 |
-          x$text$border_size_left > 0 |
-          x$text$border_size_right > 0
-        )
-     )
+      (x$text$border_size_bottom > 0 |
+        x$text$border_size_top > 0 |
+        x$text$border_size_left > 0 |
+        x$text$border_size_right > 0))
 
   ## Handle block backgrounds
   block_bg <- has_deco[x$blocks$start]
@@ -674,7 +852,9 @@ makeContext.marquee_grob <- function(x) {
     x = left_offset[block_bg] - x$text$padding_left[x$blocks$start[block_bg]],
     y = top_offset[block_bg] + x$text$padding_top[x$blocks$start[block_bg]],
     width = widths[block_bg],
-    height = heights[block_bg] - x$text$margin_top[x$blocks$start[block_bg]] - x$text$margin_bottom[x$blocks$start[block_bg]],
+    height = heights[block_bg] -
+      x$text$margin_top[x$blocks$start[block_bg]] -
+      x$text$margin_bottom[x$blocks$start[block_bg]],
     fill = x$text$background[x$blocks$start[block_bg]],
     col = x$text$border[x$blocks$start[block_bg]],
     r = x$text$border_radius[x$blocks$start[block_bg]],
@@ -704,25 +884,44 @@ makeContext.marquee_grob <- function(x) {
     lapply(split(span_ind, x$shape$y_offset[span_ind]), function(j) {
       left <- min(x$shape$x_offset[j])
       top <- max(x$shape$y_offset[j] + x$shape$ascender[j])
-      c(i[1], left, top, max(x$shape$x_offset[j] + x$shape$advance[j]) - left, top - min(x$shape$y_offset[j] + x$shape$descender[j]))
+      c(
+        i[1],
+        left,
+        top,
+        max(x$shape$x_offset[j] + x$shape$advance[j]) - left,
+        top - min(x$shape$y_offset[j] + x$shape$descender[j])
+      )
     })
   })
   span_rects <- inject(rbind(!!!unlist(span_rects, recursive = FALSE)))
 
   ### Combine block and span rects
   x$rects <- list(
-    id = c(block_rects$id, x$text$id[span_rects[,1]]),
-    x = c(block_rects$x, span_rects[,2] - x$text$padding_left[span_rects[,1]]),
-    y = c(block_rects$y, span_rects[,3] + x$text$padding_top[span_rects[,1]]),
-    width = c(block_rects$width, span_rects[,4] + x$text$padding_left[span_rects[,1]] + x$text$padding_right[span_rects[,1]]),
-    height = c(block_rects$height, span_rects[,5] + x$text$padding_top[span_rects[,1]] + x$text$padding_bottom[span_rects[,1]]),
-    fill = c(block_rects$fill, x$text$background[span_rects[,1]]),
-    col = c(block_rects$col, x$text$border[span_rects[,1]]),
-    r = c(block_rects$r, x$text$border_radius[span_rects[,1]]),
-    left = c(block_rects$left, x$text$border_size_left[span_rects[,1]]),
-    right = c(block_rects$right, x$text$border_size_right[span_rects[,1]]),
-    top = c(block_rects$top, x$text$border_size_top[span_rects[,1]]),
-    bottom = c(block_rects$bottom, x$text$border_size_bottom[span_rects[,1]])
+    id = c(block_rects$id, x$text$id[span_rects[, 1]]),
+    x = c(
+      block_rects$x,
+      span_rects[, 2] - x$text$padding_left[span_rects[, 1]]
+    ),
+    y = c(block_rects$y, span_rects[, 3] + x$text$padding_top[span_rects[, 1]]),
+    width = c(
+      block_rects$width,
+      span_rects[, 4] +
+        x$text$padding_left[span_rects[, 1]] +
+        x$text$padding_right[span_rects[, 1]]
+    ),
+    height = c(
+      block_rects$height,
+      span_rects[, 5] +
+        x$text$padding_top[span_rects[, 1]] +
+        x$text$padding_bottom[span_rects[, 1]]
+    ),
+    fill = c(block_rects$fill, x$text$background[span_rects[, 1]]),
+    col = c(block_rects$col, x$text$border[span_rects[, 1]]),
+    r = c(block_rects$r, x$text$border_radius[span_rects[, 1]]),
+    left = c(block_rects$left, x$text$border_size_left[span_rects[, 1]]),
+    right = c(block_rects$right, x$text$border_size_right[span_rects[, 1]]),
+    top = c(block_rects$top, x$text$border_size_top[span_rects[, 1]]),
+    bottom = c(block_rects$bottom, x$text$border_size_bottom[span_rects[, 1]])
   )
 
   ## Extract position of underline and strikethrough
@@ -732,11 +931,18 @@ makeContext.marquee_grob <- function(x) {
     lapply(split(span_ind, x$shape$y_offset[span_ind]), function(j) {
       ### Line width and position is relative to size
       size <- x$shape$font_size[j[1]]
-      mod <- c(-0.1, 0.3)[c(x$text$underline[i], x$text$strikethrough[i])] * size
-      l <- c(i, min(x$shape$x_offset[j]), max(x$shape$x_offset[j] + x$shape$advance[j]), x$shape$y_offset[j[1]], size * 0.075)
+      mod <- c(-0.1, 0.3)[c(x$text$underline[i], x$text$strikethrough[i])] *
+        size
+      l <- c(
+        i,
+        min(x$shape$x_offset[j]),
+        max(x$shape$x_offset[j] + x$shape$advance[j]),
+        x$shape$y_offset[j[1]],
+        size * 0.075
+      )
       if (length(mod) == 2) {
         l <- rbind(l, l)
-        l[,4] <- l[,4] + mod
+        l[, 4] <- l[, 4] + mod
       } else {
         l[4] <- l[4] + mod
       }
@@ -745,12 +951,12 @@ makeContext.marquee_grob <- function(x) {
   })
   lines <- inject(rbind(!!!unlist(lines, recursive = FALSE)))
   x$lines <- list(
-    id = x$text$id[lines[,1]],
-    x0 = lines[,2],
-    x1 = lines[,3],
-    y = lines[,4],
-    lwd = lines[,5],
-    col = x$text$color[lines[,1]]
+    id = x$text$id[lines[, 1]],
+    x0 = lines[, 2],
+    x1 = lines[, 3],
+    y = lines[, 4],
+    lwd = lines[, 5],
+    col = x$text$color[lines[, 1]]
   )
   # Place images
   image_grobs <- lapply(seq_along(images$grobs), function(i) {
@@ -759,7 +965,10 @@ makeContext.marquee_grob <- function(x) {
     grob <- images$grobs[[i]]
     grob$vp$x <- unit(x$shape$x_offset[glyph], "bigpts")
     descend <- x$shape$descender[glyph]
-    grob$vp$y <- unit(x$shape$y_offset[glyph] + descend + images$y_adjust[i], "bigpts")
+    grob$vp$y <- unit(
+      x$shape$y_offset[glyph] + descend + images$y_adjust[i],
+      "bigpts"
+    )
     grob
   })
   ## Remove the null-glyphs from the shape
@@ -805,7 +1014,14 @@ makeContent.marquee_grob <- function(x) {
     font_id <- paste0(x$shape$font_path, "&", x$shape$font_index)
     font_match <- match(font_id, unique(font_id))
     unique_font <- !duplicated(font_id)
-    fonts <- Map(glyphFont, x$shape$font_path[unique_font], x$shape$font_index[unique_font], "", 0, "")
+    fonts <- Map(
+      glyphFont,
+      x$shape$font_path[unique_font],
+      x$shape$font_index[unique_font],
+      "",
+      0,
+      ""
+    )
     fonts <- inject(glyphFontList(!!!fonts))
   }
 
@@ -840,19 +1056,35 @@ makeContent.marquee_grob <- function(x) {
           vjust = 0
         )
       } else {
-        glyphs <- systemfonts::glyph_outline(x$shape$index[i], x$shape$font_path[i], x$shape$font_index[i], x$shape$font_size[i])
-        need_bitmap <- i[attr(glyphs, "missing")]
-        glyphs <- if (nrow(glyphs) == 0) nullGrob() else pathGrob(
-          x = glyphs$x + x$shape$x_offset[i][glyphs$glyph],
-          y = glyphs$y + x$shape$y_offset[i][glyphs$glyph],
-          id = glyphs$contour,
-          pathId = glyphs$glyph,
-          default.units = "bigpts",
-          gp = gpar(fill = x$shape$col[i][vctrs::vec_unique(glyphs$glyph)], col = NA)
+        glyphs <- systemfonts::glyph_outline(
+          x$shape$index[i],
+          x$shape$font_path[i],
+          x$shape$font_index[i],
+          x$shape$font_size[i]
         )
-        raster_glyphs <- systemfonts::glyph_raster(x$shape$index[need_bitmap], x$shape$font_path[need_bitmap], x$shape$font_index[need_bitmap], x$shape$font_size[need_bitmap], col = x$shape$col[need_bitmap])
+        need_bitmap <- i[attr(glyphs, "missing")]
+        glyphs <- if (nrow(glyphs) == 0) nullGrob() else
+          pathGrob(
+            x = glyphs$x + x$shape$x_offset[i][glyphs$glyph],
+            y = glyphs$y + x$shape$y_offset[i][glyphs$glyph],
+            id = glyphs$contour,
+            pathId = glyphs$glyph,
+            default.units = "bigpts",
+            gp = gpar(
+              fill = x$shape$col[i][vctrs::vec_unique(glyphs$glyph)],
+              col = NA
+            )
+          )
+        raster_glyphs <- systemfonts::glyph_raster(
+          x$shape$index[need_bitmap],
+          x$shape$font_path[need_bitmap],
+          x$shape$font_index[need_bitmap],
+          x$shape$font_size[need_bitmap],
+          col = x$shape$col[need_bitmap]
+        )
         raster_glyphs <- Map(
-          function(glyph, x, y) systemfonts::glyph_raster_grob(glyph, x, y, interpolate = TRUE),
+          function(glyph, x, y)
+            systemfonts::glyph_raster_grob(glyph, x, y, interpolate = TRUE),
           glyph = raster_glyphs,
           x = x$shape$x_offset[need_bitmap],
           y = x$shape$y_offset[need_bitmap]
@@ -866,7 +1098,14 @@ makeContent.marquee_grob <- function(x) {
     ## Construct span and block rects
     rects <- lapply(which(x$rects$id == grob), function(i) {
       ### If the same stroke is around all sides we can just apply it to the rect
-      single_stroke <- !is.na(x$rects$col[i]) && length(unique(c(x$rects$left[i], x$rects$right[i], x$rects$top[i], x$rects$bottom[i]))) == 1
+      single_stroke <- !is.na(x$rects$col[i]) &&
+        length(unique(c(
+          x$rects$left[i],
+          x$rects$right[i],
+          x$rects$top[i],
+          x$rects$bottom[i]
+        ))) ==
+          1
       grobs <- list()
       rect <- if (x$rects$r[i] == 0) {
         rectGrob(
@@ -897,69 +1136,93 @@ makeContent.marquee_grob <- function(x) {
         )
       }
       ### If we need the fill or stroke of the rect, append it (we construct it no matter what as we need it for stroke clipping)
-      if (single_stroke || !(is.character(x$rects$fill[[i]]) && is.na(x$rects$fill[[i]]))) {
+      if (
+        single_stroke ||
+          !(is.character(x$rects$fill[[i]]) && is.na(x$rects$fill[[i]]))
+      ) {
         grobs <- append(grobs, list(rect))
       }
       ### If we don't have a single stroke we construct the sides individually
       if (!single_stroke) {
         if (x$rects$left[i] != 0) {
-          grobs <- append(grobs, list(segmentsGrob(
-            x0 = unit(x$rects$x[i], "bigpts"),
-            y0 = unit(x$rects$y[i], "bigpts"),
-            x1 = unit(x$rects$x[i], "bigpts"),
-            y1 = unit(x$rects$y[i] - x$rects$height[i], "bigpts"),
-            gp = gpar(
-              col = x$rects$col[i],
-              lwd = x$rects$left[i] * 2,
-              lineend = "square"
-            )
-          )))
+          grobs <- append(
+            grobs,
+            list(segmentsGrob(
+              x0 = unit(x$rects$x[i], "bigpts"),
+              y0 = unit(x$rects$y[i], "bigpts"),
+              x1 = unit(x$rects$x[i], "bigpts"),
+              y1 = unit(x$rects$y[i] - x$rects$height[i], "bigpts"),
+              gp = gpar(
+                col = x$rects$col[i],
+                lwd = x$rects$left[i] * 2,
+                lineend = "square"
+              )
+            ))
+          )
         }
         if (x$rects$right[i] != 0) {
-          grobs <- append(grobs, list(segmentsGrob(
-            x0 = unit(x$rects$x[i] + x$rects$width[i], "bigpts"),
-            y0 = unit(x$rects$y[i], "bigpts"),
-            x1 = unit(x$rects$x[i] + x$rects$width[i], "bigpts"),
-            y1 = unit(x$rects$y[i] - x$rects$height[i], "bigpts"),
-            gp = gpar(
-              col = x$rects$col[i],
-              lwd = x$rects$right[i] * 2,
-              lineend = "square"
-            )
-          )))
+          grobs <- append(
+            grobs,
+            list(segmentsGrob(
+              x0 = unit(x$rects$x[i] + x$rects$width[i], "bigpts"),
+              y0 = unit(x$rects$y[i], "bigpts"),
+              x1 = unit(x$rects$x[i] + x$rects$width[i], "bigpts"),
+              y1 = unit(x$rects$y[i] - x$rects$height[i], "bigpts"),
+              gp = gpar(
+                col = x$rects$col[i],
+                lwd = x$rects$right[i] * 2,
+                lineend = "square"
+              )
+            ))
+          )
         }
         if (x$rects$top[i] != 0) {
-          grobs <- append(grobs, list(segmentsGrob(
-            x0 = unit(x$rects$x[i], "bigpts"),
-            y0 = unit(x$rects$y[i], "bigpts"),
-            x1 = unit(x$rects$x[i] + x$rects$width[i], "bigpts"),
-            y1 = unit(x$rects$y[i], "bigpts"),
-            gp = gpar(
-              col = x$rects$col[i],
-              lwd = x$rects$top[i] * 2,
-              lineend = "square"
-            )
-          )))
+          grobs <- append(
+            grobs,
+            list(segmentsGrob(
+              x0 = unit(x$rects$x[i], "bigpts"),
+              y0 = unit(x$rects$y[i], "bigpts"),
+              x1 = unit(x$rects$x[i] + x$rects$width[i], "bigpts"),
+              y1 = unit(x$rects$y[i], "bigpts"),
+              gp = gpar(
+                col = x$rects$col[i],
+                lwd = x$rects$top[i] * 2,
+                lineend = "square"
+              )
+            ))
+          )
         }
         if (x$rects$bottom[i] != 0) {
-          grobs <- append(grobs, list(segmentsGrob(
-            x0 = unit(x$rects$x[i], "bigpts"),
-            y0 = unit(x$rects$y[i] - x$rects$height[i], "bigpts"),
-            x1 = unit(x$rects$x[i] + x$rects$width[i], "bigpts"),
-            y1 = unit(x$rects$y[i] - x$rects$height[i], "bigpts"),
-            gp = gpar(
-              col = x$rects$col[i],
-              lwd = x$rects$bottom[i] * 2,
-              lineend = "square"
-            )
-          )))
+          grobs <- append(
+            grobs,
+            list(segmentsGrob(
+              x0 = unit(x$rects$x[i], "bigpts"),
+              y0 = unit(x$rects$y[i] - x$rects$height[i], "bigpts"),
+              x1 = unit(x$rects$x[i] + x$rects$width[i], "bigpts"),
+              y1 = unit(x$rects$y[i] - x$rects$height[i], "bigpts"),
+              gp = gpar(
+                col = x$rects$col[i],
+                lwd = x$rects$bottom[i] * 2,
+                lineend = "square"
+              )
+            ))
+          )
         }
       }
       ### Combine it all in a single grob clipped to the bounds of the rect
-      inject(grobTree(!!!grobs, vp = viewport(clip = if (utils::packageVersion("grid") < package_version("4.1.0")) "on" else rect)))
+      inject(grobTree(
+        !!!grobs,
+        vp = viewport(
+          clip = if (utils::packageVersion("grid") < package_version("4.1.0"))
+            "on" else rect
+        )
+      ))
     })
     ## Extract the relevant image grobs
-    images <- lapply(which(x$images$id == grob), function(i) x$images$grobs[[i]])
+    images <- lapply(
+      which(x$images$id == grob),
+      function(i) x$images$grobs[[i]]
+    )
     ## Construct underline and strikethrough grob. Can be a single segments grob
     line_id <- which(x$lines$id == grob)
     lines <- if (length(line_id) == 0) {
@@ -979,7 +1242,18 @@ makeContent.marquee_grob <- function(x) {
     }
     ## Combine to a single grob
     inject(
-      grobTree(!!!rects, !!!images, glyphs, lines, vp = viewport(x$x[grob], x$y[grob], just = c(0, 0), angle = x$angle[grob]))
+      grobTree(
+        !!!rects,
+        !!!images,
+        glyphs,
+        lines,
+        vp = viewport(
+          x$x[grob],
+          x$y[grob],
+          just = c(0, 0),
+          angle = x$angle[grob]
+        )
+      )
     )
   })
 
@@ -1003,8 +1277,18 @@ collect_children <- function(elem, block_starts, block_ends, block_indent) {
   if (elem == block_ends[elem]) {
     children <- list()
   } else {
-    children <- block_starts[block_starts > elem & block_starts <= block_ends[elem] & block_indent[block_starts] == block_indent[elem] + 1]
-    children <- lapply(children, collect_children, block_starts = block_starts, block_ends = block_ends, block_indent = block_indent)
+    children <- block_starts[
+      block_starts > elem &
+        block_starts <= block_ends[elem] &
+        block_indent[block_starts] == block_indent[elem] + 1
+    ]
+    children <- lapply(
+      children,
+      collect_children,
+      block_starts = block_starts,
+      block_ends = block_ends,
+      block_indent = block_indent
+    )
   }
   list(
     element = elem,
@@ -1024,7 +1308,10 @@ get_last <- function(tree, background, border) {
   if (background[tree$element] || border[tree$element]) {
     tree$element
   } else if (length(tree$children) != 0) {
-    c(tree$element, get_last(tree$children[[length(tree$children)]], background, border))
+    c(
+      tree$element,
+      get_last(tree$children[[length(tree$children)]], background, border)
+    )
   } else {
     tree$element
   }
@@ -1040,32 +1327,43 @@ set_margins <- function(tree, margins, has_background, has_top, has_bottom) {
     margins <- set_margins(child, margins, has_background, has_top, has_bottom)
   }
   for (i in seq_along(tree$children)[-1]) {
-    margins$bottom[tree$children[[i-1]]$element] <- max(margins$bottom[tree$children[[i-1]]$element], margins$top[tree$children[[i]]$element])
+    margins$bottom[tree$children[[i - 1]]$element] <- max(
+      margins$bottom[tree$children[[i - 1]]$element],
+      margins$top[tree$children[[i]]$element]
+    )
     margins$top[tree$children[[i]]$element] <- 0
   }
   margins
 }
 
 has_identical_background <- function(a, b, style) {
-  mapply(function(a, b) {
-    identical(style$block[a], style$block[b]) &&
-    identical(style$background[[a]], style$background[[b]]) &&
-    identical(style$border[a], style$border[b]) &&
-    (is.na(style$border[a]) || (
-      identical(style$border_size_bottom[a], style$border_size_bottom[b]) &&
-      identical(style$border_size_top[a], style$border_size_top[b]) &&
-      identical(style$border_size_left[a], style$border_size_left[b]) &&
-      identical(style$border_size_right[a], style$border_size_right[b])
-    ))
-  }, a = a, b = b)
+  mapply(
+    function(a, b) {
+      identical(style$block[a], style$block[b]) &&
+        identical(style$background[[a]], style$background[[b]]) &&
+        identical(style$border[a], style$border[b]) &&
+        (is.na(style$border[a]) ||
+          (identical(
+            style$border_size_bottom[a],
+            style$border_size_bottom[b]
+          ) &&
+            identical(style$border_size_top[a], style$border_size_top[b]) &&
+            identical(style$border_size_left[a], style$border_size_left[b]) &&
+            identical(style$border_size_right[a], style$border_size_right[b])))
+    },
+    a = a,
+    b = b
+  )
 }
 
 add_inline_padding <- function(parsed) {
   has_background <- which(
     parsed$block == c(0, parsed$block[seq_len(nrow(parsed) - 1)]) &
-      parsed$padding_right != 0 & parsed$padding_left != 0
+      parsed$padding_right != 0 &
+      parsed$padding_left != 0
   )
-  needs_padding <- parsed$block[has_background] != parsed$block[has_background - 1] |
+  needs_padding <- parsed$block[has_background] !=
+    parsed$block[has_background - 1] |
     !has_identical_background(has_background, has_background - 1, parsed)
   needs_padding <- has_background[needs_padding]
 
@@ -1075,7 +1373,10 @@ add_inline_padding <- function(parsed) {
 
   padding <- data.frame(
     loc = c(needs_padding, parsed$ends[needs_padding]),
-    width = c(parsed$padding_left[needs_padding], parsed$padding_right[needs_padding]),
+    width = c(
+      parsed$padding_left[needs_padding],
+      parsed$padding_right[needs_padding]
+    ),
     offset = rep(c(0, 1), each = length(needs_padding))
   )
   padding <- unique(padding[padding$width != 0, ])
