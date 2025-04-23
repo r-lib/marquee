@@ -8,3 +8,5 @@ inst/doc
 docs
 /.quarto/
 .vscode
+compile_commands.json
+.cache
