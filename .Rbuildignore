@@ -10,3 +10,7 @@
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
 ^.vscode$
+^compile_commands\.json$
+^\.cache$
+^[\.]?air\.toml$
+^\.vscode$

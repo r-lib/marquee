@@ -10,6 +10,9 @@ test_that("parse works", {
   skip_on_os("windows")
   skip_on_os("linux")
   file <- tempfile()
-  write.csv(parsed[, !names(parsed) %in% c("background", "features", "bullets")], file)
+  write.csv(
+    parsed[, !names(parsed) %in% c("background", "features", "bullets")],
+    file
+  )
   expect_snapshot_file(file, "parsed.csv")
 })

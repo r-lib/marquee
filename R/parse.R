@@ -129,6 +129,13 @@
 #' for the `red` tag. Likewise, parsing `"Color {#00FF00 me} green"` will
 #' automatically set the color of `"me"` to #00FF00 (fully saturated green).
 #'
+#' **Automatic sizing**
+#' Like the automatic coloring described above, marquee also offers a shortcut
+#' for changing the size of text on the fly. Any class consisting solely of
+#' numbers will (if the class is not explicitly defined) by considered a text
+#' sizing class. So, parsing `"This {.50 text} is big"` automatically sets the
+#' font size of `"text"` to `50`.
+#'
 #' # Additional parsing information
 #' Apart from splitting the text up into tokens, `marquee_parse()` also provides
 #' some additional information useful for rendering the output in the expected
@@ -158,7 +165,11 @@ marquee_parse <- function(text, style = classic_style(), ignore_html = TRUE) {
   ignore_html[is.na(ignore_html)] <- TRUE
   parsed <- marquee_c(text, style, ignore_html)
   # Remove terminal line end from code blocks
-  parsed$text[parsed$type == "cb"] <- sub("\n$", "", parsed$text[parsed$type == "cb"])
+  parsed$text[parsed$type == "cb"] <- sub(
+    "\n$",
+    "",
+    parsed$text[parsed$type == "cb"]
+  )
   class(parsed) <- c("marquee_parsed", class(parsed))
   parsed
 }

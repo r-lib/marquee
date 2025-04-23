@@ -83,14 +83,34 @@
 #' # Full style
 #' base_style()
 #'
-style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
-                  features = NULL, size = NULL, color = NULL, lineheight = NULL,
-                  align = NULL, tracking = NULL, indent = NULL, hanging = NULL,
-                  margin = NULL, padding = NULL, background = NULL, border = NULL,
-                  border_size = NULL, border_radius = NULL,
-                  outline = NULL, outline_size = NULL, bullets = NULL,
-                  underline = NULL, strikethrough = NULL, baseline = NULL,
-                  img_asp = NULL, text_direction = NULL) {
+style <- function(
+  family = NULL,
+  weight = NULL,
+  italic = NULL,
+  width = NULL,
+  features = NULL,
+  size = NULL,
+  color = NULL,
+  lineheight = NULL,
+  align = NULL,
+  tracking = NULL,
+  indent = NULL,
+  hanging = NULL,
+  margin = NULL,
+  padding = NULL,
+  background = NULL,
+  border = NULL,
+  border_size = NULL,
+  border_radius = NULL,
+  outline = NULL,
+  outline_size = NULL,
+  bullets = NULL,
+  underline = NULL,
+  strikethrough = NULL,
+  baseline = NULL,
+  img_asp = NULL,
+  text_direction = NULL
+) {
   check_string(family, allow_null = TRUE)
 
   if (is.character(weight)) weight <- systemfonts::as_font_weight(weight)
@@ -114,7 +134,8 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   check_string(color, allow_null = TRUE, allow_na = TRUE)
   if (!is.null(color) && is.na(color)) color[] <- NA_character_
 
-  if (!is_relative(lineheight)) check_number_decimal(lineheight, allow_null = TRUE)
+  if (!is_relative(lineheight))
+    check_number_decimal(lineheight, allow_null = TRUE)
 
   check_string(align, allow_null = TRUE)
 
@@ -127,10 +148,12 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   if (!is_modifier(hanging)) check_number_decimal(hanging, allow_null = TRUE)
 
   if (is.null(margin)) margin <- trbl()
-  if (!is_trbl(margin)) stop_input_type(margin, "a marquee_trbl object", allow_null = TRUE)
+  if (!is_trbl(margin))
+    stop_input_type(margin, "a marquee_trbl object", allow_null = TRUE)
 
   if (is.null(padding)) padding <- trbl()
-  if (!is_trbl(padding)) stop_input_type(padding, "a marquee_trbl object", allow_null = TRUE)
+  if (!is_trbl(padding))
+    stop_input_type(padding, "a marquee_trbl object", allow_null = TRUE)
 
   if (!inherits(background, "GridPattern")) {
     check_string(unclass(background), allow_null = TRUE, allow_na = TRUE)
@@ -141,15 +164,19 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
   if (!is.null(border) && is.na(border)) border[] <- NA_character_
 
   if (is.null(border_size)) border_size <- trbl()
-  if (!is_trbl(border_size)) stop_input_type(border_size, "a marquee_trbl object", allow_null = TRUE)
+  if (!is_trbl(border_size))
+    stop_input_type(border_size, "a marquee_trbl object", allow_null = TRUE)
 
-  if (is.unit(border_radius)) border_radius <- convertWidth(border_radius, "bigpts", FALSE)
-  if (!is_modifier(border_radius)) check_number_decimal(border_radius, allow_null = TRUE)
+  if (is.unit(border_radius))
+    border_radius <- convertWidth(border_radius, "bigpts", FALSE)
+  if (!is_modifier(border_radius))
+    check_number_decimal(border_radius, allow_null = TRUE)
 
   check_string(outline, allow_null = TRUE, allow_na = TRUE)
   if (!is.null(outline) && is.na(outline)) outline[] <- NA_character_
 
-  if (is.unit(outline_size)) outline_size <- convertHeight(size, "bigpts", FALSE)
+  if (is.unit(outline_size))
+    outline_size <- convertHeight(size, "bigpts", FALSE)
 
   check_character(bullets, allow_null = TRUE)
 
@@ -163,7 +190,8 @@ style <- function(family = NULL, weight = NULL, italic = NULL, width = NULL,
 
   if (!is_modifier(baseline)) check_number_decimal(baseline, allow_null = TRUE)
 
-  structure(list(
+  structure(
+    list(
       size = size, # Important this is the first. Required by compiled code
       background = background, # Important this is the second. Required by compiled code
       color = color, # Important this is the third. Required by compiled code
@@ -210,10 +238,22 @@ is_style <- function(x) inherits(x, "marquee_style")
 format.marquee_style <- function(x, ...) {
   defined_options <- x[!vapply(x, is.null, logical(1))]
   if (length(defined_options) == 0) return(character())
-  options <- format(names(defined_options), width = max(nchar(names(defined_options))), justify = "right")
-  paste0(options, ": ", vapply(defined_options, function(opt) {
-    paste(format(opt, ...), collapse = ", ")
-  }, character(1)))
+  options <- format(
+    names(defined_options),
+    width = max(nchar(names(defined_options))),
+    justify = "right"
+  )
+  paste0(
+    options,
+    ": ",
+    vapply(
+      defined_options,
+      function(opt) {
+        paste(format(opt, ...), collapse = ", ")
+      },
+      character(1)
+    )
+  )
 }
 #' @export
 print.marquee_style <- function(x, ...) {
@@ -238,30 +278,55 @@ str.marquee_style <- function(object, ...) {
 
 #' @export
 `$<-.marquee_style` <- function(x, name, value) {
-  cli::cli_abort("Setting style values using {.arg $}, {.arg []}, or {.arg [[]]} are not permitted. Please use {.fun modify_style}")
+  cli::cli_abort(
+    "Setting style values using {.arg $}, {.arg []}, or {.arg [[]]} are not permitted. Please use {.fun modify_style}"
+  )
 }
 
 #' @export
 `[[<-.marquee_style` <- function(x, ..., value) {
-  cli::cli_abort("Setting style values using {.arg $}, {.arg []}, or {.arg [[]]} are not permitted. Please use {.fun modify_style}")
+  cli::cli_abort(
+    "Setting style values using {.arg $}, {.arg []}, or {.arg [[]]} are not permitted. Please use {.fun modify_style}"
+  )
 }
 
 #' @export
 `[<-.marquee_style` <- function(x, ..., value) {
-  cli::cli_abort("Setting style values using {.arg $}, {.arg []}, or {.arg [[]]} are not permitted. Please use {.fun modify_style}")
+  cli::cli_abort(
+    "Setting style values using {.arg $}, {.arg []}, or {.arg [[]]} are not permitted. Please use {.fun modify_style}"
+  )
 }
 
 #' @rdname style
 #' @export
-base_style <- function(family = "", weight = "normal", italic = FALSE,
-                       width = "normal", features = systemfonts::font_feature(),
-                       size = 12, color = "black", lineheight = 1.6,
-                       align = "auto", tracking = 0, indent = 0, hanging = 0,
-                       margin = trbl(0, 0, rem(1)), padding = trbl(0),
-                       background = NA, border = NA, border_size = trbl(0),
-                       border_radius = 0, outline = NA, outline_size = 1, bullets = marquee_bullets,
-                       underline = FALSE, strikethrough = FALSE, baseline = 0,
-                       img_asp = 1.65, text_direction = "auto") {
+base_style <- function(
+  family = "",
+  weight = "normal",
+  italic = FALSE,
+  width = "normal",
+  features = systemfonts::font_feature(),
+  size = 12,
+  color = "black",
+  lineheight = 1.6,
+  align = "auto",
+  tracking = 0,
+  indent = 0,
+  hanging = 0,
+  margin = trbl(0, 0, rem(1)),
+  padding = trbl(0),
+  background = NA,
+  border = NA,
+  border_size = trbl(0),
+  border_radius = 0,
+  outline = NA,
+  outline_size = 1,
+  bullets = marquee_bullets,
+  underline = FALSE,
+  strikethrough = FALSE,
+  baseline = 0,
+  img_asp = 1.65,
+  text_direction = "auto"
+) {
   style(
     family = family,
     weight = weight,

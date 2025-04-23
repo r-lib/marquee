@@ -1,7 +1,13 @@
 test_that("geom_marquee inserts the aesthetics correctly", {
-
   p <- ggplot2::ggplot(mtcars) +
-    geom_marquee(ggplot2::aes(disp, mpg, label = gear), family = "serif", size = 6, color = "red", fill = "blue", size.unit = "Pt")
+    geom_marquee(
+      ggplot2::aes(disp, mpg, label = gear),
+      family = "serif",
+      size = 6,
+      color = "red",
+      fill = "blue",
+      size.unit = "Pt"
+    )
   p <- ggplot2::ggplotGrob(p)
   grob <- p$grobs[[which(p$layout$name == "panel")]]$children[[3]]
 

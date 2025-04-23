@@ -6,16 +6,16 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-5147-4711")),
     person("Martin", "Mitáš", role = "aut",
            comment = "Author of MD4C"),
-    person("Posit Software, PBC", role = c("cph", "fnd"))
+    person("Posit Software, PBC", role = c("cph", "fnd"),
+           comment = c(ROR = "03wc8by49"))
   )
-Description: Provides the mean to parse and render markdown text with grid along
-    with facilities to define the styling of the text.
+Description: Provides the mean to parse and render markdown text with grid
+    along with facilities to define the styling of the text.
 License: MIT + file LICENSE
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-LinkingTo:
-    cpp11
+URL: https://marquee.r-lib.org, https://github.com/r-lib/marquee
+BugReports: https://github.com/r-lib/marquee/issues
+Depends:
+    R (>= 4.1)
 Imports:
     cli,
     glue,
@@ -38,8 +38,14 @@ Suggests:
     rmarkdown,
     rsvg,
     testthat (>= 3.0.0)
-URL: https://marquee.r-lib.org, https://github.com/r-lib/marquee
-BugReports: https://github.com/r-lib/marquee/issues
+LinkingTo:
+    cpp11
+VignetteBuilder: 
+    knitr
+Config/build/compilation-database: true
 Config/Needs/website: tidyverse/tidytemplate
-VignetteBuilder: knitr
 Config/testthat/edition: 3
+Config/usethis/last-upkeep: 2025-04-23
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

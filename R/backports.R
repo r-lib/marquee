@@ -1,6 +1,8 @@
 version_unavailable <- function(min_version) {
   function(...) {
-    cli::cli_abort("This graphics feature is not available before R v{min_version}")
+    cli::cli_abort(
+      "This graphics feature is not available before R v{min_version}"
+    )
   }
 }
 
@@ -10,7 +12,9 @@ glyphInfo <- version_unavailable("4.3.0")
 glyphAnchor <- version_unavailable("4.3.0")
 glyphGrob <- version_unavailable("4.3.0")
 groupGrob <- function(...) {
-  cli::cli_warn("R 4.2 or higher is required to ensure correct clipping when background is present")
+  cli::cli_warn(
+    "R 4.2 or higher is required to ensure correct clipping when background is present"
+  )
   gList(...)
 }
 

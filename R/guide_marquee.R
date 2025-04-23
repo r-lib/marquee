@@ -92,11 +92,16 @@
 #' base + aes(colour = class) +
 #'   labs(colour = "Cars including suv and minivan vehicles") +
 #'   guides(colour = guide_marquee(detect = TRUE))
-guide_marquee <- function(title = ggplot2::waiver(),
-                          # Note: prefixing namespace prevents recursive default argument
-                          style = marquee::style(background = NA),
-                          detect = FALSE, theme =  NULL, position = "top",
-                          override.aes = list(), order = 1) {
+guide_marquee <- function(
+  title = ggplot2::waiver(),
+  # Note: prefixing namespace prevents recursive default argument
+  style = marquee::style(background = NA),
+  detect = FALSE,
+  theme = NULL,
+  position = "top",
+  override.aes = list(),
+  order = 1
+) {
   check_installed("ggplot2", version = "3.5.0")
   if (!(ggplot2::is.theme(theme) || is.null(theme))) {
     stop_input_type(theme, "a <theme>")
@@ -140,7 +145,11 @@ guide_marquee <- function(title = ggplot2::waiver(),
 NULL
 
 on_load(
-  makeActiveBinding("GuideMarquee", function() guide_env$guide, environment(guide_marquee))
+  makeActiveBinding(
+    "GuideMarquee",
+    function() guide_env$guide,
+    environment(guide_marquee)
+  )
 )
 
 guide_env <- new_environment(list(guide = NULL))
@@ -150,29 +159,41 @@ make_marquee_guide <- function() {
     # We don't use guide classes directly as earlier ggplot2 versions might
     # be loaded where they don't exist.
     parent <- utils::getFromNamespace("GuideLegend", "ggplot2")
-    base   <- utils::getFromNamespace("Guide", "ggplot2")
+    base <- utils::getFromNamespace("Guide", "ggplot2")
   } else {
     return(NULL)
   }
 
   guide_env$guide <- ggplot2::ggproto(
-    "GuideMarquee", parent,
+    "GuideMarquee",
+    parent,
 
     params = list(
-      title = ggplot2::waiver(), theme = NULL, name = "guide_marquee",
-      position = NULL, direction = NULL, order = 0, hash = character(),
-      style = style(), detect = FALSE, override.aes = list()
+      title = ggplot2::waiver(),
+      theme = NULL,
+      name = "guide_marquee",
+      position = NULL,
+      direction = NULL,
+      order = 0,
+      hash = character(),
+      style = style(),
+      detect = FALSE,
+      override.aes = list()
     ),
 
     elements = list(
-      title   = "plot.subtitle",
+      title = "plot.subtitle",
       spacing = "legend.box.spacing",
-      key     = "legend.key"
+      key = "legend.key"
     ),
 
-    draw = function(self, theme, position = NULL, direction = NULL,
-                    params = self$params) {
-
+    draw = function(
+      self,
+      theme,
+      position = NULL,
+      direction = NULL,
+      params = self$params
+    ) {
       params$position <- params$position %||% position
 
       elems <- base$setup_elements(params, self$elements, theme)
@@ -193,8 +214,8 @@ make_marquee_guide <- function() {
 
       # Place image and label tags
       glyphs <- group_glyphs(self, params, elems)
-      text   <- weave_glyphs(text, glyphs, labs)
-      text   <- replace_tags(text, labs, params$detect)
+      text <- weave_glyphs(text, glyphs, labs)
+      text <- replace_tags(text, labs, params$detect)
 
       # Set style colour
       style <- elems$title$style %||% classic_style()
@@ -209,12 +230,22 @@ make_marquee_guide <- function() {
       # TODO: this is a hack until #24 is solved
       f <- element_grob.element_marquee
       fn_env(f) <- list2env(glyphs)
-      grob <- f(elems$title, label = text, width = width, margin_y = TRUE, style = style)
+      grob <- f(
+        elems$title,
+        label = text,
+        width = width,
+        margin_y = TRUE,
+        style = style
+      )
 
       gt <- gtable::gtable(widths = width, heights = grobHeight(grob))
       gtable::gtable_add_grob(
-        gt, grob, t = 1, l = 1,
-        clip = "off", name = params$name
+        gt,
+        grob,
+        t = 1,
+        l = 1,
+        clip = "off",
+        name = params$name
       )
     }
   )
@@ -225,7 +256,6 @@ on_load(on_package_load("ggplot2", {
 }))
 
 group_glyphs <- function(self, params, elems) {
-
   n_layers <- length(params$decor) + 1
   n_breaks <- params$n_breaks <- nrow(params$key)
   size <- convertUnit(unit(elems$title$size, "pt"), "cm", valueOnly = TRUE)
@@ -235,7 +265,6 @@ group_glyphs <- function(self, params, elems) {
 
   # Combine glyphs coming from multiple layers and respect their alotted size
   glyphs <- lapply(glyphs, function(key) {
-
     width <- lapply(key, attr, which = "width")
     width[lengths(width) != 1] <- 0
     width <- max(unlist(width))
@@ -247,7 +276,7 @@ group_glyphs <- function(self, params, elems) {
     vp <- NULL
     if (width != 0 || height != 0) {
       vp <- viewport(
-        width  = unit(max(width,  size), "cm"),
+        width = unit(max(width, size), "cm"),
         height = unit(max(height, size), "cm")
       )
     }
@@ -259,7 +288,6 @@ group_glyphs <- function(self, params, elems) {
 }
 
 weave_glyphs <- function(text, glyphs, labels) {
-
   img_tag <- paste0("![](", names(glyphs), ")")
   n <- rev(seq_along(glyphs))
   # TODO: figure out what to do when `any(n %in% labels)`
@@ -288,7 +316,6 @@ weave_glyphs <- function(text, glyphs, labels) {
 }
 
 replace_tags <- function(text, labels, detect) {
-
   n <- rev(seq_along(labels))
   tags <- vctrs::vec_as_names(labels, repair = "universal", quiet = TRUE)
   tags <- paste0("lab_", tolower(tags))
@@ -316,10 +343,22 @@ replace_tags <- function(text, labels, detect) {
   if (isTRUE(detect)) {
     # Regex pattern searches for labels flanked by word breaks \b(label)\b and
     # excludes matches within tags (?<!{.tags)
-    labels <- paste0("\\b(", regescape(labels), ")(?<!\\{\\.", regescape(tags), ")\\b")
+    labels <- paste0(
+      "\\b(",
+      regescape(labels),
+      ")(?<!\\{\\.",
+      regescape(tags),
+      ")\\b"
+    )
     replacement <- paste0("\\{\\.", regescape(tags), " \\1\\}")
     for (i in n) {
-      text <- gsub(x = text, labels[i], replacement[i], ignore.case = TRUE, perl = TRUE)
+      text <- gsub(
+        x = text,
+        labels[i],
+        replacement[i],
+        ignore.case = TRUE,
+        perl = TRUE
+      )
     }
   }
 
@@ -332,7 +371,6 @@ regescape <- function(x) {
 }
 
 recolour_style <- function(style, text, params) {
-
   key <- params$key
   label <- params$style %||% style()
   if (is_style_set(label)) {
@@ -361,7 +399,9 @@ recolour_style <- function(style, text, params) {
   # Find out which keys are represented in text
   idx <- which(vapply(
     paste0("{.", tags, " "),
-    grepl, x = text[1], fixed = TRUE,
+    grepl,
+    x = text[1],
+    fixed = TRUE,
     FUN.VALUE = logical(1)
   ))
 
@@ -377,7 +417,7 @@ recolour_style <- function(style, text, params) {
   for (i in idx) {
     # Set default fields to key color
     args <- style[[1]][[tags[i]]][fields]
-    nms  <- setdiff(fields, names(args)[lengths(args) > 0])
+    nms <- setdiff(fields, names(args)[lengths(args) > 0])
     args[nms] <- key_color[i]
     # Recolour label's style
     style <- modify_style(style, tag = tags[i], !!!args)

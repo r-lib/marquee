@@ -1,7 +1,6 @@
 skip_if_not_installed("ggplot2", "3.5.0")
 
 test_that("guide_marquee can interpolate legend glyphs", {
-
   df <- data.frame(x = c("A", "B", "C"))
   p <- ggplot2::ggplot(df, ggplot2::aes(x, x, shape = x)) +
     ggplot2::geom_point() +
@@ -23,14 +22,17 @@ test_that("guide_marquee can interpolate legend glyphs", {
     c("GLYPH_A", "GLYPH_B", "GLYPH_C")
   )
   expect_true(
-    all(vapply(grob$images$grobs, function(key) {
-      !inherits(key, "missing_grob") && inherits(key, "gTree")
-    }, logical(1)))
+    all(vapply(
+      grob$images$grobs,
+      function(key) {
+        !inherits(key, "missing_grob") && inherits(key, "gTree")
+      },
+      logical(1)
+    ))
   )
 })
 
 test_that("guide_marquee can recolour text", {
-
   df <- data.frame(x = c("A", "B", "C"))
   p <- ggplot2::ggplot(df, ggplot2::aes(x, x, colour = x)) +
     ggplot2::geom_point() +
@@ -53,6 +55,15 @@ test_that("guide_marquee can recolour text", {
   )
   expect_equal(
     grob$text$color,
-    c("black", "black", "limegreen", "black", "gold", "black", "orchid", "black")
+    c(
+      "black",
+      "black",
+      "limegreen",
+      "black",
+      "gold",
+      "black",
+      "orchid",
+      "black"
+    )
   )
 })
