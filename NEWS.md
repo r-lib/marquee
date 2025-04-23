@@ -1,5 +1,6 @@
 # marquee (development version)
 
+* Size of `element_marquee()` is communicated similar to `element_text()` (#57)
 * You can now change the size by using a {.size ...} shortcut, e.g. {.30 BIG} to
   render `BIG` with font size 30
 
