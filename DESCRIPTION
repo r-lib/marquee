@@ -44,3 +44,4 @@ Config/Needs/website: tidyverse/tidytemplate
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/build/compilation-database: true
+Config/usethis/last-upkeep: 2025-04-23
