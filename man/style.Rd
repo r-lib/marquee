@@ -25,7 +25,7 @@ style(
   border_size = NULL,
   border_radius = NULL,
   outline = NULL,
-  outline_size = NULL,
+  outline_width = NULL,
   outline_join = NULL,
   outline_mitre = NULL,
   bullets = NULL,
@@ -56,7 +56,7 @@ base_style(
   border_size = trbl(0),
   border_radius = 0,
   outline = NA,
-  outline_size = 1,
+  outline_width = 1,
   outline_join = "round",
   outline_mitre = 10,
   bullets = marquee_bullets,
@@ -137,7 +137,7 @@ to \code{\link[=trbl]{trbl()}}}
 
 \item{outline}{The color of the outline stroke.}
 
-\item{outline_size}{The line width of the outline stroke.}
+\item{outline_width}{The line width of the outline stroke.}
 
 \item{outline_join}{The line join type for the outline. Either \code{"round"},
 \code{"mitre"}, or \code{"bevel"}.}

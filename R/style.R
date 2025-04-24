@@ -56,7 +56,7 @@
 #' to [trbl()]
 #' @param border_radius The corner radius of the background, given in points
 #' @param outline The color of the outline stroke.
-#' @param outline_size The line width of the outline stroke.
+#' @param outline_width The line width of the outline stroke.
 #' @param outline_join The line join type for the outline. Either `"round"`,
 #' `"mitre"`, or `"bevel"`.
 #' @param outline_mitre The mitre limit (relative distance between inner and
@@ -107,7 +107,7 @@ style <- function(
   border_size = NULL,
   border_radius = NULL,
   outline = NULL,
-  outline_size = NULL,
+  outline_width = NULL,
   outline_join = NULL,
   outline_mitre = NULL,
   bullets = NULL,
@@ -181,8 +181,8 @@ style <- function(
   check_string(outline, allow_null = TRUE, allow_na = TRUE)
   if (!is.null(outline) && is.na(outline)) outline[] <- NA_character_
 
-  if (is.unit(outline_size))
-    outline_size <- convertHeight(size, "bigpts", FALSE)
+  if (is.unit(outline_width))
+    outline_width <- convertHeight(size, "bigpts", FALSE)
 
   check_string(outline_join, allow_null = TRUE)
   if (!is.null(outline_join))
@@ -237,7 +237,7 @@ style <- function(
       border_size_left = border_size[[4]],
       border_radius = border_radius,
       outline = outline,
-      outline_size = outline_size,
+      outline_width = outline_width,
       outline_join = outline_join,
       outline_mitre = outline_mitre,
       bullets = bullets,
@@ -338,7 +338,7 @@ base_style <- function(
   border_size = trbl(0),
   border_radius = 0,
   outline = NA,
-  outline_size = 1,
+  outline_width = 1,
   outline_join = "round",
   outline_mitre = 10,
   bullets = marquee_bullets,
@@ -368,7 +368,7 @@ base_style <- function(
     border_size = border_size,
     border_radius = border_radius,
     outline = outline,
-    outline_size = outline_size,
+    outline_width = outline_width,
     outline_join = outline_join,
     outline_mitre = outline_mitre,
     bullets = bullets,

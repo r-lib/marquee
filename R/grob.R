@@ -543,7 +543,7 @@ makeContext.marquee_grob <- function(x) {
   shape$shape$col <- x$text$color[idx]
   shape$shape$id <- x$text$id[idx]
   shape$shape$outline <- x$text$outline[idx]
-  shape$shape$outline_size <- x$text$outline_size[idx]
+  shape$shape$outline_width <- x$text$outline_width[idx]
   shape$shape$outline_join <- x$text$outline_join[idx]
   shape$shape$outline_mitre <- x$text$outline_mitre[idx]
   bshape <- x$bullets$shape
@@ -586,7 +586,7 @@ makeContext.marquee_grob <- function(x) {
     bshape$shape$col <- x$text$color[idx]
     bshape$shape$id <- x$text$id[idx]
     bshape$shape$outline <- x$text$outline[idx]
-    bshape$shape$outline_size <- x$text$outline_size[idx]
+    bshape$shape$outline_width <- x$text$outline_width[idx]
     bshape$shape$outline_join <- x$text$outline_join[idx]
     bshape$shape$outline_mitre <- x$text$outline_mitre[idx]
   }
@@ -1108,7 +1108,7 @@ makeContent.marquee_grob <- function(x) {
           y = x$shape$y_offset[need_bitmap]
         )
         glyphs <- inject(grobTree(!!!outline, glyphs, !!!raster_glyphs))
-        }
+      }
     } else {
       glyphs <- NULL
     }
@@ -1415,14 +1415,14 @@ outline_glyphs <- function(glyph_info, shape) {
   if (all(is.na(shape$outline))) {
     return(NULL)
   }
-  id <- vctrs::vec_group_loc(shape[, c("outline", "outline_size")])
+  id <- vctrs::vec_group_loc(shape[, c("outline", "outline_width")])
   id <- id[!is.na(id$key$outline), ]
   outlines <- vector("list", nrow(id))
   for (idx in seq_along(outlines)) {
     outline <- glyph_info
     outline$glyphs <- outline$glyphs[id$loc[[idx]], , drop = FALSE]
     outline_gp <- gpar(
-      lwd = id$key$outline_size[idx] * 2,
+      lwd = id$key$outline_width[idx] * 2,
       col = id$key$outline[idx],
       linejoin = id$key$outline_join[idx],
       linemitre = id$key$outline_mitre[idx]
@@ -1450,7 +1450,7 @@ outline_polygon <- function(polygon, shape) {
     default.units = "bigpts",
     gp = gpar(
       fill = NA,
-      lwd = shape$outline_size[i] * 2,
+      lwd = shape$outline_width[i] * 2,
       col = shape$outline[i],
       linejoin = shape$outline_join[i],
       linemitre = shape$outline_mitre[i]
