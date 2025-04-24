@@ -504,8 +504,10 @@ cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent,
     // Count the number of consecutive ul nestings
     int n_ind = 0;
     for (R_xlen_t k = stretch_start.size() - 1; k >= 0; --k) {
-      if (i > stretch_end[k] || stretch_type[k] == "ol") break;
-      n_ind++;
+      if (i >= stretch_start[k] && i <= stretch_end[k]) {
+        if (stretch_type[k] == "ol") break;
+        n_ind++;
+      }
     }
     cpp11::r_string ul_bullet = bullets[i][n_ind % bullets[i].size()];
 

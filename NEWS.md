@@ -9,6 +9,8 @@
 * Added support for PNG and JPEG files from URLs (#63)
 * Fixed a bug in bullet placement when the bullet was the last in the document
   and contained multiple text spans (#54)
+* Fixed a bug in nested unordered bullet lists where the calculated bullet would
+  be wrong (#53)
 
 # marquee 1.0.0
 
