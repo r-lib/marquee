@@ -7,6 +7,8 @@
   Outlines can be controlled with the `outline`, `outline_width`, `outline_join`
   and `outline_mitre` style settings (#60)
 * Added support for PNG and JPEG files from URLs (#63)
+* Fixed a bug in bullet placement when the bullet was the last in the document
+  and contained multiple text spans (#54)
 
 # marquee 1.0.0
 

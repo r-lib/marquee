@@ -535,7 +535,7 @@ cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent,
         }
         placement.push_back(j + 1);
         // Move j to the start of the next block
-        while (j < block.size() - 2 && li_block == block[j + 1]) j++;
+        while (j < block.size() - 1 && li_block == block[j + 1]) j++;
       }
     }
     stretch_end.push_back(end);
