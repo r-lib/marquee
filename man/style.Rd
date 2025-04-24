@@ -26,6 +26,8 @@ style(
   border_radius = NULL,
   outline = NULL,
   outline_size = NULL,
+  outline_join = NULL,
+  outline_mitre = NULL,
   bullets = NULL,
   underline = NULL,
   strikethrough = NULL,
@@ -55,6 +57,8 @@ base_style(
   border_radius = 0,
   outline = NA,
   outline_size = 1,
+  outline_join = "round",
+  outline_mitre = 10,
   bullets = marquee_bullets,
   underline = FALSE,
   strikethrough = FALSE,
@@ -134,6 +138,12 @@ to \code{\link[=trbl]{trbl()}}}
 \item{outline}{The color of the outline stroke.}
 
 \item{outline_size}{The line width of the outline stroke.}
+
+\item{outline_join}{The line join type for the outline. Either \code{"round"},
+\code{"mitre"}, or \code{"bevel"}.}
+
+\item{outline_mitre}{The mitre limit (relative distance between inner and
+outer corner at a join) if \code{outline_join = "mitre"}.}
 
 \item{bullets}{A vector of strings to use for bullets in unordered lists.
 \code{marquee_bullets} provides a selection}

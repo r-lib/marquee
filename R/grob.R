@@ -544,6 +544,8 @@ makeContext.marquee_grob <- function(x) {
   shape$shape$id <- x$text$id[idx]
   shape$shape$outline <- x$text$outline[idx]
   shape$shape$outline_size <- x$text$outline_size[idx]
+  shape$shape$outline_join <- x$text$outline_join[idx]
+  shape$shape$outline_mitre <- x$text$outline_mitre[idx]
   bshape <- x$bullets$shape
 
   # Init height structures
@@ -585,6 +587,8 @@ makeContext.marquee_grob <- function(x) {
     bshape$shape$id <- x$text$id[idx]
     bshape$shape$outline <- x$text$outline[idx]
     bshape$shape$outline_size <- x$text$outline_size[idx]
+    bshape$shape$outline_join <- x$text$outline_join[idx]
+    bshape$shape$outline_mitre <- x$text$outline_mitre[idx]
   }
   # make rtl bullets left-justified
   bltr <- bshape$metrics$ltr[bshape$shape$metric_id]
@@ -1074,8 +1078,10 @@ makeContent.marquee_grob <- function(x) {
         )
         need_bitmap <- i[attr(glyphs, "missing")]
         outline <- outline_polygon(glyphs, x$shape[i, , drop = FALSE])
-        glyphs <- if (nrow(glyphs) == 0) nullGrob() else
-          pathGrob(
+        if (nrow(glyphs) == 0) {
+          glyphs <- nullGrob()
+        } else {
+          glyphs <- pathGrob(
             x = glyphs$x + x$shape$x_offset[i][glyphs$glyph],
             y = glyphs$y + x$shape$y_offset[i][glyphs$glyph],
             id = glyphs$contour,
@@ -1086,6 +1092,14 @@ makeContent.marquee_grob <- function(x) {
               col = NA
             )
           )
+        }
+        raster_glyphs <- systemfonts::glyph_raster(
+          x$shape$index[need_bitmap],
+          x$shape$font_path[need_bitmap],
+          x$shape$font_index[need_bitmap],
+          x$shape$font_size[need_bitmap],
+          col = x$shape$col[need_bitmap]
+        )
         raster_glyphs <- Map(
           function(glyph, x, y)
             systemfonts::glyph_raster_grob(glyph, x, y, interpolate = TRUE),
@@ -1094,7 +1108,7 @@ makeContent.marquee_grob <- function(x) {
           y = x$shape$y_offset[need_bitmap]
         )
         glyphs <- inject(grobTree(!!!outline, glyphs, !!!raster_glyphs))
-      }
+        }
     } else {
       glyphs <- NULL
     }
@@ -1409,7 +1423,9 @@ outline_glyphs <- function(glyph_info, shape) {
     outline$glyphs <- outline$glyphs[id$loc[[idx]], , drop = FALSE]
     outline_gp <- gpar(
       lwd = id$key$outline_size[idx] * 2,
-      col = id$key$outline[idx]
+      col = id$key$outline[idx],
+      linejoin = id$key$outline_join[idx],
+      linemitre = id$key$outline_mitre[idx]
     )
     outline <- glyphGrob(outline, x = 0, y = 0, hjust = 0, vjust = 0)
     outline <- strokeGrob(outline, gp = outline_gp)
@@ -1435,7 +1451,9 @@ outline_polygon <- function(polygon, shape) {
     gp = gpar(
       fill = NA,
       lwd = shape$outline_size[i] * 2,
-      col = shape$outline[i]
+      col = shape$outline[i],
+      linejoin = shape$outline_join[i],
+      linemitre = shape$outline_mitre[i]
     )
   ))
 }

@@ -167,7 +167,7 @@ element_grob.element_marquee <- function(
   y <- y %||% rep(just$vjust, n)
   width <- width %||% element$width %||% NA
 
-  grob <-  marquee_grob(
+  grob <- marquee_grob(
     label,
     style,
     force_body_margin = TRUE,
@@ -181,9 +181,9 @@ element_grob.element_marquee <- function(
 
   if (xor(margin_x, margin_y)) {
     if (margin_x) grob$full_height <- unit(1, "null")
-    if (margin_y) grob$full_width  <- unit(1, "null")
+    if (margin_y) grob$full_width <- unit(1, "null")
   }
-      
+
   grob
 }
 

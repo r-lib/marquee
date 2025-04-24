@@ -57,6 +57,10 @@
 #' @param border_radius The corner radius of the background, given in points
 #' @param outline The color of the outline stroke.
 #' @param outline_size The line width of the outline stroke.
+#' @param outline_join The line join type for the outline. Either `"round"`,
+#' `"mitre"`, or `"bevel"`.
+#' @param outline_mitre The mitre limit (relative distance between inner and
+#' outer corner at a join) if `outline_join = "mitre"`.
 #' @param bullets A vector of strings to use for bullets in unordered lists.
 #' `marquee_bullets` provides a selection
 #' @param underline Should text be underlined
@@ -104,6 +108,8 @@ style <- function(
   border_radius = NULL,
   outline = NULL,
   outline_size = NULL,
+  outline_join = NULL,
+  outline_mitre = NULL,
   bullets = NULL,
   underline = NULL,
   strikethrough = NULL,
@@ -178,6 +184,17 @@ style <- function(
   if (is.unit(outline_size))
     outline_size <- convertHeight(size, "bigpts", FALSE)
 
+  check_string(outline_join, allow_null = TRUE)
+  if (!is.null(outline_join))
+    outline_join <- arg_match0(outline_join, c("round", "mitre", "bevel"))
+
+  check_number_decimal(
+    outline_mitre,
+    allow_null = TRUE,
+    min = 1,
+    allow_infinite = FALSE
+  )
+
   check_character(bullets, allow_null = TRUE)
 
   check_bool(underline, allow_null = TRUE)
@@ -221,6 +238,8 @@ style <- function(
       border_radius = border_radius,
       outline = outline,
       outline_size = outline_size,
+      outline_join = outline_join,
+      outline_mitre = outline_mitre,
       bullets = bullets,
       underline = underline,
       strikethrough = strikethrough,
@@ -320,6 +339,8 @@ base_style <- function(
   border_radius = 0,
   outline = NA,
   outline_size = 1,
+  outline_join = "round",
+  outline_mitre = 10,
   bullets = marquee_bullets,
   underline = FALSE,
   strikethrough = FALSE,
@@ -348,6 +369,8 @@ base_style <- function(
     border_radius = border_radius,
     outline = outline,
     outline_size = outline_size,
+    outline_join = outline_join,
+    outline_mitre = outline_mitre,
     bullets = bullets,
     underline = underline,
     strikethrough = strikethrough,
