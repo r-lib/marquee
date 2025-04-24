@@ -173,6 +173,20 @@ to <code><a href="style_helpers.html">trbl()</a></code></p></dd>
     <dt><code>border_radius</code></dt>
 <dd><p>The corner radius of the background, given in points</p></dd>
 
+    <dt><code>outline</code></dt>
+<dd><p>The color of the outline stroke.</p></dd>
+
+    <dt><code>outline_width</code></dt>
+<dd><p>The line width of the outline stroke.</p></dd>
+
+    <dt><code>outline_join</code></dt>
+<dd><p>The line join type for the outline. Either <code>"round"</code>,
+<code>"mitre"</code>, or <code>"bevel"</code>.</p></dd>
+
+    <dt><code>outline_mitre</code></dt>
+<dd><p>The mitre limit (relative distance between inner and
+outer corner at a join) if <code>outline_join = "mitre"</code>.</p></dd>
+
     <dt><code>bullets</code></dt>
 <dd><p>A vector of strings to use for bullets in unordered lists.
 <code>marquee_bullets</code> provides a selection</p></dd>
@@ -217,7 +231,7 @@ indentation and citation border</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">classic_style</span><span class="op">(</span><span class="fl">16</span>, <span class="st">"serif"</span>, <span class="st">"sans"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;marquee_style_set[1]&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] &lt;base, body, ul, ol, li, hr, h1, h2, h3, h4, h5, h6, cb, p, qb, em, str, a, code, u, del, img, sub, sup&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] &lt;base, body, ul, ol, li, hr, h1, h2, h3, h4, h5, h6, cb, p, qb, em, str, a, code, u, del, img, sub, sup, out&gt;</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
