@@ -6,6 +6,7 @@
 * Added functionality to add outline to text as well as adding the `.out` style.
   Outlines can be controlled with the `outline`, `outline_width`, `outline_join`
   and `outline_mitre` style settings (#60)
+* Added support for PNG and JPEG files from URLs (#63)
 
 # marquee 1.0.0
 

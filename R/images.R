@@ -3,6 +3,11 @@ images_as_grobs <- function(paths, env = caller_env()) {
   is_jpeg <- grepl("\\w\\.jpe?g$", paths)
   is_svg <- grepl("\\w\\.svg$", paths)
   lapply(seq_along(paths), function(i) {
+    if (grepl("^https?://", paths[i])) {
+      temp_loc <- tempfile()
+      download.file(paths[i], temp_loc, quiet = TRUE)
+      paths[i] <- temp_loc
+    }
     obj <- NULL
     if (is_png[i]) {
       obj <- try_fetch(
