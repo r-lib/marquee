@@ -539,8 +539,13 @@ makeContext.marquee_grob <- function(x) {
   }
 
   # Inherit color and id from parsed text
-  shape$shape$col <- x$text$color[shape$shape$string_id]
-  shape$shape$id <- x$text$id[shape$shape$string_id]
+  idx <- shape$shape$string_id
+  shape$shape$col <- x$text$color[idx]
+  shape$shape$id <- x$text$id[idx]
+  shape$shape$outline <- x$text$outline[idx]
+  shape$shape$outline_width <- x$text$outline_width[idx]
+  shape$shape$outline_join <- x$text$outline_join[idx]
+  shape$shape$outline_mitre <- x$text$outline_mitre[idx]
   bshape <- x$bullets$shape
 
   # Init height structures
@@ -577,8 +582,13 @@ makeContext.marquee_grob <- function(x) {
       direction = ifelse(shape$metrics$ltr[bullet_blocks], "ltr", "rtl")
     )
     ## Inherit color and id from the relevant block
-    bshape$shape$col <- x$text$color[x$bullets$index[bshape$shape$metric_id]]
-    bshape$shape$id <- x$text$id[x$bullets$index[bshape$shape$metric_id]]
+    idx <- x$bullets$index[bshape$shape$metric_id]
+    bshape$shape$col <- x$text$color[idx]
+    bshape$shape$id <- x$text$id[idx]
+    bshape$shape$outline <- x$text$outline[idx]
+    bshape$shape$outline_width <- x$text$outline_width[idx]
+    bshape$shape$outline_join <- x$text$outline_join[idx]
+    bshape$shape$outline_mitre <- x$text$outline_mitre[idx]
   }
   # make rtl bullets left-justified
   bltr <- bshape$metrics$ltr[bshape$shape$metric_id]
@@ -1048,6 +1058,7 @@ makeContent.marquee_grob <- function(x) {
           vAnchor = glyphAnchor(0, "bottom"),
           col = x$shape$col[i]
         )
+        outline <- outline_glyphs(glyphs, x$shape[i, , drop = FALSE])
         glyphs <- glyphGrob(
           glyphs,
           x = 0,
@@ -1055,6 +1066,9 @@ makeContent.marquee_grob <- function(x) {
           hjust = 0,
           vjust = 0
         )
+        if (!is.null(outline)) {
+          glyphs <- inject(grobTree(!!!outline, glyphs))
+        }
       } else {
         glyphs <- systemfonts::glyph_outline(
           x$shape$index[i],
@@ -1063,8 +1077,11 @@ makeContent.marquee_grob <- function(x) {
           x$shape$font_size[i]
         )
         need_bitmap <- i[attr(glyphs, "missing")]
-        glyphs <- if (nrow(glyphs) == 0) nullGrob() else
-          pathGrob(
+        outline <- outline_polygon(glyphs, x$shape[i, , drop = FALSE])
+        if (nrow(glyphs) == 0) {
+          glyphs <- nullGrob()
+        } else {
+          glyphs <- pathGrob(
             x = glyphs$x + x$shape$x_offset[i][glyphs$glyph],
             y = glyphs$y + x$shape$y_offset[i][glyphs$glyph],
             id = glyphs$contour,
@@ -1075,6 +1092,7 @@ makeContent.marquee_grob <- function(x) {
               col = NA
             )
           )
+        }
         raster_glyphs <- systemfonts::glyph_raster(
           x$shape$index[need_bitmap],
           x$shape$font_path[need_bitmap],
@@ -1089,7 +1107,7 @@ makeContent.marquee_grob <- function(x) {
           x = x$shape$x_offset[need_bitmap],
           y = x$shape$y_offset[need_bitmap]
         )
-        glyphs <- inject(grobTree(glyphs, !!!raster_glyphs))
+        glyphs <- inject(grobTree(!!!outline, glyphs, !!!raster_glyphs))
       }
     } else {
       glyphs <- NULL
@@ -1388,4 +1406,54 @@ add_inline_padding <- function(parsed) {
   parsed$text[padding$loc] <- NA
   parsed$tracking[padding$loc] <- padding$width
   parsed
+}
+
+outline_glyphs <- function(glyph_info, shape) {
+  if (NROW(glyph_info$glyphs) < 1) {
+    return(NULL)
+  }
+  if (all(is.na(shape$outline))) {
+    return(NULL)
+  }
+  id <- vctrs::vec_group_loc(shape[, c("outline", "outline_width")])
+  id <- id[!is.na(id$key$outline), ]
+  outlines <- vector("list", nrow(id))
+  for (idx in seq_along(outlines)) {
+    outline <- glyph_info
+    outline$glyphs <- outline$glyphs[id$loc[[idx]], , drop = FALSE]
+    outline_gp <- gpar(
+      lwd = id$key$outline_width[idx] * 2,
+      col = id$key$outline[idx],
+      linejoin = id$key$outline_join[idx],
+      linemitre = id$key$outline_mitre[idx]
+    )
+    outline <- glyphGrob(outline, x = 0, y = 0, hjust = 0, vjust = 0)
+    outline <- strokeGrob(outline, gp = outline_gp)
+    outlines[[idx]] <- outline
+  }
+  outlines
+}
+
+outline_polygon <- function(polygon, shape) {
+  if (NROW(polygon) < 1) {
+    return(NULL)
+  }
+  if (all(is.na(shape$outline))) {
+    return(NULL)
+  }
+  i <- vctrs::vec_unique(polygon$glyph)
+  list(pathGrob(
+    x = polygon$x + shape$x_offset[polygon$glyph],
+    y = polygon$y + shape$y_offset[polygon$glyph],
+    id = polygon$contour,
+    pathId = polygon$glyph,
+    default.units = "bigpts",
+    gp = gpar(
+      fill = NA,
+      lwd = shape$outline_width[i] * 2,
+      col = shape$outline[i],
+      linejoin = shape$outline_join[i],
+      linemitre = shape$outline_mitre[i]
+    )
+  ))
 }

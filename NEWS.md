@@ -3,6 +3,9 @@
 * Size of `element_marquee()` is communicated similar to `element_text()` (#57)
 * You can now change the size by using a {.size ...} shortcut, e.g. {.30 BIG} to
   render `BIG` with font size 30
+* Added functionality to add outline to text as well as adding the `.out` style.
+  Outlines can be controlled with the `outline`, `outline_width`, `outline_join`
+  and `outline_mitre` style settings (#60)
 
 # marquee 1.0.0
 

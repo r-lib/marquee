@@ -24,6 +24,10 @@ style(
   border = NULL,
   border_size = NULL,
   border_radius = NULL,
+  outline = NULL,
+  outline_width = NULL,
+  outline_join = NULL,
+  outline_mitre = NULL,
   bullets = NULL,
   underline = NULL,
   strikethrough = NULL,
@@ -51,6 +55,10 @@ base_style(
   border = NA,
   border_size = trbl(0),
   border_radius = 0,
+  outline = NA,
+  outline_width = 1,
+  outline_join = "round",
+  outline_mitre = 10,
   bullets = marquee_bullets,
   underline = FALSE,
   strikethrough = FALSE,
@@ -126,6 +134,16 @@ the padding but not the margin}
 to \code{\link[=trbl]{trbl()}}}
 
 \item{border_radius}{The corner radius of the background, given in points}
+
+\item{outline}{The color of the outline stroke.}
+
+\item{outline_width}{The line width of the outline stroke.}
+
+\item{outline_join}{The line join type for the outline. Either \code{"round"},
+\code{"mitre"}, or \code{"bevel"}.}
+
+\item{outline_mitre}{The mitre limit (relative distance between inner and
+outer corner at a join) if \code{outline_join = "mitre"}.}
 
 \item{bullets}{A vector of strings to use for bullets in unordered lists.
 \code{marquee_bullets} provides a selection}

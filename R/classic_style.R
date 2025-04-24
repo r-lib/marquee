@@ -129,6 +129,7 @@ classic_style <- function(
     del = style(strikethrough = TRUE),
     img = style(align = "center", border = NA),
     sub = style(size = em(0.5), baseline = em(-0.2)),
-    sup = style(size = em(0.5), baseline = em(1))
+    sup = style(size = em(0.5), baseline = em(1)),
+    out = style(color = "#ffffff", outline = "#000000")
   )
 }
