@@ -103,7 +103,9 @@ guide_marquee <- function(
   order = 1
 ) {
   check_installed("ggplot2", version = "3.5.0")
-  if (!(ggplot2::is.theme(theme) || is.null(theme))) {
+
+  is_theme <- get0("is_theme", asNamespace("ggplot2"), ifnotfound = ggplot2::is.theme)
+  if (!(is_theme(theme) || is.null(theme))) {
     stop_input_type(theme, "a <theme>")
   }
   if (!is.null(position)) {
