@@ -62,7 +62,9 @@ element_marquee <- function(
   width = NULL,
   inherit.blank = FALSE
 ) {
-  if (!is.null(color)) colour <- color
+  if (!is.null(color)) {
+    colour <- color
+  }
   n <- max(
     length(family),
     length(colour),
@@ -115,7 +117,9 @@ element_grob.element_marquee <- function(
   width = NULL,
   ...
 ) {
-  if (is.null(label)) return(ggplot2::zeroGrob())
+  if (is.null(label)) {
+    return(ggplot2::zeroGrob())
+  }
   style <- style %||% element$style %||% classic_style()
   style <- modify_style(
     style,
@@ -147,7 +151,9 @@ element_grob.element_marquee <- function(
   }
 
   vjust <- vjust %||% element$vjust
-  if (all(as.numeric(margin)[c(1, 3)] == 0)) vjust <- ink(vjust)
+  if (all(as.numeric(margin)[c(1, 3)] == 0)) {
+    vjust <- ink(vjust)
+  }
   if (!is.null(margin)) {
     pad <- skip_inherit(trbl(
       if (margin_y) margin[1] else 0,
@@ -180,7 +186,9 @@ element_grob.element_marquee <- function(
   )
 
   if (xor(margin_x, margin_y)) {
-    if (margin_x) grob$full_height <- unit(1, "null")
+    if (margin_x) {
+      grob$full_height <- unit(1, "null")
+    }
     if (margin_y) grob$full_width <- unit(1, "null")
   }
 
@@ -228,7 +236,9 @@ on_load({
 #'
 marquefy_theme <- function(theme) {
   theme[] <- lapply(theme, function(elem) {
-    if (!inherits(elem, "element_text")) return(elem)
+    if (!inherits(elem, "element_text")) {
+      return(elem)
+    }
     style <- classic_style()
     if (!is.null(elem$face)) {
       if (elem$face %in% c("italic", "bold.italic")) {
