@@ -103,7 +103,9 @@ guide_marquee <- function(
   order = 1
 ) {
   check_installed("ggplot2", version = "3.5.0")
-  if (!(ggplot2::is.theme(theme) || is.null(theme))) {
+
+  is_theme <- get0("is_theme", asNamespace("ggplot2"), ifnotfound = ggplot2::is.theme)
+  if (!(is_theme(theme) || is.null(theme))) {
     stop_input_type(theme, "a <theme>")
   }
   if (!is.null(position)) {
@@ -256,7 +258,12 @@ on_load(on_package_load("ggplot2", {
 }))
 
 group_glyphs <- function(self, params, elems) {
-  n_layers <- length(params$decor) + 1
+
+  if ("class_ggplot" %in% getNamespaceExports("ggplot2")) {
+    n_layers <- 1
+  } else {
+    n_layers <- length(params$decor) + 1
+  }
   n_breaks <- params$n_breaks <- nrow(params$key)
   size <- convertUnit(unit(elems$title$size, "pt"), "cm", valueOnly = TRUE)
 
