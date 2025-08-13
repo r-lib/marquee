@@ -581,15 +581,17 @@ makeContext.marquee_grob <- function(x) {
       vjust = 1,
       direction = ifelse(shape$metrics$ltr[bullet_blocks], "ltr", "rtl")
     )
-    ## Inherit color and id from the relevant block
-    idx <- x$bullets$index[bshape$shape$metric_id]
-    bshape$shape$col <- x$text$color[idx]
-    bshape$shape$id <- x$text$id[idx]
-    bshape$shape$outline <- x$text$outline[idx]
-    bshape$shape$outline_width <- x$text$outline_width[idx]
-    bshape$shape$outline_join <- x$text$outline_join[idx]
-    bshape$shape$outline_mitre <- x$text$outline_mitre[idx]
   }
+
+  ## Inherit color and id from the relevant block
+  idx <- x$bullets$index[bshape$shape$metric_id]
+  bshape$shape$col <- x$text$color[idx]
+  bshape$shape$id <- x$text$id[idx]
+  bshape$shape$outline <- x$text$outline[idx]
+  bshape$shape$outline_width <- x$text$outline_width[idx]
+  bshape$shape$outline_join <- x$text$outline_join[idx]
+  bshape$shape$outline_mitre <- x$text$outline_mitre[idx]
+  
   # make rtl bullets left-justified
   bltr <- bshape$metrics$ltr[bshape$shape$metric_id]
   bshape$shape$x_offset[!bltr] <- bshape$shape$x_offset[!bltr] +

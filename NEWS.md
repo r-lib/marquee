@@ -11,6 +11,7 @@
   and contained multiple text spans (#54)
 * Fixed a bug in nested unordered bullet lists where the calculated bullet would
   be wrong (#53)
+* Fixed a bug when using ordered list
 
 # marquee 1.0.0
 
