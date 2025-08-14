@@ -57,6 +57,7 @@ the text and interpolate legend glyphs.</p>
 <span>  title <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/waiver.html" class="external-link">waiver</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  style <span class="op">=</span> <span class="fu">marquee</span><span class="fu">::</span><span class="fu"><a href="style.html">style</a></span><span class="op">(</span>background <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>  detect <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  theme <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"top"</span>,</span>
 <span>  override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -87,15 +88,26 @@ specifically. For <code>colour</code> or <code>fill</code> scales, the <code>col
 automatically detect labels and apply.</p></dd>
 
 
+<dt id="arg-width">width<a class="anchor" aria-label="anchor" href="#arg-width"></a></dt>
+<dd><p>The width of the textbox. If <code>NULL</code> it will take up the width of
+the panel, but due to issues with grid this might lead to an erroneous
+height calculation</p></dd>
+
+
 <dt id="arg-theme">theme<a class="anchor" aria-label="anchor" href="#arg-theme"></a></dt>
 <dd><p>A <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></code> object to style the guide individually or
 differently from the plot's theme settings. The <code>theme</code> argument in the
-guide overrides, and is combined with, the plot's theme.</p></dd>
+guide partially overrides, and is combined with, the plot's theme.
+Arguments that apply to a single legend are respected, most of which have
+the <code>legend</code>-prefix. Arguments that apply to combined legends
+(the legend box) are ignored, including <code>legend.position</code>,
+<code>legend.justification.*</code>, <code>legend.location</code> and <code>legend.box.*</code>.</p></dd>
 
 
 <dt id="arg-position">position<a class="anchor" aria-label="anchor" href="#arg-position"></a></dt>
 <dd><p>A character string indicating where the legend should be
-placed relative to the plot panels.</p></dd>
+placed relative to the plot panels.
+One of "top", "right", "bottom", "left", or "inside".</p></dd>
 
 
 <dt id="arg-override-aes">override.aes<a class="anchor" aria-label="anchor" href="#arg-override-aes"></a></dt>
