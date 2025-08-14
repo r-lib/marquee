@@ -13,6 +13,9 @@
 #'   `border` style properties are overridden when set as `NULL`, see examples.
 #' @param detect Either `FALSE` to typeset entirely through syntax or `TRUE` to
 #'   automatically detect labels and apply.
+#' @param width The width of the textbox. If `NULL` it will take up the width of
+#'   the panel, but due to issues with grid this might lead to an erroneous
+#'   height calculation
 #' @param override.aes A list specifying aesthetic parameters of the legend
 #'   keys. See details and examples in
 #'   [`?guide_legend`][ggplot2::guide_legend()].
@@ -97,6 +100,7 @@ guide_marquee <- function(
   # Note: prefixing namespace prevents recursive default argument
   style = marquee::style(background = NA),
   detect = FALSE,
+  width = NULL,
   theme = NULL,
   position = "top",
   override.aes = list(),
@@ -104,7 +108,11 @@ guide_marquee <- function(
 ) {
   check_installed("ggplot2", version = "3.5.0")
 
-  is_theme <- get0("is_theme", asNamespace("ggplot2"), ifnotfound = ggplot2::is.theme)
+  is_theme <- get0(
+    "is_theme",
+    asNamespace("ggplot2"),
+    ifnotfound = ggplot2::is.theme
+  )
   if (!(is_theme(theme) || is.null(theme))) {
     stop_input_type(theme, "a <theme>")
   }
@@ -124,6 +132,7 @@ guide_marquee <- function(
     detect = detect,
     position = position,
     style = style,
+    width = width,
     theme = theme,
     override.aes = override.aes,
     super = GuideMarquee
@@ -179,6 +188,7 @@ make_marquee_guide <- function() {
       order = 0,
       hash = character(),
       style = style(),
+      width = NULL,
       detect = FALSE,
       override.aes = list()
     ),
@@ -237,8 +247,9 @@ make_marquee_guide <- function() {
         label = text,
         width = width,
         margin_y = TRUE,
-        style = style
+        style = style,
       )
+      grob <- editGrob(grob, vp = viewport(just = "top"))
 
       gt <- gtable::gtable(widths = width, heights = grobHeight(grob))
       gtable::gtable_add_grob(
@@ -258,7 +269,6 @@ on_load(on_package_load("ggplot2", {
 }))
 
 group_glyphs <- function(self, params, elems) {
-
   if ("class_ggplot" %in% getNamespaceExports("ggplot2")) {
     n_layers <- 1
   } else {

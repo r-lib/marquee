@@ -196,14 +196,23 @@ marquee_grob <- function(
   }
   check_bool(force_body_margin)
 
-  if (!is.unit(x)) x <- unit(x, default.units)
-  if (!is.unit(y)) y <- unit(y, default.units)
+  if (!is.unit(x)) {
+    x <- unit(x, default.units)
+  }
+  if (!is.unit(y)) {
+    y <- unit(y, default.units)
+  }
   width <- width %||% unit(1, "npc")
-  if (!is.unit(width)) width <- unit(width, default.units)
+  if (!is.unit(width)) {
+    width <- unit(width, default.units)
+  }
 
   # Parse input
-  parsed <- if (!is_parsed(text)) marquee_parse(text, style, ignore_html) else
+  parsed <- if (!is_parsed(text)) {
+    marquee_parse(text, style, ignore_html)
+  } else {
     text
+  }
 
   # Add spacing for inline padding
   parsed <- add_inline_padding(parsed)
@@ -490,7 +499,9 @@ makeContext.marquee_grob <- function(x) {
     space_after = 0,
     direction = x$text$text_direction
   )
-  if (nrow(shape$shape) == 0) return(nullGrob())
+  if (nrow(shape$shape) == 0) {
+    return(nullGrob())
+  }
 
   # If any widths are not defined we grab the text widths from the shaping and start again
   if (anyNA(widths)) {
@@ -591,7 +602,7 @@ makeContext.marquee_grob <- function(x) {
   bshape$shape$outline_width <- x$text$outline_width[idx]
   bshape$shape$outline_join <- x$text$outline_join[idx]
   bshape$shape$outline_mitre <- x$text$outline_mitre[idx]
-  
+
   # make rtl bullets left-justified
   bltr <- bshape$metrics$ltr[bshape$shape$metric_id]
   bshape$shape$x_offset[!bltr] <- bshape$shape$x_offset[!bltr] +
@@ -616,8 +627,11 @@ makeContext.marquee_grob <- function(x) {
         shape$shape$y_offset[first] == max(shape$shape$y_offset[first])
       ]
       first <- first[
-        if (shape$metrics$ltr[i]) which.min(shape$shape$glyph[first]) else
+        if (shape$metrics$ltr[i]) {
+          which.min(shape$shape$glyph[first])
+        } else {
           which.max(shape$shape$glyph[first])
+        }
       ]
       added_height <- shape$shape$y_offset[first] -
         bshape$shape$y_offset[match(bullet_ind, bshape$shape$metric_id)]
@@ -659,8 +673,11 @@ makeContext.marquee_grob <- function(x) {
       heights[indent_stack[k]] <- heights[indent_stack[k]] + heights[i]
     }
 
-    next_indent <- if (i == length(x$blocks$start)) 1 else
+    next_indent <- if (i == length(x$blocks$start)) {
+      1
+    } else {
       x$blocks$indent[i + 1]
+    }
     if (indent > next_indent) {
       ### If exiting a block, add parent blocks bottom padding + margin to offset
       for (k in next_indent + seq_len(indent - next_indent) - 1) {
@@ -1103,8 +1120,9 @@ makeContent.marquee_grob <- function(x) {
           col = x$shape$col[need_bitmap]
         )
         raster_glyphs <- Map(
-          function(glyph, x, y)
-            systemfonts::glyph_raster_grob(glyph, x, y, interpolate = TRUE),
+          function(glyph, x, y) {
+            systemfonts::glyph_raster_grob(glyph, x, y, interpolate = TRUE)
+          },
           glyph = raster_glyphs,
           x = x$shape$x_offset[need_bitmap],
           y = x$shape$y_offset[need_bitmap]
@@ -1233,8 +1251,11 @@ makeContent.marquee_grob <- function(x) {
       inject(grobTree(
         !!!grobs,
         vp = viewport(
-          clip = if (utils::packageVersion("grid") < package_version("4.1.0"))
-            "on" else rect
+          clip = if (utils::packageVersion("grid") < package_version("4.1.0")) {
+            "on"
+          } else {
+            rect
+          }
         )
       ))
     })
@@ -1417,7 +1438,13 @@ outline_glyphs <- function(glyph_info, shape) {
   if (all(is.na(shape$outline))) {
     return(NULL)
   }
-  id <- vctrs::vec_group_loc(shape[, c("outline", "outline_width")])
+
+  id <- vctrs::vec_group_loc(shape[, c(
+    "outline",
+    "outline_width",
+    "outline_join",
+    "outline_mitre"
+  )])
   id <- id[!is.na(id$key$outline), ]
   outlines <- vector("list", nrow(id))
   for (idx in seq_along(outlines)) {

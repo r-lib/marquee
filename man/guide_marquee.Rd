@@ -8,6 +8,7 @@ guide_marquee(
   title = ggplot2::waiver(),
   style = marquee::style(background = NA),
   detect = FALSE,
+  width = NULL,
   theme = NULL,
   position = "top",
   override.aes = list(),
@@ -28,12 +29,21 @@ specifically. For \code{colour} or \code{fill} scales, the \code{color}, \code{b
 \item{detect}{Either \code{FALSE} to typeset entirely through syntax or \code{TRUE} to
 automatically detect labels and apply.}
 
+\item{width}{The width of the textbox. If \code{NULL} it will take up the width of
+the panel, but due to issues with grid this might lead to an erroneous
+height calculation}
+
 \item{theme}{A \code{\link[ggplot2:theme]{theme}} object to style the guide individually or
 differently from the plot's theme settings. The \code{theme} argument in the
-guide overrides, and is combined with, the plot's theme.}
+guide partially overrides, and is combined with, the plot's theme.
+Arguments that apply to a single legend are respected, most of which have
+the \code{legend}-prefix. Arguments that apply to combined legends
+(the legend box) are ignored, including \code{legend.position},
+\verb{legend.justification.*}, \code{legend.location} and \verb{legend.box.*}.}
 
 \item{position}{A character string indicating where the legend should be
-placed relative to the plot panels.}
+placed relative to the plot panels.
+One of "top", "right", "bottom", "left", or "inside".}
 
 \item{override.aes}{A list specifying aesthetic parameters of the legend
 keys. See details and examples in
