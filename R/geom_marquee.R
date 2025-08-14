@@ -8,6 +8,10 @@
 #' even then it might make sense to opt for this geom.
 #'
 #' @inheritParams ggplot2::geom_text
+#' @param If `FALSE`, overrides the default aesthetics, rather than combining
+#' with them. This is most useful for helper functions that define both data and
+#' aesthetics and shouldn't inherit behaviour from the default plot
+#' specification
 #'
 #' @return A ggplot2 layer that can be added to a plot
 #'
