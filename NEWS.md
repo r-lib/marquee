@@ -1,3 +1,5 @@
+# marquee (development version)
+
 # marquee 1.1.0
 
 * Size of `element_marquee()` is communicated similar to `element_text()` (#57)
