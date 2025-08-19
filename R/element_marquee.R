@@ -136,18 +136,18 @@ element_grob.element_marquee <- function(
   angle <- (angle %||% element$angle %||% 0) %% 360
 
   # Make sure margin doesn't rotate with element as that is how it works for element_text
+  new_margin_x <- margin_x
+  new_margin_y <- margin_y
   if (angle > 45 && angle <= 135) {
     margin <- margin[c(4, 1, 2, 3)]
-    tmp <- margin_y
-    margin_y <- margin_x
-    margin_x <- tmp
+    new_margin_x <- margin_y
+    new_margin_y <- margin_x
   } else if (angle > 135 && angle <= 225) {
     margin <- margin[c(3, 4, 1, 2)]
   } else if (angle > 225 && angle <= 315) {
     margin <- margin[c(2, 3, 4, 1)]
-    tmp <- margin_y
-    margin_y <- margin_x
-    margin_x <- tmp
+    new_margin_x <- margin_y
+    new_margin_y <- margin_x
   }
 
   vjust <- vjust %||% element$vjust
@@ -156,10 +156,10 @@ element_grob.element_marquee <- function(
   }
   if (!is.null(margin)) {
     pad <- skip_inherit(trbl(
-      if (margin_y) margin[1] else 0,
-      if (margin_x) margin[2] else 0,
-      if (margin_y) margin[3] else 0,
-      if (margin_x) margin[4] else 0
+      if (new_margin_y) margin[1] else 0,
+      if (new_margin_x) margin[2] else 0,
+      if (new_margin_y) margin[3] else 0,
+      if (new_margin_x) margin[4] else 0
     ))
     style <- modify_style(style, "body", padding = pad)
   }

@@ -1,5 +1,8 @@
 # marquee (development version)
 
+* Fixed a bug in `element_marquee()` that resulted in wrong width calculation
+  for rotated text
+
 # marquee 1.1.0
 
 * Size of `element_marquee()` is communicated similar to `element_text()` (#57)
