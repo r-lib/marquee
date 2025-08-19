@@ -233,11 +233,11 @@ make_marquee_guide <- function() {
       style <- elems$title$style %||% classic_style()
       style <- recolour_style(style, text, params)
 
-      if (params$position %in% c("top", "bottom")) {
-        width <- unit(1, "npc")
-      } else {
-        width <- ggplot2::calc_element("legend.key.width", theme) * 5
-      }
+      width <- elems$title$width %||% switch(
+        params$position,
+        top = , bottom = unit(1, "npc"),
+        ggplot2::calc_element("legend.key.width", theme) * 5
+      )
 
       # TODO: this is a hack until #24 is solved
       f <- element_grob.element_marquee
