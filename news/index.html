@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">marquee</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,16 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.1.0" id="marquee-110">marquee 1.1.0<a class="anchor" aria-label="anchor" href="#marquee-110"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.1.1" id="marquee-111">marquee 1.1.1<a class="anchor" aria-label="anchor" href="#marquee-111"></a></h2><p class="text-muted">CRAN release: 2025-08-27</p>
+<ul><li>Fixed a bug in <code><a href="../reference/element_marquee.html">element_marquee()</a></code> that resulted in wrong width calculation for rotated text (<a href="https://github.com/r-lib/marquee/issues/69" class="external-link">#69</a>)</li>
+<li>If image URLs doesn’t indicate image format marquee will attempt to sniff it</li>
+<li>Fixes an S7 compatibility issue with merge_element (<a href="https://github.com/r-lib/marquee/issues/83" class="external-link">#83</a>)</li>
+<li>marquee should no longer open a graphics device if none exists (<a href="https://github.com/r-lib/marquee/issues/75" class="external-link">#75</a>)</li>
+<li>
+<code><a href="../reference/element_marquee.html">element_marquee()</a></code> now works with factor input and will fall back to <code><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text()</a></code> for expressions (<a href="https://github.com/r-lib/marquee/issues/71" class="external-link">#71</a>)</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.0" id="marquee-110">marquee 1.1.0<a class="anchor" aria-label="anchor" href="#marquee-110"></a></h2><p class="text-muted">CRAN release: 2025-08-19</p>
 <ul><li>Size of <code><a href="../reference/element_marquee.html">element_marquee()</a></code> is communicated similar to <code><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text()</a></code> (<a href="https://github.com/r-lib/marquee/issues/57" class="external-link">#57</a>)</li>
 <li>You can now change the size by using a {.size …} shortcut, e.g. {.30 BIG} to render <code>BIG</code> with font size 30</li>
 <li>Added functionality to add outline to text as well as adding the <code>.out</code> style. Outlines can be controlled with the <code>outline</code>, <code>outline_width</code>, <code>outline_join</code> and <code>outline_mitre</code> style settings (<a href="https://github.com/r-lib/marquee/issues/60" class="external-link">#60</a>)</li>
