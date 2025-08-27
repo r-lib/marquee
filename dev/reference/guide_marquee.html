@@ -160,10 +160,6 @@ verbatim with the application of the <code>style</code> argument.</p></li>
 <span class="r-in"><span>    guide <span class="op">=</span> <span class="st">"marquee"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-plt img"><img src="guide_marquee-1.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Recolouring text</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">&lt;-</span> <span class="va">base</span> <span class="op">+</span></span></span>
@@ -173,28 +169,16 @@ verbatim with the application of the <code>style</code> argument.</p></li>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"marquee"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="guide_marquee-2.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Adjust display of labels</span></span></span>
 <span class="r-in"><span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="style.html">style</a></span><span class="op">(</span>weight <span class="op">=</span> <span class="st">"bold"</span>, italic <span class="op">=</span> <span class="cn">TRUE</span>, background <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu">guide_marquee</span><span class="op">(</span>style <span class="op">=</span> <span class="va">st</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="guide_marquee-3.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using background instead of text colour by setting it to NULL</span></span></span>
 <span class="r-in"><span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="style.html">style</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"black"</span>, background <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu">guide_marquee</span><span class="op">(</span>style <span class="op">=</span> <span class="va">st</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="guide_marquee-4.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Customising style of each label through style sets</span></span></span>
 <span class="r-in"><span><span class="co"># Note: tag names must be universal per `vctrs::vec_as_names` and</span></span></span>
@@ -205,39 +189,23 @@ verbatim with the application of the <code>style</code> argument.</p></li>
 <span class="r-in"><span>                   color <span class="op">=</span> <span class="st">"black"</span>, background <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu">guide_marquee</span><span class="op">(</span>style <span class="op">=</span> <span class="va">st</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="guide_marquee-5.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Alternatively:</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"marquee"</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.subtitle <span class="op">=</span> <span class="fu"><a href="element_marquee.html">element_marquee</a></span><span class="op">(</span>style <span class="op">=</span> <span class="va">st</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="guide_marquee-6.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Splicing in labels by number (!!2) or label (!!subcompact)</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">class</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"Cars including !!2 and !!subcompact vehicles"</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"marquee"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="guide_marquee-7.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using automatic detection</span></span></span>
 <span class="r-in"><span><span class="va">base</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">class</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"Cars including suv and minivan vehicles"</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu">guide_marquee</span><span class="op">(</span>detect <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="guide_marquee-8.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MUST CALL GRID</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
