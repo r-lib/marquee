@@ -25,7 +25,6 @@ as_bigpts <- function(x, width = TRUE) {
   type <- grid::unitType(x)
   val <- as.numeric(x) * bigpts_mod[match(type, bigpts_mod_unit)]
   if (anyNA(val)) {
-    cat("MUST CALL GRID\n")
     nas <- which(is.na(val))
     val[nas] <- if (width) convertWidth(x[nas], "bigpts", TRUE) else convertHeight(x[nas], "bigpts", TRUE)
   }
