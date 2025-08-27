@@ -151,6 +151,16 @@ calculating final element state.</p></dd>
     <p>An <code>element_marquee</code> object that can be used in place of
 <code>element_text</code> in ggplot2 theme specifications</p>
     </div>
+    <div class="section level2">
+    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
+    <p>grid, which marquee, ggplot2, etc are build upon contains a bug that
+means that the height of a grob is calculated before the grob knows it's
+width. The result of this is that if the width of an <code>element_marquee()</code> is
+<code>NULL</code> (the default), the text may overflow its allocated space with an
+additional line. Unfortunately there is no great fix for this, other than
+eyeball the width it has available and pass that to the element (e.g.
+<code>element_marquee(width = grid::unit(10, "cm"))</code>)</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
