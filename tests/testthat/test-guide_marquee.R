@@ -8,10 +8,13 @@ test_that("guide_marquee can interpolate legend glyphs", {
       name = "Glyph <<A>>, glyph <<2>> and <<C>>",
       guide = "marquee"
     )
+
+  png(tempfile())
   b <- ggplot2::ggplot_build(p)
   params <- b$plot$guides$get_params("shape")
 
   grob <- GuideMarquee$draw(ggplot2::theme_get(), params = params)$grobs[[1]]
+  dev.off()
 
   expect_equal(
     grob$text$text,
@@ -41,10 +44,14 @@ test_that("guide_marquee can recolour text", {
       name = "The quick !!2rown fox {.3 jumps} over the {.A lazy dog}",
       guide = "marquee"
     )
+
+  png(tempfile())
   b <- ggplot2::ggplot_build(p)
   params <- b$plot$guides$get_params("colour")
 
   grob <- GuideMarquee$draw(ggplot2::theme_get(), params = params)$grobs[[1]]
+    dev.off()
+
   expect_equal(
     grob$text$text,
     c("", "The quick ", "B", "rown fox ", "jumps", " over the ", "lazy dog", "")

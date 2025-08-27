@@ -93,10 +93,10 @@ is_modifier <- function(x)
 #' @rdname style_helpers
 #' @export
 trbl <- function(top = NULL, right = top, bottom = top, left = right) {
-  if (is.unit(top)) top <- convertHeight(top, "bigpts", TRUE)
-  if (is.unit(right)) right <- convertWidth(right, "bigpts", TRUE)
-  if (is.unit(bottom)) bottom <- convertHeight(bottom, "bigpts", TRUE)
-  if (is.unit(left)) left <- convertWidth(left, "bigpts", TRUE)
+  if (is.unit(top)) top <- as_bigpts(top, width = FALSE)
+  if (is.unit(right)) right <- as_bigpts(right)
+  if (is.unit(bottom)) bottom <- as_bigpts(bottom, width = FALSE)
+  if (is.unit(left)) left <- as_bigpts(left)
   if (!is.null(top) && !is_modifier(top))
     check_number_decimal(top, allow_null = TRUE)
   if (!is.null(right) && !is_modifier(right))

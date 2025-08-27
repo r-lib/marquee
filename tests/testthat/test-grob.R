@@ -3,11 +3,13 @@ test_that("grobs gets correctly constructed", {
   expect_s3_class(grob1, "marquee_grob")
   expect_false(inherits(grob1, "marquee_precalculated_grob"))
 
+  png(tempfile())
   grob2 <- marquee_grob(
     markdown_test,
     classic_style(lineheight = 1.1),
     width = unit(10, "cm")
   )
+  dev.off()
   expect_s3_class(grob2, "marquee_grob")
   expect_s3_class(grob2, "marquee_precalculated_grob")
 

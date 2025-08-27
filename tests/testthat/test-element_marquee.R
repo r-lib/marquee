@@ -23,6 +23,7 @@ test_that("element_marquee() observes customs around margin_x/margin_y", {
 
   elem <- element_marquee(margin = unit(c(1, 1, 1, 1), "bigpts"), hjust = 0.5, vjust = 0.5, angle = 0)
 
+  png(tempfile())
   width  <- function(x) convertWidth(grobWidth(x),   "bigpts", valueOnly = TRUE)
   height <- function(x) convertHeight(grobHeight(x), "bigpts", valueOnly = TRUE)
 
@@ -41,4 +42,5 @@ test_that("element_marquee() observes customs around margin_x/margin_y", {
   x <- element_grob.element_marquee(elem, "test", margin_x = FALSE, margin_y = FALSE)
   expect_gt(width(x), 0)
   expect_gt(height(x), 0)
+  dev.off()
 })

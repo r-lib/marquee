@@ -119,47 +119,80 @@ style <- function(
 ) {
   check_string(family, allow_null = TRUE)
 
-  if (is.character(weight)) weight <- systemfonts::as_font_weight(weight)
+  if (is.character(weight)) {
+    weight <- systemfonts::as_font_weight(weight)
+  }
   check_number_whole(weight, allow_null = TRUE)
-  if (!is.null(weight)) weight <- as.integer(weight)
+  if (!is.null(weight)) {
+    weight <- as.integer(weight)
+  }
 
   check_bool(italic, allow_null = TRUE)
 
-  if (is.character(width)) width <- systemfonts::as_font_width(width)
+  if (is.character(width)) {
+    width <- systemfonts::as_font_width(width)
+  }
   check_number_whole(width, allow_null = TRUE)
-  if (!is.null(width)) width <- as.integer(width)
+  if (!is.null(width)) {
+    width <- as.integer(width)
+  }
 
   if (!is.null(features) && !inherits(features, "font_feature")) {
     stop_input_type(features, "a font_feature object", allow_null = TRUE)
   }
 
-  if (inherits(size, "marquee_em")) size <- relative(size[[1]])
-  if (is.unit(size)) size <- convertHeight(size, "bigpts", FALSE)
-  if (!is_modifier(size)) check_number_decimal(size, allow_null = TRUE)
+  if (inherits(size, "marquee_em")) {
+    size <- relative(size[[1]])
+  }
+  if (is.unit(size)) {
+    size <- as_bigpts(size, width = FALSE)
+  }
+  if (!is_modifier(size)) {
+    check_number_decimal(size, allow_null = TRUE)
+  }
 
   check_string(color, allow_null = TRUE, allow_na = TRUE)
-  if (!is.null(color) && is.na(color)) color[] <- NA_character_
+  if (!is.null(color) && is.na(color)) {
+    color[] <- NA_character_
+  }
 
-  if (!is_relative(lineheight))
+  if (!is_relative(lineheight)) {
     check_number_decimal(lineheight, allow_null = TRUE)
+  }
 
   check_string(align, allow_null = TRUE)
 
-  if (!is_relative(tracking)) check_number_decimal(tracking, allow_null = TRUE)
+  if (!is_relative(tracking)) {
+    check_number_decimal(tracking, allow_null = TRUE)
+  }
 
-  if (is.unit(indent)) indent <- convertWidth(indent, "bigpts", FALSE)
-  if (!is_modifier(indent)) check_number_decimal(indent, allow_null = TRUE)
+  if (is.unit(indent)) {
+    indent <- as_bigpts(indent)
+  }
+  if (!is_modifier(indent)) {
+    check_number_decimal(indent, allow_null = TRUE)
+  }
 
-  if (is.unit(hanging)) hanging <- convertWidth(hanging, "bigpts", FALSE)
-  if (!is_modifier(hanging)) check_number_decimal(hanging, allow_null = TRUE)
+  if (is.unit(hanging)) {
+    hanging <- as_bigpts(hanging)
+  }
+  if (!is_modifier(hanging)) {
+    check_number_decimal(hanging, allow_null = TRUE)
+  }
 
-  if (is.null(margin)) margin <- trbl()
-  if (!is_trbl(margin))
+  if (is.null(margin)) {
+    margin <- trbl()
+  }
+  if (!is_trbl(margin)) {
     stop_input_type(margin, "a marquee_trbl object", allow_null = TRUE)
+  }
 
-  if (is.null(padding)) padding <- trbl()
-  if (!is_trbl(padding))
+  if (is.null(padding)) {
+    padding <- trbl()
+  }
+  if (!is_trbl(padding)) {
     stop_input_type(padding, "a marquee_trbl object", allow_null = TRUE)
+  }
 
   if (!inherits(background, "GridPattern")) {
     check_string(unclass(background), allow_null = TRUE, allow_na = TRUE)
@@ -167,26 +200,37 @@ style <- function(
   }
 
   check_string(border, allow_null = TRUE, allow_na = TRUE)
-  if (!is.null(border) && is.na(border)) border[] <- NA_character_
+  if (!is.null(border) && is.na(border)) {
+    border[] <- NA_character_
+  }
 
-  if (is.null(border_size)) border_size <- trbl()
-  if (!is_trbl(border_size))
+  if (is.null(border_size)) {
+    border_size <- trbl()
+  }
+  if (!is_trbl(border_size)) {
     stop_input_type(border_size, "a marquee_trbl object", allow_null = TRUE)
+  }
 
-  if (is.unit(border_radius))
-    border_radius <- convertWidth(border_radius, "bigpts", FALSE)
-  if (!is_modifier(border_radius))
+  if (is.unit(border_radius)) {
+    border_radius <- as_bigpts(border_radius)
+  }
+  if (!is_modifier(border_radius)) {
     check_number_decimal(border_radius, allow_null = TRUE)
+  }
 
   check_string(outline, allow_null = TRUE, allow_na = TRUE)
-  if (!is.null(outline) && is.na(outline)) outline[] <- NA_character_
+  if (!is.null(outline) && is.na(outline)) {
+    outline[] <- NA_character_
+  }
 
-  if (is.unit(outline_width))
-    outline_width <- convertHeight(size, "bigpts", FALSE)
+  if (is.unit(outline_width)) {
+    outline_width <- as_bigpts(outline_width)
+  }
 
   check_string(outline_join, allow_null = TRUE)
-  if (!is.null(outline_join))
+  if (!is.null(outline_join)) {
     outline_join <- arg_match0(outline_join, c("round", "mitre", "bevel"))
+  }
 
   check_number_decimal(
     outline_mitre,
@@ -205,7 +249,9 @@ style <- function(
 
   check_string(text_direction, allow_null = TRUE)
 
-  if (!is_modifier(baseline)) check_number_decimal(baseline, allow_null = TRUE)
+  if (!is_modifier(baseline)) {
+    check_number_decimal(baseline, allow_null = TRUE)
+  }
 
   structure(
     list(
@@ -256,7 +302,9 @@ is_style <- function(x) inherits(x, "marquee_style")
 #' @export
 format.marquee_style <- function(x, ...) {
   defined_options <- x[!vapply(x, is.null, logical(1))]
-  if (length(defined_options) == 0) return(character())
+  if (length(defined_options) == 0) {
+    return(character())
+  }
   options <- format(
     names(defined_options),
     width = max(nchar(names(defined_options))),

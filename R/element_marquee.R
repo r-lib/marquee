@@ -213,6 +213,20 @@ on_load({
       asNamespace("ggplot2")
     )
   )
+  if (requireNamespace("ggplot2", quietly = TRUE)) {
+    if (S7::S7_inherits(ggplot2::element_text)) {
+      merge_element <- ggplot2::merge_element
+      S7::method(
+        merge_element,
+        list(ggplot2::element_text, S7::new_S3_class("element_marquee"))
+      ) <- function(new, old) {
+        idx <- lengths(S7::props(new)) == 0
+        idx <- names(idx[idx])
+        S7::props(new)[idx] <- unclass(old)[idx]
+        new
+      }
+    }
+  }
 })
 
 #' Convert all text elements in a theme to marquee elements
@@ -327,3 +341,4 @@ rotate_just <- function(angle, hjust, vjust) {
     )
   )
 }
+

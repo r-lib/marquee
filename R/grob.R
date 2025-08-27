@@ -336,10 +336,12 @@ marquee_grob <- function(
   )
   # Check if we can do all calculations upfront
   if (
-    all(
-      is.na(grob$width) |
-        !unitType(absolute.size(grob$width)) %in% c("null", "sum", "min", "max")
-    )
+    dev.cur() != 1 &&
+      all(
+        is.na(grob$width) |
+          !unitType(absolute.size(grob$width)) %in%
+            c("null", "sum", "min", "max")
+      )
   ) {
     grob <- makeContent.marquee_grob(makeContext.marquee_grob(grob))
     class(grob) <- c("marquee_precalculated_grob", class(grob))
@@ -354,8 +356,8 @@ makeContext.marquee_grob <- function(x) {
   # of the viewport for conversion
   width <- ifelse(
     findInterval(x$angle, c(0, c(0, 90, 180, 270) + 45)) %% 2 == 1,
-    convertWidth(x$width, "bigpts", TRUE),
-    convertHeight(x$width, "bigpts", TRUE)
+    as_bigpts(x$width),
+    as_bigpts(x$width, width = FALSE)
   )
 
   # Calculate width of each block
@@ -429,7 +431,7 @@ makeContext.marquee_grob <- function(x) {
       }
     } else {
       ### Grob has a width. Use that unless it exceeds the block width
-      true_width <- convertWidth(vp$width, "bigpts", TRUE)
+      true_width <- as_bigpts(vp$width)
       width <- min(widths[x$text$block[images$index[i]]], true_width)
       scale <- width / true_width
     }
@@ -450,8 +452,8 @@ makeContext.marquee_grob <- function(x) {
         height <- width / x$text$img_asp[images$index[i]]
       }
     } else {
-      ### Grob has width. We use that but scale it based on width downscaling
-      height <- convertWidth(vp$height, "bigpts", TRUE) * scale
+      ### Grob has height We use that but scale it based on width downscaling
+      height <- as_bigpts(vp$height, width = FALSE) * scale
     }
     ## Set dimensions in size and tracking (this is how it is passed to textshaping)
     size[images$index[i]] <- height
@@ -488,13 +490,10 @@ makeContext.marquee_grob <- function(x) {
     align = x$text$align,
     hjust = 0,
     vjust = 1,
-    max_width = rep(
-      convertWidth(unit(widths, "bigpts"), "inches", TRUE),
-      x$blocks$length
-    ),
+    max_width = rep(widths / 72, x$blocks$length),
     tracking = tracking,
-    indent = convertWidth(unit(x$text$indent, "bigpts"), "inches", TRUE),
-    hanging = convertWidth(unit(x$text$hanging, "bigpts"), "inches", TRUE),
+    indent = x$text$indent / 72, # These values are provided as bigpts by the style
+    hanging = x$text$hanging / 72,
     space_before = 0,
     space_after = 0,
     direction = x$text$text_direction

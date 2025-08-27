@@ -14,7 +14,9 @@ test_that("images are picked up", {
 
   image_locs <- c(logo, "grob", "gg", "patch", "table", unknown)
 
+  png(tempfile())
   imgs <- images_as_grobs(image_locs)
+  dev.off()
 
   expect_type(imgs, "list")
   expect_s3_class(imgs[[1]], "rastergrob")

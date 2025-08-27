@@ -8,7 +8,9 @@ test_that("geom_marquee inserts the aesthetics correctly", {
       fill = "blue",
       size.unit = "Pt"
     )
+  png(tempfile())
   p <- ggplot2::ggplotGrob(p)
+  dev.off()
   grob <- p$grobs[[which(p$layout$name == "panel")]]$children[[3]]
 
   expect_equal(grob$text$family[1], "serif")
