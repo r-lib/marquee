@@ -10,6 +10,14 @@
 #' small shifts in the visuals when going from `element_text()` to
 #' `element_marquee()` as size reporting may differ between the two elements.
 #'
+#' @note grid, which marquee, ggplot2, etc are build upon contains a bug that
+#' means that the height of a grob is calculated before the grob knows it's
+#' width. The result of this is that if the width of an `element_marquee()` is
+#' `NULL` (the default), the text may overflow its allocated space with an
+#' additional line. Unfortunately there is no great fix for this, other than
+#' eyeball the width it has available and pass that to the element (e.g.
+#' `element_marquee(width = grid::unit(10, "cm"))`)
+#'
 #' @param family The font family of the base style
 #' @param colour,color The font colour of the base style
 #' @param size The font size of the base style
