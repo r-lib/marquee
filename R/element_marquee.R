@@ -128,6 +128,29 @@ element_grob.element_marquee <- function(
   if (is.null(label)) {
     return(ggplot2::zeroGrob())
   }
+  if (is.expression(label)) {
+    element$style <- NULL
+    element$width <- NULL
+    return(ggplot2::element_grob(
+      inject(element_text(
+        !!!element
+      )),
+      label,
+      x = x,
+      y = y,
+      family = family,
+      colour = colour,
+      size = size,
+      hjust = hjust,
+      vjust = vjust,
+      angle = angle,
+      lineheight = lineheight,
+      margin = margin,
+      margin_x = margin_x,
+      margin_y = margin_y
+    ))
+  }
+  label <- as.character(label)
   style <- style %||% element$style %||% classic_style()
   style <- modify_style(
     style,
@@ -341,4 +364,3 @@ rotate_just <- function(angle, hjust, vjust) {
     )
   )
 }
-
