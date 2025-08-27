@@ -2,6 +2,7 @@
 
 * Fixed a bug in `element_marquee()` that resulted in wrong width calculation
   for rotated text
+* If image URLs doesn't indicate image format marquee will attempt to sniff it
 
 # marquee 1.1.0
 

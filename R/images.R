@@ -3,10 +3,36 @@ images_as_grobs <- function(paths, env = caller_env()) {
   is_jpeg <- grepl("\\w\\.jpe?g$", paths)
   is_svg <- grepl("\\w\\.svg$", paths)
   lapply(seq_along(paths), function(i) {
-    if (grepl("^https?://", paths[i])) {
-      temp_loc <- tempfile()
-      utils::download.file(paths[i], temp_loc, quiet = TRUE)
-      paths[i] <- temp_loc
+    if (!is_png[i] && !is_jpeg[i] && !is_svg[i]) {
+      if (grepl("^https?://", paths[i])) {
+        temp_loc <- tempfile()
+        utils::download.file(paths[i], temp_loc, quiet = TRUE)
+        paths[i] <- temp_loc
+      }
+    }
+    if (!is_png[i] && !is_jpeg[i] && !is_svg[i]) {
+      is_png[i] <- tryCatch(
+        {
+          png::readPNG(paths[i])
+          TRUE
+        },
+        error = function(...) FALSE
+      )
+      if (!is_png[i]) {
+        is_jpeg[i] <- tryCatch(
+          {
+            jpeg::readJPEG(paths[i])
+            TRUE
+          },
+          error = function(...) FALSE
+        )
+      }
+      if (!is_png[i] && !is_jpeg[i]) {
+        is_svg[i] <- suppressWarnings(grepl(
+          "^<svg",
+          readLines(paths[i], n = 1)
+        ))
+      }
     }
     obj <- NULL
     if (is_png[i]) {
@@ -23,7 +49,7 @@ images_as_grobs <- function(paths, env = caller_env()) {
       check_installed("rsvg")
       svg <- suppressWarnings(charToRaw(paste0(
         trimws(readLines(paths[i])),
-        collapse = ""
+        collapse = "\n"
       )))
       obj <- try_fetch(
         rsvg::rsvg_nativeraster(svg, width = 500),
@@ -68,8 +94,11 @@ missing_grob <- function() {
       gp = gpar(col = "black", fill = NA, lwd = 4)
     ),
     vp = viewport(
-      clip = if (utils::packageVersion("grid") < package_version("4.1.0"))
-        "on" else rectGrob()
+      clip = if (utils::packageVersion("grid") < package_version("4.1.0")) {
+        "on"
+      } else {
+        rectGrob()
+      }
     ),
     cl = "missing_grob"
   )
