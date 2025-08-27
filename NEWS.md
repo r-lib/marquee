@@ -1,8 +1,10 @@
 # marquee (development version)
 
 * Fixed a bug in `element_marquee()` that resulted in wrong width calculation
-  for rotated text
+  for rotated text (#69)
 * If image URLs doesn't indicate image format marquee will attempt to sniff it
+* Fixes an S7 compatibility issue with merge_element (#83)
+* marquee should no longer open a graphics device if none exists (#75)
 
 # marquee 1.1.0
 
