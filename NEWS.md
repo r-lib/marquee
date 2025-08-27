@@ -1,3 +1,5 @@
+# marquee (development version)
+
 # marquee 1.1.1
 
 * Fixed a bug in `element_marquee()` that resulted in wrong width calculation
