@@ -28,10 +28,10 @@ images_as_grobs <- function(paths, env = caller_env()) {
         )
       }
       if (!is_png[i] && !is_jpeg[i]) {
-        is_svg[i] <- suppressWarnings(grepl(
-          "^<svg",
-          readLines(paths[i], n = 1)
-        ))
+        is_svg[i] <- tryCatch(
+          suppressWarnings(grepl("^<svg", readLines(paths[i], n = 1))),
+          error = function(...) FALSE
+        )
       }
     }
     obj <- NULL
