@@ -137,7 +137,9 @@ Contrary to the standard text and label geoms, \code{geom_marquee()} takes a
 default value (\code{NA}) lets the text run as long as it want's (honoring hard
 breaks), but setting this to something else will instruct marquee to use at
 most that amount of space. You can use grid units to set it to an absolute
-amount.
+amount. The default means that if the label contains no text at all (e.g. it
+is only an image tag) then the width is zero and the content disappears. In
+that case, you must provide a width.
 }
 \examples{
 \dontshow{if (rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
