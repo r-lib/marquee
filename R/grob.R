@@ -336,7 +336,7 @@ marquee_grob <- function(
   )
   # Check if we can do all calculations upfront
   if (
-    dev.cur() != 1 &&
+    grDevices::dev.cur() != 1 &&
       all(
         is.na(grob$width) |
           !unitType(absolute.size(grob$width)) %in%

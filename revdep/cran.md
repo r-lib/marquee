@@ -1,5 +1,3 @@
-patch release with fixes for a few regressions and bugs
-
 ## revdepcheck results
 
 We checked 1 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.

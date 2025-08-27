@@ -132,7 +132,7 @@ element_grob.element_marquee <- function(
     element$style <- NULL
     element$width <- NULL
     return(ggplot2::element_grob(
-      inject(element_text(
+      inject(ggplot2::element_text(
         !!!element
       )),
       label,
