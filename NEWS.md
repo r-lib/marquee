@@ -2,6 +2,8 @@
 
 * Better vectorisation of style_set and classic_style
 * Renamed `border_size` to `border_width` for consistency
+* Added `border_type` and `outline_type` styles to control the linetype of
+  borders and outlines
 
 # marquee 1.1.1
 

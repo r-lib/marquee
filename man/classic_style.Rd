@@ -69,9 +69,15 @@ made with \code{grid::linearGradient()}/\code{grid::radialGradient()}/\code{grid
 the padding but not the margin}
     \item{\code{border_width}}{The line width of the background stroke, given as a call
 to \code{\link[=trbl]{trbl()}}}
+    \item{\code{border_type}}{The linetype of the background stroke, given as an an
+\code{lty} compatible value (See the \emph{Line Type Specification} section in
+\link[graphics:par]{par})}
     \item{\code{border_radius}}{The corner radius of the background, given in points}
     \item{\code{outline}}{The color of the outline stroke.}
     \item{\code{outline_width}}{The line width of the outline stroke.}
+    \item{\code{outline_type}}{The linetype of the outline stroke, given as an an
+\code{lty} compatible value (See the \emph{Line Type Specification} section in
+\link[graphics:par]{par})}
     \item{\code{outline_join}}{The line join type for the outline. Either \code{"round"},
 \code{"mitre"}, or \code{"bevel"}.}
     \item{\code{outline_mitre}}{The mitre limit (relative distance between inner and

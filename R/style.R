@@ -54,9 +54,15 @@
 #' the padding but not the margin
 #' @param border_width The line width of the background stroke, given as a call
 #' to [trbl()]
+#' @param border_type The linetype of the background stroke, given as an an
+#' `lty` compatible value (See the *Line Type Specification* section in
+#' [par][graphics::par])
 #' @param border_radius The corner radius of the background, given in points
 #' @param outline The color of the outline stroke.
 #' @param outline_width The line width of the outline stroke.
+#' @param outline_type The linetype of the outline stroke, given as an an
+#' `lty` compatible value (See the *Line Type Specification* section in
+#' [par][graphics::par])
 #' @param outline_join The line join type for the outline. Either `"round"`,
 #' `"mitre"`, or `"bevel"`.
 #' @param outline_mitre The mitre limit (relative distance between inner and
@@ -108,9 +114,11 @@ style <- function(
   background = NULL,
   border = NULL,
   border_width = NULL,
+  border_type = NULL,
   border_radius = NULL,
   outline = NULL,
   outline_width = NULL,
+  outline_type = NULL,
   outline_join = NULL,
   outline_mitre = NULL,
   bullets = NULL,
@@ -209,7 +217,11 @@ style <- function(
   }
 
   if (lifecycle::is_present(border_size)) {
-    lifecycle::deprecate_soft("1.1.2", "style(border_size)", "style(border_width)")
+    lifecycle::deprecate_soft(
+      "1.1.2",
+      "style(border_size)",
+      "style(border_width)"
+    )
     border_width <- border_size
   }
 
@@ -218,6 +230,22 @@ style <- function(
   }
   if (!is_trbl(border_width)) {
     stop_input_type(border_width, "a marquee_trbl object", allow_null = TRUE)
+  }
+
+  if (!is.null(border_type)) {
+    if (is.character(border_type)) {
+      check_string(border_type)
+      if (
+        !border_type %in% linetype_names &&
+          nchar(border_type) %in% c(2, 4, 6, 8) &&
+          !grepl("^[a-fA-F0-9]{2,8}$", border_type)
+      ) {
+        stop_input_type(border_type, "a valid lty value", allow_null = TRUE)
+      }
+    } else {
+      check_number_whole(border_type, min = 1, max = 6)
+      border_type <- linetype_names[border_type + 1]
+    }
   }
 
   if (is.unit(border_radius)) {
@@ -234,6 +262,22 @@ style <- function(
 
   if (is.unit(outline_width)) {
     outline_width <- as_bigpts(outline_width)
+  }
+
+  if (!is.null(outline_type)) {
+    if (is.character(outline_type)) {
+      check_string(outline_type)
+      if (
+        !outline_type %in% linetype_names &&
+          nchar(outline_type) %in% c(2, 4, 6, 8) &&
+          !grepl("^[a-fA-F0-9]+$", outline_type)
+      ) {
+        stop_input_type(outline_type, "a valid lty value", allow_null = TRUE)
+      }
+    } else {
+      check_number_whole(outline_type, min = 1, max = 6)
+      outline_type <- linetype_names[outline_type + 1]
+    }
   }
 
   check_string(outline_join, allow_null = TRUE)
@@ -290,9 +334,11 @@ style <- function(
       border_width_right = border_width[[2]],
       border_width_bottom = border_width[[3]],
       border_width_left = border_width[[4]],
+      border_type = border_type,
       border_radius = border_radius,
       outline = outline,
       outline_width = outline_width,
+      outline_type = outline_type,
       outline_join = outline_join,
       outline_mitre = outline_mitre,
       bullets = bullets,
@@ -393,9 +439,11 @@ base_style <- function(
   background = NA,
   border = NA,
   border_width = trbl(0),
+  border_type = "solid",
   border_radius = 0,
   outline = NA,
   outline_width = 1,
+  outline_type = "solid",
   outline_join = "round",
   outline_mitre = 10,
   bullets = marquee_bullets,
@@ -407,7 +455,11 @@ base_style <- function(
   border_size = deprecated()
 ) {
   if (lifecycle::is_present(border_size)) {
-    lifecycle::deprecate_soft("1.1.2", "base_style(border_size)", "base_style(border_width)")
+    lifecycle::deprecate_soft(
+      "1.1.2",
+      "base_style(border_size)",
+      "base_style(border_width)"
+    )
     border_width <- border_size
   }
   style(
@@ -428,9 +480,11 @@ base_style <- function(
     background = background,
     border = border,
     border_width = border_width,
+    border_type = border_type,
     border_radius = border_radius,
     outline = outline,
     outline_width = outline_width,
+    outline_type = outline_type,
     outline_join = outline_join,
     outline_mitre = outline_mitre,
     bullets = bullets,
@@ -441,3 +495,13 @@ base_style <- function(
     text_direction = text_direction
   )
 }
+
+linetype_names <- c(
+  "blank",
+  "solid",
+  "dashed",
+  "dotted",
+  "dotdash",
+  "longdash",
+  "twodash"
+)

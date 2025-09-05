@@ -23,9 +23,11 @@ style(
   background = NULL,
   border = NULL,
   border_width = NULL,
+  border_type = NULL,
   border_radius = NULL,
   outline = NULL,
   outline_width = NULL,
+  outline_type = NULL,
   outline_join = NULL,
   outline_mitre = NULL,
   bullets = NULL,
@@ -55,9 +57,11 @@ base_style(
   background = NA,
   border = NA,
   border_width = trbl(0),
+  border_type = "solid",
   border_radius = 0,
   outline = NA,
   outline_width = 1,
+  outline_type = "solid",
   outline_join = "round",
   outline_mitre = 10,
   bullets = marquee_bullets,
@@ -135,11 +139,19 @@ the padding but not the margin}
 \item{border_width}{The line width of the background stroke, given as a call
 to \code{\link[=trbl]{trbl()}}}
 
+\item{border_type}{The linetype of the background stroke, given as an an
+\code{lty} compatible value (See the \emph{Line Type Specification} section in
+\link[graphics:par]{par})}
+
 \item{border_radius}{The corner radius of the background, given in points}
 
 \item{outline}{The color of the outline stroke.}
 
 \item{outline_width}{The line width of the outline stroke.}
+
+\item{outline_type}{The linetype of the outline stroke, given as an an
+\code{lty} compatible value (See the \emph{Line Type Specification} section in
+\link[graphics:par]{par})}
 
 \item{outline_join}{The line join type for the outline. Either \code{"round"},
 \code{"mitre"}, or \code{"bevel"}.}

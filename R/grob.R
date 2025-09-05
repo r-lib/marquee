@@ -889,7 +889,8 @@ makeContext.marquee_grob <- function(x) {
     left = x$text$border_width_left[x$blocks$start[block_bg]],
     right = x$text$border_width_right[x$blocks$start[block_bg]],
     top = x$text$border_width_top[x$blocks$start[block_bg]],
-    bottom = x$text$border_width_bottom[x$blocks$start[block_bg]]
+    bottom = x$text$border_width_bottom[x$blocks$start[block_bg]],
+    lty = x$text$border_type[x$blocks$start[block_bg]]
   )
 
   ## Handle span backgrounds
@@ -948,7 +949,8 @@ makeContext.marquee_grob <- function(x) {
     r = c(block_rects$r, x$text$border_radius[span_rects[, 1]]),
     left = c(block_rects$left, x$text$border_width_left[span_rects[, 1]]),
     right = c(block_rects$right, x$text$border_width_right[span_rects[, 1]]),
-    top = c(block_rects$top, x$text$border_width_top[span_rects[, 1]]),
+    bottom = c(block_rects$bottom, x$text$border_width_bottom[span_rects[, 1]]),
+    lty = c(block_rects$lty, x$text$border_type[span_rects[, 1]])
     bottom = c(block_rects$bottom, x$text$border_width_bottom[span_rects[, 1]])
   )
 
@@ -1154,7 +1156,8 @@ makeContent.marquee_grob <- function(x) {
           gp = gpar(
             fill = x$rects$fill[[i]],
             col = if (single_stroke) x$rects$col[i] else NA,
-            lwd = x$rects$left[i] * 2 #### We double it as we clip the outer part away
+            lwd = x$rects$left[i] * 2, #### We double it as we clip the outer part away
+            lty = x$rects$lty[i]
           )
         )
       } else {
@@ -1168,7 +1171,8 @@ makeContent.marquee_grob <- function(x) {
           gp = gpar(
             fill = x$rects$fill[[i]],
             col = if (single_stroke) x$rects$col[i] else NA,
-            lwd = x$rects$left[i] * 2
+            lwd = x$rects$left[i] * 2,
+            lty = x$rects$lty[i]
           )
         )
       }
@@ -1192,7 +1196,8 @@ makeContent.marquee_grob <- function(x) {
               gp = gpar(
                 col = x$rects$col[i],
                 lwd = x$rects$left[i] * 2,
-                lineend = "square"
+                lineend = "square",
+                lty = x$rects$lty[i]
               )
             ))
           )
@@ -1208,7 +1213,8 @@ makeContent.marquee_grob <- function(x) {
               gp = gpar(
                 col = x$rects$col[i],
                 lwd = x$rects$right[i] * 2,
-                lineend = "square"
+                lineend = "square",
+                lty = x$rects$lty[i]
               )
             ))
           )
@@ -1224,7 +1230,8 @@ makeContent.marquee_grob <- function(x) {
               gp = gpar(
                 col = x$rects$col[i],
                 lwd = x$rects$top[i] * 2,
-                lineend = "square"
+                lineend = "square",
+                lty = x$rects$lty[i]
               )
             ))
           )
@@ -1240,7 +1247,8 @@ makeContent.marquee_grob <- function(x) {
               gp = gpar(
                 col = x$rects$col[i],
                 lwd = x$rects$bottom[i] * 2,
-                lineend = "square"
+                lineend = "square",
+                lty = x$rects$lty[i]
               )
             ))
           )
@@ -1389,7 +1397,10 @@ has_identical_background <- function(a, b, style) {
           ) &&
             identical(style$border_width_top[a], style$border_width_top[b]) &&
             identical(style$border_width_left[a], style$border_width_left[b]) &&
-            identical(style$border_width_right[a], style$border_width_right[b])))
+            identical(
+              style$border_width_right[a],
+              style$border_width_right[b]
+            )))
     },
     a = a,
     b = b
@@ -1441,6 +1452,7 @@ outline_glyphs <- function(glyph_info, shape) {
   id <- vctrs::vec_group_loc(shape[, c(
     "outline",
     "outline_width",
+    "outline_type",
     "outline_join",
     "outline_mitre"
   )])
@@ -1451,6 +1463,7 @@ outline_glyphs <- function(glyph_info, shape) {
     outline$glyphs <- outline$glyphs[id$loc[[idx]], , drop = FALSE]
     outline_gp <- gpar(
       lwd = id$key$outline_width[idx] * 2,
+      lty = id$key$outline_type[idx],
       col = id$key$outline[idx],
       linejoin = id$key$outline_join[idx],
       linemitre = id$key$outline_mitre[idx]

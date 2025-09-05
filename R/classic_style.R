@@ -87,7 +87,8 @@ classic_style <- function(
         margin = trbl(em(1), NULL, NULL, NULL),
         padding = trbl(0, 0, em(0.3)),
         border = "#eeeeee",
-        border_width = trbl(0, 0, rem(1 / 16))
+        border_width = trbl(0, 0, rem(1 / 16)),
+        border_type = "solid"
       ),
       h2 = style(
         family = header_font,
@@ -97,7 +98,8 @@ classic_style <- function(
         margin = trbl(em(1), NULL, NULL, NULL),
         padding = trbl(0, 0, em(0.3)),
         border = "#eeeeee",
-        border_width = trbl(0, 0, rem(1 / 16))
+        border_width = trbl(0, 0, rem(1 / 16)),
+        border_type = "solid"
       ),
       h3 = style(
         family = header_font,
