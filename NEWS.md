@@ -1,3 +1,5 @@
+# marquee (development version)
+
 # marquee 1.2.0
 
 * Better vectorisation of style_set and classic_style
