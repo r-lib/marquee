@@ -1,6 +1,7 @@
 # marquee (development version)
 
 * Better vectorisation of style_set and classic_style
+* Renamed `border_size` to `border_width` for consistency
 
 # marquee 1.1.1
 

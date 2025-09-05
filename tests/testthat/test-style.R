@@ -141,13 +141,13 @@ test_that("style checks it's inputs", {
   expect_type(s$border, "character")
 
   # Border size
-  expect_silent(s <- style(border_size = trbl(1, relative(2), em(3), rem(4))))
-  expect_equal(s$border_size_top, 1)
-  expect_equal(s$border_size_right, relative(2))
-  expect_equal(s$border_size_bottom, em(3))
-  expect_equal(s$border_size_left, rem(4))
-  expect_snapshot_error(style(border_size = "A"))
-  expect_snapshot_error(style(border_size = TRUE))
+  expect_silent(s <- style(border_width = trbl(1, relative(2), em(3), rem(4))))
+  expect_equal(s$border_width_top, 1)
+  expect_equal(s$border_width_right, relative(2))
+  expect_equal(s$border_width_bottom, em(3))
+  expect_equal(s$border_width_left, rem(4))
+  expect_snapshot_error(style(border_width = "A"))
+  expect_snapshot_error(style(border_width = TRUE))
 
   # Border radius
   expect_silent(s <- style(border_radius = 9))

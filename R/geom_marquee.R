@@ -59,7 +59,7 @@
 #'   "body",
 #'   padding = skip_inherit(trbl(4)),
 #'   border = "black",
-#'   border_size = skip_inherit(trbl(1)),
+#'   border_width = skip_inherit(trbl(1)),
 #'   border_radius = 3
 #' )
 #' p + geom_marquee(aes(label = rownames(mtcars), fill = gear), style = label_style)

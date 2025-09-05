@@ -78,7 +78,7 @@
 #' # prefixed with `lab_`.
 #' st <- classic_style()
 #' st <- modify_style(st, tag = "lab_f", background = NULL, color = "black")
-#' st <- modify_style(st, tag = "lab_r", border_size = trbl(1),
+#' st <- modify_style(st, tag = "lab_r", border_width = trbl(1),
 #'                    color = "black", background = NA)
 #' base + guides(colour = guide_marquee(style = st))
 #'

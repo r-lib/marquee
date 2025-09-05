@@ -2,8 +2,9 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @useDynLib marquee, .registration = TRUE
-#' @import rlang
 #' @import grid
+#' @import rlang
+#' @importFrom lifecycle deprecated
+#' @useDynLib marquee, .registration = TRUE
 ## usethis namespace: end
 NULL

@@ -262,8 +262,8 @@ marquee_grob <- function(
     function(x) !(is.character(x) && is.na(x[1])),
     logical(1)
   )
-  has_top <- !is.na(parsed$border) & parsed$border_size_top != 0
-  has_bottom <- !is.na(parsed$border) & parsed$border_size_bottom != 0
+  has_top <- !is.na(parsed$border) & parsed$border_width_top != 0
+  has_bottom <- !is.na(parsed$border) & parsed$border_width_bottom != 0
   for (root in blocks$start[blocks$indent == 1]) {
     block_tree <- collect_children(
       root,
@@ -868,10 +868,10 @@ makeContext.marquee_grob <- function(x) {
     logical(1)
   ) |
     (!is.na(x$text$border) &
-      (x$text$border_size_bottom > 0 |
-        x$text$border_size_top > 0 |
-        x$text$border_size_left > 0 |
-        x$text$border_size_right > 0))
+      (x$text$border_width_bottom > 0 |
+        x$text$border_width_top > 0 |
+        x$text$border_width_left > 0 |
+        x$text$border_width_right > 0))
 
   ## Handle block backgrounds
   block_bg <- has_deco[x$blocks$start]
@@ -886,10 +886,10 @@ makeContext.marquee_grob <- function(x) {
     fill = x$text$background[x$blocks$start[block_bg]],
     col = x$text$border[x$blocks$start[block_bg]],
     r = x$text$border_radius[x$blocks$start[block_bg]],
-    left = x$text$border_size_left[x$blocks$start[block_bg]],
-    right = x$text$border_size_right[x$blocks$start[block_bg]],
-    top = x$text$border_size_top[x$blocks$start[block_bg]],
-    bottom = x$text$border_size_bottom[x$blocks$start[block_bg]]
+    left = x$text$border_width_left[x$blocks$start[block_bg]],
+    right = x$text$border_width_right[x$blocks$start[block_bg]],
+    top = x$text$border_width_top[x$blocks$start[block_bg]],
+    bottom = x$text$border_width_bottom[x$blocks$start[block_bg]]
   )
 
   ## Handle span backgrounds
@@ -946,10 +946,10 @@ makeContext.marquee_grob <- function(x) {
     fill = c(block_rects$fill, x$text$background[span_rects[, 1]]),
     col = c(block_rects$col, x$text$border[span_rects[, 1]]),
     r = c(block_rects$r, x$text$border_radius[span_rects[, 1]]),
-    left = c(block_rects$left, x$text$border_size_left[span_rects[, 1]]),
-    right = c(block_rects$right, x$text$border_size_right[span_rects[, 1]]),
-    top = c(block_rects$top, x$text$border_size_top[span_rects[, 1]]),
-    bottom = c(block_rects$bottom, x$text$border_size_bottom[span_rects[, 1]])
+    left = c(block_rects$left, x$text$border_width_left[span_rects[, 1]]),
+    right = c(block_rects$right, x$text$border_width_right[span_rects[, 1]]),
+    top = c(block_rects$top, x$text$border_width_top[span_rects[, 1]]),
+    bottom = c(block_rects$bottom, x$text$border_width_bottom[span_rects[, 1]])
   )
 
   ## Extract position of underline and strikethrough
@@ -1384,12 +1384,12 @@ has_identical_background <- function(a, b, style) {
         identical(style$border[a], style$border[b]) &&
         (is.na(style$border[a]) ||
           (identical(
-            style$border_size_bottom[a],
-            style$border_size_bottom[b]
+            style$border_width_bottom[a],
+            style$border_width_bottom[b]
           ) &&
-            identical(style$border_size_top[a], style$border_size_top[b]) &&
-            identical(style$border_size_left[a], style$border_size_left[b]) &&
-            identical(style$border_size_right[a], style$border_size_right[b])))
+            identical(style$border_width_top[a], style$border_width_top[b]) &&
+            identical(style$border_width_left[a], style$border_width_left[b]) &&
+            identical(style$border_width_right[a], style$border_width_right[b])))
     },
     a = a,
     b = b

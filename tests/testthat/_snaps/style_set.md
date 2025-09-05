@@ -24,7 +24,7 @@
 
 ---
 
-    Can't recycle `size` (size 2) to size 3.
+    Can't recycle `x` (size 3) to match `size` (size 2).
 
 # remove_style() works
 

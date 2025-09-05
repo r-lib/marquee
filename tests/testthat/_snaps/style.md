@@ -144,11 +144,11 @@
 
 ---
 
-    `border_size` must be a marquee_trbl object or `NULL`, not the string "A".
+    `border_width` must be a marquee_trbl object or `NULL`, not the string "A".
 
 ---
 
-    `border_size` must be a marquee_trbl object or `NULL`, not `TRUE`.
+    `border_width` must be a marquee_trbl object or `NULL`, not `TRUE`.
 
 ---
 

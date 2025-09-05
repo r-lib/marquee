@@ -77,7 +77,7 @@ classic_style <- function(
       hr = style(
         padding = trbl(0, 0, rem(1 / 8)),
         border = "#eeeeee",
-        border_size = trbl(0, 0, rem(1 / 16))
+        border_width = trbl(0, 0, rem(1 / 16))
       ),
       h1 = style(
         family = header_font,
@@ -87,7 +87,7 @@ classic_style <- function(
         margin = trbl(em(1), NULL, NULL, NULL),
         padding = trbl(0, 0, em(0.3)),
         border = "#eeeeee",
-        border_size = trbl(0, 0, rem(1 / 16))
+        border_width = trbl(0, 0, rem(1 / 16))
       ),
       h2 = style(
         family = header_font,
@@ -97,7 +97,7 @@ classic_style <- function(
         margin = trbl(em(1), NULL, NULL, NULL),
         padding = trbl(0, 0, em(0.3)),
         border = "#eeeeee",
-        border_size = trbl(0, 0, rem(1 / 16))
+        border_width = trbl(0, 0, rem(1 / 16))
       ),
       h3 = style(
         family = header_font,
@@ -143,7 +143,7 @@ classic_style <- function(
           trbl(em(0.2), em(1), em(0.2), 0)
         },
         border = "#dddddd",
-        border_size = if (ltr) {
+        border_width = if (ltr) {
           trbl(0, 0, 0, rem(0.25))
         } else {
           trbl(0, rem(0.25), 0, 0)

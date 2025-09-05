@@ -102,7 +102,7 @@ modify_style.marquee_style_set <- function(x, tag, ...) {
   opts$tag <- NULL
 
   args <- names(opts)
-  expand <- args %in% c("margin", "padding", "border_size")
+  expand <- args %in% c("margin", "padding", "border_width")
   if (any(expand)) {
     args <- c(
       args[!expand],
@@ -150,7 +150,7 @@ modify_style.marquee_style_set <- function(x, tag, ...) {
 modify_style.marquee_style <- function(x, tag, ...) {
   opts <- list2(...)
   args <- names(opts)
-  expand <- args %in% c("margin", "padding", "border_size")
+  expand <- args %in% c("margin", "padding", "border_width")
   if (any(expand)) {
     args <- c(
       args[!expand],

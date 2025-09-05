@@ -67,7 +67,7 @@ the padding but not the margin. Can be a solid color or a gradient or pattern
 made with \code{grid::linearGradient()}/\code{grid::radialGradient()}/\code{grid::pattern()}}
     \item{\code{border}}{The color of the background stroke. The background includes
 the padding but not the margin}
-    \item{\code{border_size}}{The line width of the background stroke, given as a call
+    \item{\code{border_width}}{The line width of the background stroke, given as a call
 to \code{\link[=trbl]{trbl()}}}
     \item{\code{border_radius}}{The corner radius of the background, given in points}
     \item{\code{outline}}{The color of the outline stroke.}
@@ -90,6 +90,8 @@ change the order of glyphs within a span of text, but rather whether
 consequtive blocks of text are laid out left-to-right or right-to-left. It
 also affects to which side indentation is applied as well as the meaning of
 \code{"auto"}, and \code{"justified-auto"} aligment.}
+    \item{\code{border_size}}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{border_width}
+instead}
   }}
 
 \item{ltr}{Is the style intended for left-to-right text? This affects list

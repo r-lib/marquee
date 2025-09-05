@@ -52,7 +52,7 @@
 #' made with `grid::linearGradient()`/`grid::radialGradient()`/`grid::pattern()`
 #' @param border The color of the background stroke. The background includes
 #' the padding but not the margin
-#' @param border_size The line width of the background stroke, given as a call
+#' @param border_width The line width of the background stroke, given as a call
 #' to [trbl()]
 #' @param border_radius The corner radius of the background, given in points
 #' @param outline The color of the outline stroke.
@@ -75,6 +75,9 @@
 #' consequtive blocks of text are laid out left-to-right or right-to-left. It
 #' also affects to which side indentation is applied as well as the meaning of
 #' `"auto"`, and `"justified-auto"` aligment.
+#' @param border_size `r lifecycle::badge('deprecated')` Use `border_width`
+#' instead
+#'
 #'
 #' @return A `marquee_style` object
 #'
@@ -104,7 +107,7 @@ style <- function(
   padding = NULL,
   background = NULL,
   border = NULL,
-  border_size = NULL,
+  border_width = NULL,
   border_radius = NULL,
   outline = NULL,
   outline_width = NULL,
@@ -115,7 +118,8 @@ style <- function(
   strikethrough = NULL,
   baseline = NULL,
   img_asp = NULL,
-  text_direction = NULL
+  text_direction = NULL,
+  border_size = deprecated()
 ) {
   check_string(family, allow_null = TRUE)
 
@@ -204,11 +208,16 @@ style <- function(
     border[] <- NA_character_
   }
 
-  if (is.null(border_size)) {
-    border_size <- trbl()
+  if (lifecycle::is_present(border_size)) {
+    lifecycle::deprecate_soft("1.1.2", "style(border_size)", "style(border_width)")
+    border_width <- border_size
   }
-  if (!is_trbl(border_size)) {
-    stop_input_type(border_size, "a marquee_trbl object", allow_null = TRUE)
+
+  if (is.null(border_width)) {
+    border_width <- trbl()
+  }
+  if (!is_trbl(border_width)) {
+    stop_input_type(border_width, "a marquee_trbl object", allow_null = TRUE)
   }
 
   if (is.unit(border_radius)) {
@@ -277,10 +286,10 @@ style <- function(
       padding_bottom = padding[[3]],
       padding_left = padding[[4]],
       border = border,
-      border_size_top = border_size[[1]],
-      border_size_right = border_size[[2]],
-      border_size_bottom = border_size[[3]],
-      border_size_left = border_size[[4]],
+      border_width_top = border_width[[1]],
+      border_width_right = border_width[[2]],
+      border_width_bottom = border_width[[3]],
+      border_width_left = border_width[[4]],
       border_radius = border_radius,
       outline = outline,
       outline_width = outline_width,
@@ -383,7 +392,7 @@ base_style <- function(
   padding = trbl(0),
   background = NA,
   border = NA,
-  border_size = trbl(0),
+  border_width = trbl(0),
   border_radius = 0,
   outline = NA,
   outline_width = 1,
@@ -394,8 +403,13 @@ base_style <- function(
   strikethrough = FALSE,
   baseline = 0,
   img_asp = 1.65,
-  text_direction = "auto"
+  text_direction = "auto",
+  border_size = deprecated()
 ) {
+  if (lifecycle::is_present(border_size)) {
+    lifecycle::deprecate_soft("1.1.2", "base_style(border_size)", "base_style(border_width)")
+    border_width <- border_size
+  }
   style(
     family = family,
     weight = weight,
@@ -413,7 +427,7 @@ base_style <- function(
     padding = padding,
     background = background,
     border = border,
-    border_size = border_size,
+    border_width = border_width,
     border_radius = border_radius,
     outline = outline,
     outline_width = outline_width,
