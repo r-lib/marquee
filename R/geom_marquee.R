@@ -175,18 +175,13 @@ make_marquee_geom <- function() {
         )
       }
 
-      styles <- modify_style(
+      styles <- combine_styles(
         styles,
-        "base",
         family = data$family,
         size = size,
         lineheight = data$lineheight,
-        color = colour
-      )
-      styles <- modify_style(
-        styles,
-        "body",
-        background = skip_inherit(data$fill)
+        color = colour,
+        background = data$fill
       )
 
       data <- coord$transform(data, panel_params)

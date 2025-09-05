@@ -81,7 +81,26 @@ format.marquee_style_set <- function(x, ...) {
 #' @rdname style_set
 #' @export
 modify_style <- function(x, tag, ...) {
-  opts <- list2(...)
+  UseMethod("modify_style")
+}
+#' @export
+modify_style.marquee_style_set <- function(x, tag, ...) {
+  tag <- tolower(tag)
+  check_character(tag)
+
+  opts <- lapply(list2(...), function(x) {
+    if (is_list(x) && !is_bare_list(x)) {
+      list(x)
+    } else {
+      x
+    }
+  })
+  opts <- vctrs::vec_recycle_common(x = x, tag = tag, !!!opts)
+  x <- opts$x
+  tag <- opts$tag
+  opts$x <- NULL
+  opts$tag <- NULL
+
   args <- names(opts)
   expand <- args %in% c("margin", "padding", "border_size")
   if (any(expand)) {
@@ -93,37 +112,6 @@ modify_style <- function(x, tag, ...) {
         c("top", "right", "bottom", "left")
       )
     )
-  }
-
-  if (is_style(x)) {
-    new_style <- style(...)
-    cls <- class(x)
-    class(x) <- NULL
-    x[args] <- new_style[args]
-    class(x) <- cls
-    return(x)
-  }
-
-  tag <- tolower(tag)
-  if (!is_style_set(x)) {
-    stop_input_type(x, "a style set object")
-  }
-  check_character(tag)
-  tag <- vctrs::vec_recycle(tag, length(x))
-
-  for (i in seq_along(opts)) {
-    opt <- opts[[i]]
-    if (
-      is.null(opt) ||
-        is_style(opt) ||
-        is_modifier(opt) ||
-        is_trbl(opt) ||
-        inherits(opt, "font_feature") ||
-        inherits(opt, "GridPattern")
-    ) {
-      opt <- list(opt)
-    }
-    opts[[i]] <- vctrs::vec_recycle(opt, length(x), x_arg = names(opts)[i])
   }
 
   for (i in seq_along(x)) {
@@ -155,6 +143,29 @@ modify_style <- function(x, tag, ...) {
     }
   }
 
+  x
+}
+
+#' @export
+modify_style.marquee_style <- function(x, tag, ...) {
+  opts <- list2(...)
+  args <- names(opts)
+  expand <- args %in% c("margin", "padding", "border_size")
+  if (any(expand)) {
+    args <- c(
+      args[!expand],
+      paste0(
+        rep(args[expand], each = 4),
+        "_",
+        c("top", "right", "bottom", "left")
+      )
+    )
+  }
+  new_style <- style(...)
+  cls <- class(x)
+  class(x) <- NULL
+  x[args] <- new_style[args]
+  class(x) <- cls
   x
 }
 
