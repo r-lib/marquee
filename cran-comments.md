@@ -1,4 +1,4 @@
-patch release with fixes for a few regressions and bugs
+minor release with further improvements to styling
 
 ## revdepcheck results
 
