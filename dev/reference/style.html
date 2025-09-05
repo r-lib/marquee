@@ -79,7 +79,7 @@ for a style with sensible defaults for all it's options.</p>
 <span>  padding <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  background <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  border <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  border_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  border_width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  border_radius <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  outline <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  outline_width <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -90,7 +90,8 @@ for a style with sensible defaults for all it's options.</p>
 <span>  strikethrough <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  baseline <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  img_asp <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  text_direction <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  text_direction <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  border_size <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">base_style</span><span class="op">(</span></span>
@@ -110,7 +111,7 @@ for a style with sensible defaults for all it's options.</p>
 <span>  padding <span class="op">=</span> <span class="fu"><a href="style_helpers.html">trbl</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
 <span>  background <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  border <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  border_size <span class="op">=</span> <span class="fu"><a href="style_helpers.html">trbl</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  border_width <span class="op">=</span> <span class="fu"><a href="style_helpers.html">trbl</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
 <span>  border_radius <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  outline <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  outline_width <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -121,7 +122,8 @@ for a style with sensible defaults for all it's options.</p>
 <span>  strikethrough <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  baseline <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  img_asp <span class="op">=</span> <span class="fl">1.65</span>,</span>
-<span>  text_direction <span class="op">=</span> <span class="st">"auto"</span></span>
+<span>  text_direction <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  border_size <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -223,7 +225,7 @@ made with <code><a href="https://rdrr.io/r/grid/patterns.html" class="external-l
 the padding but not the margin</p></dd>
 
 
-<dt id="arg-border-size">border_size<a class="anchor" aria-label="anchor" href="#arg-border-size"></a></dt>
+<dt id="arg-border-width">border_width<a class="anchor" aria-label="anchor" href="#arg-border-width"></a></dt>
 <dd><p>The line width of the background stroke, given as a call
 to <code><a href="style_helpers.html">trbl()</a></code></p></dd>
 
@@ -281,6 +283,11 @@ consequtive blocks of text are laid out left-to-right or right-to-left. It
 also affects to which side indentation is applied as well as the meaning of
 <code>"auto"</code>, and <code>"justified-auto"</code> aligment.</p></dd>
 
+
+<dt id="arg-border-size">border_size<a class="anchor" aria-label="anchor" href="#arg-border-size"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>border_width</code>
+instead</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -298,43 +305,43 @@ also affects to which side indentation is applied as well as the meaning of
 <span class="r-in"><span><span class="co"># Full style</span></span></span>
 <span class="r-in"><span><span class="fu">base_style</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;marquee_style[37]&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               size: 12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         background: NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              color: black</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             family: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             weight: 400</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             italic: FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              width: 5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           features: &lt;empty&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         lineheight: 1.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              align: auto</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           tracking: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             indent: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            hanging: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         margin_top: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       margin_right: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      margin_bottom: rem(1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        margin_left: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        padding_top: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      padding_right: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     padding_bottom: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       padding_left: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             border: NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    border_size_top: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  border_size_right: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> border_size_bottom: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   border_size_left: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      border_radius: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            outline: NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      outline_width: 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       outline_join: round</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      outline_mitre: 10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            bullets: •, ◦, ▪, ▫, ‣, ⁃</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          underline: FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      strikethrough: FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           baseline: 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            img_asp: 1.65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     text_direction: auto</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                size: 12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          background: NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               color: black</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              family: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              weight: 400</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              italic: FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               width: 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            features: &lt;empty&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          lineheight: 1.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               align: auto</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            tracking: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              indent: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             hanging: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          margin_top: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        margin_right: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       margin_bottom: rem(1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         margin_left: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         padding_top: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       padding_right: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      padding_bottom: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        padding_left: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              border: NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    border_width_top: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  border_width_right: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> border_width_bottom: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   border_width_left: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       border_radius: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             outline: NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       outline_width: 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        outline_join: round</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       outline_mitre: 10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             bullets: •, ◦, ▪, ▫, ‣, ⁃</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           underline: FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       strikethrough: FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            baseline: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             img_asp: 1.65</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      text_direction: auto</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
