@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">marquee</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,7 @@ feel pretty much at home.</p>
 <h3 id="styles">Styles<a class="anchor" aria-label="anchor" href="#styles"></a>
 </h3>
 <p>In marquee, a style defines the full specification for how an element
-(block or span) should visually appear. It holds 28 different settings
+(block or span) should visually appear. It holds 31 different settings
 concerning everything from font rendering, to spacing, coloring, and
 alignment. Rather than going through all here, I’ll point towards the
 documentation for the <code><a href="../reference/style.html">style()</a></code> function.</p>
@@ -172,17 +172,18 @@ base element of the document.</p>
 <h3 id="side-values">Side values<a class="anchor" aria-label="anchor" href="#side-values"></a>
 </h3>
 <p>A style has three settings that relates to the four sides of a box.
-<code>margin</code>, <code>padding</code>, and <code>border_size</code>.
-These are set to values constructed with <code><a href="../reference/style_helpers.html">trbl()</a></code>, which
-works like margin settings in CSS. If you provide it with 1 value it
-will set all sides to that value. If you provide it with two values and
-it will set top and bottom to the first and left and right to the
-second. If you provide it with three values it will set the top to the
-first, left and right to the second, and bottom to the third. If you
-provide it with four values it will set the <strong>t</strong>op to the
-first, <strong>r</strong>ight to the second, <strong>b</strong>ottom to
-the third, and <strong>l</strong>eft to the fourth (the bold first
-letters gives a clue to why the constructor is named as it is).</p>
+<code>margin</code>, <code>padding</code>, and
+<code>border_width</code>. These are set to values constructed with
+<code><a href="../reference/style_helpers.html">trbl()</a></code>, which works like margin settings in CSS. If you
+provide it with 1 value it will set all sides to that value. If you
+provide it with two values and it will set top and bottom to the first
+and left and right to the second. If you provide it with three values it
+will set the top to the first, left and right to the second, and bottom
+to the third. If you provide it with four values it will set the
+<strong>t</strong>op to the first, <strong>r</strong>ight to the second,
+<strong>b</strong>ottom to the third, and <strong>l</strong>eft to the
+fourth (the bold first letters gives a clue to why the constructor is
+named as it is).</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
