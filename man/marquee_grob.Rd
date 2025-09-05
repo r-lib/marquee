@@ -116,9 +116,10 @@ performed.
 
 \strong{Underline and strikethrough}
 
-Underlines are placed 0.1em below the baseline of the text. Strikethrough are
-placed 0.3em above the baseline. The width of the line is set to 0.075em. It
-inherits the color of the text. No further styling is possible.
+Underlines are placed according to the font specification. Strikethrough are
+placed 0.3em above the baseline. The width of the line is set according to
+the fonr specification for underline width, both for underline and
+strikethrough. It inherits the color of the text.
 
 \strong{Spans with background}
 

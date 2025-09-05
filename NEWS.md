@@ -4,6 +4,8 @@
 * Renamed `border_size` to `border_width` for consistency
 * Added `border_type` and `outline_type` styles to control the linetype of
   borders and outlines
+* Underline and strikethrough now uses metrics from the font for width and
+  position
 
 # marquee 1.1.1
 

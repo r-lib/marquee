@@ -80,9 +80,10 @@
 #'
 #' **Underline and strikethrough**
 #'
-#' Underlines are placed 0.1em below the baseline of the text. Strikethrough are
-#' placed 0.3em above the baseline. The width of the line is set to 0.075em. It
-#' inherits the color of the text. No further styling is possible.
+#' Underlines are placed according to the font specification. Strikethrough are
+#' placed 0.3em above the baseline. The width of the line is set according to
+#' the fonr specification for underline width, both for underline and
+#' strikethrough. It inherits the color of the text.
 #'
 #' **Spans with background**
 #'
@@ -949,9 +950,9 @@ makeContext.marquee_grob <- function(x) {
     r = c(block_rects$r, x$text$border_radius[span_rects[, 1]]),
     left = c(block_rects$left, x$text$border_width_left[span_rects[, 1]]),
     right = c(block_rects$right, x$text$border_width_right[span_rects[, 1]]),
+    top = c(block_rects$top, x$text$border_width_top[span_rects[, 1]]),
     bottom = c(block_rects$bottom, x$text$border_width_bottom[span_rects[, 1]]),
     lty = c(block_rects$lty, x$text$border_type[span_rects[, 1]])
-    bottom = c(block_rects$bottom, x$text$border_width_bottom[span_rects[, 1]])
   )
 
   ## Extract position of underline and strikethrough
@@ -961,14 +962,20 @@ makeContext.marquee_grob <- function(x) {
     lapply(split(span_ind, x$shape$y_offset[span_ind]), function(j) {
       ### Line width and position is relative to size
       size <- x$shape$font_size[j[1]]
-      mod <- c(-0.1, 0.3)[c(x$text$underline[i], x$text$strikethrough[i])] *
-        size
+      info <- systemfonts::font_info(
+        path = x$shape$font_path[j[1]],
+        index = x$shape$font_index[j[1]],
+        size = size,
+        res = 600
+      )
+      mod <- c(info$underline_pos * 72 / 600, 0.3 * size)
+      mod <- mod[c(x$text$underline[i], x$text$strikethrough[i])]
       l <- c(
         i,
         min(x$shape$x_offset[j]),
         max(x$shape$x_offset[j] + x$shape$advance[j]),
         x$shape$y_offset[j[1]],
-        size * 0.075
+        info$underline_size * 72 / 600
       )
       if (length(mod) == 2) {
         l <- rbind(l, l)
