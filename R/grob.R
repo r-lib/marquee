@@ -277,7 +277,8 @@ marquee_grob <- function(
       collapsed_margins,
       has_background,
       has_top,
-      has_bottom
+      has_bottom,
+      if (force_body_margin) 0 else NULL
     )
   }
   # Body margin wins over any collapsing
@@ -1373,15 +1374,17 @@ get_last <- function(tree, background, border) {
     tree$element
   }
 }
-set_margins <- function(tree, margins, has_background, has_top, has_bottom) {
+set_margins <- function(tree, margins, has_background, has_top, has_bottom, forced_margin = NULL) {
   tops <- get_first(tree, has_background, has_top)
-  margins$top[tops[1]] <- max(margins$top[tops])
+  margins$top[tops[1]] <- forced_margin %||% max(margins$top[tops])
   margins$top[tops[-1]] <- 0
   bottoms <- get_last(tree, has_background, has_top)
-  margins$bottom[bottoms[1]] <- max(margins$bottom[bottoms])
+  margins$bottom[bottoms[1]] <- forced_margin %||% max(margins$bottom[bottoms])
   margins$bottom[bottoms[-1]] <- 0
-  for (child in tree$children) {
-    margins <- set_margins(child, margins, has_background, has_top, has_bottom)
+  for (i in seq_along(tree$children)) {
+    child <- tree$children[[i]]
+    is_last <- i == length(tree$children)
+    margins <- set_margins(child, margins, has_background, has_top, has_bottom, if (is_last) forced_margin else NULL)
   }
   for (i in seq_along(tree$children)[-1]) {
     margins$bottom[tree$children[[i - 1]]$element] <- max(

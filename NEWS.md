@@ -2,6 +2,7 @@
 
 * Fixed a bug when calculating em() of a relative sized style
 * Fixed a bug in outline glyphs
+* Fixed a bug in `force_body_margin`
 
 # marquee 1.2.0
 
