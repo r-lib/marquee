@@ -1,5 +1,7 @@
 # marquee (development version)
 
+* Fixed a bug when calculating em() of a relative sized style
+
 # marquee 1.2.0
 
 * Better vectorisation of style_set and classic_style

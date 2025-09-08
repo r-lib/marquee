@@ -1,3 +1,4 @@
+#include "R_ext/Print.h"
 #include "md4c.h"
 
 #include <cpp11/integers.hpp>
@@ -439,7 +440,8 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
         double val = 0;
         SEXP elem = VECTOR_ELT(userdata.style[j], i);
         if (is_em(elem)) {
-          val = REAL(VECTOR_ELT(userdata.style[j], 0))[0] * REAL(VECTOR_ELT(elem, 0))[0];
+          // The base size of the style should already be available in column 8
+          val = REAL(res[8])[j] * REAL(VECTOR_ELT(elem, 0))[0];
         } else if (is_rem(elem)) {
           int id = userdata.id[j] - 1;
           val = rem_size[id] * REAL(VECTOR_ELT(elem, 0))[0];
