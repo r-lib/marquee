@@ -1,6 +1,7 @@
 # marquee (development version)
 
 * Fixed a bug when calculating em() of a relative sized style
+* Fixed a bug in outline glyphs
 
 # marquee 1.2.0
 

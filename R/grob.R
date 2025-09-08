@@ -555,6 +555,7 @@ makeContext.marquee_grob <- function(x) {
   shape$shape$id <- x$text$id[idx]
   shape$shape$outline <- x$text$outline[idx]
   shape$shape$outline_width <- x$text$outline_width[idx]
+  shape$shape$outline_type <- x$text$outline_type[idx]
   shape$shape$outline_join <- x$text$outline_join[idx]
   shape$shape$outline_mitre <- x$text$outline_mitre[idx]
   bshape <- x$bullets$shape
