@@ -213,6 +213,7 @@ make_marquee_guide <- function() {
       if (!inherits(elems$title, "element_marquee")) {
         elems$title <- ggplot2::merge_element(element_marquee(), elems$title)
       }
+      elems$title$width <- params$width %||% elems$title$width
       # We offset the margin to counteract the legend.box.spacing so that
       # it resembles a regular subtitle better
       i <- match(params$position, c("bottom", "left", "top", "right"))

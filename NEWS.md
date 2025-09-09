@@ -3,6 +3,7 @@
 * Fixed a bug when calculating em() of a relative sized style
 * Fixed a bug in outline glyphs
 * Fixed a bug in `force_body_margin`
+* Make sure that `width` is properly propagated in ´guide_marquee()`
 
 # marquee 1.2.0
 
