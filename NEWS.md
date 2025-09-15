@@ -1,3 +1,5 @@
+# marquee (development version)
+
 # marquee 1.2.1
 
 * Fixed a bug when calculating em() of a relative sized style
