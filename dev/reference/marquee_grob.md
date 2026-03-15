@@ -1,0 +1,215 @@
+# Construct a grob rendering one or more markdown texts
+
+This is the main function of marquee. It takes a vector of markdown
+strings, parses them with the provided style, and returns a grob capable
+of rendering the parsed text into rich text and (possibly) images. See
+[`marquee_parse()`](https://marquee.r-lib.org/dev/reference/marquee_parse.md)
+for more information about how markdown is parsed and see details below
+for further information on how rendering proceeds.
+
+## Usage
+
+``` r
+marquee_grob(
+  text,
+  style = classic_style(),
+  ignore_html = TRUE,
+  force_body_margin = FALSE,
+  x = 0,
+  y = 1,
+  width = NULL,
+  default.units = "npc",
+  hjust = "left",
+  vjust = "top",
+  angle = 0,
+  vp = NULL,
+  name = NULL
+)
+```
+
+## Arguments
+
+- text:
+
+  Either a character vector or a `marquee_parsed` object as created by
+  [`marquee_parse()`](https://marquee.r-lib.org/dev/reference/marquee_parse.md)
+
+- style:
+
+  A style set such as
+  [`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md)
+  that defines how the text should be rendered
+
+- ignore_html:
+
+  Should HTML code be removed from the output
+
+- force_body_margin:
+
+  Should the body margin override margin collapsing calculations. See
+  Details.
+
+- x, y:
+
+  The location of the markdown text in the graphics. If numeric it will
+  be converted to units using `default.units`
+
+- width:
+
+  The width of each markdown text. If numeric it will be converted to
+  units using `default.units`. `NULL` is equivalent to the width of the
+  parent container. `NA` uses the width of the text as the full width of
+  the grob and will thus avoid any soft breaking of lines.
+
+- default.units:
+
+  A string giving the default units to apply to `x`, `y`, and `width`
+
+- hjust:
+
+  The horizontal justification of the markdown with respect to `x`. Can
+  either be a numeric or one of `"left"`, `"left-ink"`, `"center"`,
+  `"center-ink"`, `"right-ink"`, or `"right"`
+
+- vjust:
+
+  The vertical justification of the markdown with respect to `y`. Can
+  either be a numeric or one of `"bottom"`, `"bottom-ink"`,
+  `"last-line"`, `"center"`, `"center-ink"`, `"first-line"`,
+  `"top-ink"`, `"top"`
+
+- angle:
+
+  The angle of rotation (in degrees) around `x` and `y`
+
+- vp:
+
+  An optional viewport to assign to the grob
+
+- name:
+
+  The name for the grob. If `NULL` a unique name will be generated
+
+## Value
+
+A grob of class `marquee`
+
+## Rendering
+
+marquee is first and foremost developed with the new 'glyph' rendering
+features in 4.3.0 in mind. However, not all graphics devices supports
+this, and while some might eventually do, it is quite concievable that
+some never will. Because of this, marquee has a fallback where it will
+render text as a mix of polygons and rasters (depending on the font in
+use) if the device doesn't report 'glyphs' capabilities. The upside is
+that it works (almost) everywhere, but the downside is that the fallback
+is much slower and with poorer visual quality. Because of this it is
+advisable to use a modern graphics device with glyphs support if at all
+possible.
+
+## Rendering style
+
+The rendering more or less adheres to the styling provided by
+[`marquee_parse()`](https://marquee.r-lib.org/dev/reference/marquee_parse.md),
+but has some intricacies as detailed below:
+
+**Tight lists**
+
+If a list is tight, the bottom margin of each `li` tag will be set so
+the spacing matches the lineheight. Further, the top margin will be set
+to 0.
+
+**Block images**
+
+In markdown, image tags are span elements so they can be placed inline.
+However, if an image tag is the only thing that is contained inside a p
+tag marquee determines that it should be considered a block element. In
+that case, the parent p element inherits the styling from the image
+element so that the image can e.g. adhere to `align` properties, or
+provide their own padding.
+
+**Horizontal rulers**
+
+These elements are rendered as an empty block. The standard style sets a
+bottom border size and no size for the other sides.
+
+**Margin collapsing**
+
+Margin calculations follows the margin collapsing rules of HTML. Read
+more about these at
+[mdn](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_box_model/Mastering_margin_collapsing).
+Margin collapsing means that elements with margin set to 0 might end up
+with a margin. Specifically for the body element this can be a problem
+if you want to enforce a tight box around your text. Because of this the
+`force_body_margin` argument allows you to overwrite the margins for the
+body element with the original values after collapsing has been
+performed.
+
+**Underline and strikethrough**
+
+Underlines are placed according to the font specification. Strikethrough
+are placed 0.3em above the baseline. The width of the line is set
+according to the fonr specification for underline width, both for
+underline and strikethrough. It inherits the color of the text.
+
+**Spans with background**
+
+Consecutive spans with the same background and border settings are
+merged into a single rectangle. The padding of the span defines the size
+of the background.
+
+**Bullet position**
+
+Bullets are placed, right-aligned, 0.25em to the left of the first line
+in the li element if the text direction is ltr. For rtl text it is
+placed, left-aligned, 0.25 em to the right of the first line.
+
+**Border with border radius**
+
+If borders are not the same on all sides they are drawn one by one. In
+this case the border radius is ignored.
+
+## Image rendering
+
+The image tag can be used to place images. There are support for both
+png, jpeg, and svg images. If the path instead names a grob, ggplot, or
+patchwork object then this is rendered instead. If the file cannot be
+read, if it d oesn't exist, or if the path names an object that is not a
+grob, ggplot or patchwork, a placeholder is rendered in it's place
+(black square with red cross).
+
+**Image sizing**
+
+There is no standard in markdown for specifying the size of images. By
+default, block-level images fill the width of it's container and
+maintain it's aspect ratio. Inline images have a default width of 0.65em
+and a height matching the aspect ration.
+
+However, if you wish to control sizing, you can instead provide the
+image as a grob with a viewport with fixed dimensions, in which case
+this will be used as long as the width doesn't exceed the width of the
+container (in which case it will get downsized). If a rastergrob is
+provided without absolute sizing, the aspect ratio will match the
+raster, otherwise the aspect ratio will be taken from the styling of the
+element (defaults to 1.65)
+
+## Table rendering
+
+While marquee does not support the extended table syntax for markdown it
+does allow you to include tables in the output. It does so by supporting
+gt objects as valid paths in image tags in the same way as ggplots etc.
+This meeans that you can style your tables any way you wish and with the
+full power of gt, which is much more flexible than the markdown table
+syntax.
+
+## Textbox justification
+
+The justification options exceeds the classic ones provided by grid.
+While numeric values are available as always, the number of possible
+text values are larger. Horizontal justification add `"left-ink"`,
+`"center-ink"`, and `"right-ink"` which uses the left-most and
+right-most positioned glyph (or halfway between them) as anchors.
+Vertical justification has the equivalent `"bottom-ink"`,
+`"center-ink"`, and `"top-ink"` anchors, but also `"first-line"` and
+`"last-line"` which sets the anchor at the baseline of the first or last
+line respectively.

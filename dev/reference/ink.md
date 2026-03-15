@@ -1,0 +1,96 @@
+# Make justifications relative to the ink extent of the text
+
+Marquee measures the extent of the box around text with bearings, that
+is, the height of the string "mean" is the same as the height of the
+string "median", despite the latter having a "d" extending upwards. This
+makes it easier to justification text irrespective of the glyphs used to
+render it. However, if you want alignment to be relative to the "tight"
+box around the text (the bounding box of where ink has been placed), you
+can use the `ink()` function to inform marquee of your intend. In
+general the effect is often minuscule for horizontal justifications but
+can have a big effect on vertical justification depending on the
+presence of ascenders and descenders in the rendered glyphs.
+
+## Usage
+
+``` r
+ink(x = numeric(), use_ink = TRUE)
+```
+
+## Arguments
+
+- x:
+
+  A string giving a valid justification or a numeric between 0 and 1
+
+- use_ink:
+
+  Should the values be relative to the ink extend. Will be recycled to
+  the length of `x`
+
+## Value
+
+A `marquee_ink` vector
+
+## Examples
+
+``` r
+# Plot to illustrate the difference in vertical alignment
+library(grid)
+grid.newpage()
+grid.draw(
+  marquee_grob(
+    c("### Textbox justification (default)",
+      "### Bounding box justification (using `ink()`)"),
+    x = 0.5,
+    y = c(0.95, 0.45),
+    hjust = 0.5,
+    width = NA
+  )
+)
+
+# Standard justification
+grid.draw(
+  marquee_grob(
+    "mean",
+    x = 0.5,
+    y = 0.75,
+    hjust = "right",
+    vjust = 0.5,
+    width = NA
+  )
+)
+grid.draw(
+  marquee_grob(
+    "median",
+    x = 0.5,
+    y = 0.75,
+    hjust = "left",
+    vjust = 0.5,
+    width = NA
+  )
+)
+
+# Justification using `ink()`
+grid.draw(
+  marquee_grob(
+    "mean",
+    x = 0.5,
+    y = 0.25,
+    hjust = "right",
+    vjust = ink(0.5),
+    width = NA
+  )
+)
+grid.draw(
+  marquee_grob(
+    "median",
+    x = 0.5,
+    y = 0.25,
+    hjust = "left",
+    vjust = ink(0.5),
+    width = NA
+  )
+)
+
+```

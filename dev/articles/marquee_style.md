@@ -1,0 +1,121 @@
+# Marquee Styling
+
+``` r
+library(marquee)
+```
+
+As we discussed in the Marquee Syntax article, most of the syntax in
+markdown is semantic, meaining that it concerns itself with the nature
+of what it encodes, rather than the look of it. The other side of the
+coin, how it looks, will be dealt with in this article. Note that this
+division between semantics and style is also seen in HTML5 where the
+looks is fully relegated to CSS and the tags are all semantic.
+
+## A slightly less cascading style specification
+
+HTML has CSS to take care of styling for it, and that has over the years
+morphed into a sprawling and powerful language of it’s own. Both too
+complicated to support for something like marquee, and too complicated
+to be needed for styling markdown (after all it’s main goal is to style
+full webpages, not documents). Marquee instead defines it’s own limited
+styling system which is simple enough to reason about, and powerful
+enough to support what is needed for markdown text. Many concepts are
+borrowed from CSS so if you are used to that you should feel pretty much
+at home.
+
+### Styles
+
+In marquee, a style defines the full specification for how an element
+(block or span) should visually appear. It holds 31 different settings
+concerning everything from font rendering, to spacing, coloring, and
+alignment. Rather than going through all here, I’ll point towards the
+documentation for the
+[`style()`](https://marquee.r-lib.org/dev/reference/style.md) function.
+
+While span and block elements takes the same style specifications, some
+settings only apply to block elements and are ignored for spans. These
+are `lineheight`, `align`, `indent`, `hanging`, `margin`, `bullets`, and
+`img_asp`.
+
+### Style sets
+
+A style set is a collection of styles, each style related to a specific
+type of element. It does not need to provide a style for all elements in
+the text, and the elements doesn’t need to be complete. The only hard
+requirement is that it contains a complete style named `base`, from
+which everything else can be derived. marquee ships with a style set
+called
+[`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md)
+which aims to mimic the standard look of rendered markdown. New style
+sets can either be build from the ground up or based off of
+[`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md).
+
+### Inheritance
+
+Marquee uses a very simple inheritance model for it’s styling, that can
+be boiled down to a single short sentance:
+
+> An element inherits any unspecified from it’s parent element.
+
+Any setting in a style object set to `NULL` will be inherited from the
+parent all the way down to the base style (which is the reason why that
+style must be complete). As an example, let’s look at the style for the
+`em` element in the
+[`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md):
+
+``` r
+classic_style()[[1]]$em
+#> <marquee_style[1]>
+#> italic: TRUE
+```
+
+The only thing it touches is the `italic` setting, everything else is
+borrowed from whatever element it is placed into.
+
+There are two other ways to influence style inheritance. The first one
+is wrapping a value in
+[`skip_inherit()`](https://marquee.r-lib.org/dev/reference/style_helpers.md).
+This will instruct marquee to inherit the value one level up in the
+hierarchy rather than from the direct parent (if the parent of the
+parent is also set to
+[`skip_inherit()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
+it moves up yet another level, and so on). The second one is wrapping a
+numeric value in
+[`relative()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
+which will instruct marquee to use the relative value as a multiplier
+applied to the parent.
+
+### Sizing
+
+All sizes in a style is in (big)points (the distinction between
+bigpoints and points are rather small and boring. Bigpoints are 1/72
+inches, which is what we use). Instead of setting a style setting
+directly to a numeric value, you can make it relative to the font size
+of the style using
+[`em()`](https://marquee.r-lib.org/dev/reference/style_helpers.md). This
+is beneficial for e.g. padding, margin, indent, etc. where you often
+want it to scale with the font size. In the case you set the size to an
+em value, it will be relative to it’s parent and effectively be
+equivalent to using
+[`relative()`](https://marquee.r-lib.org/dev/reference/style_helpers.md).
+There is a variant of em values called
+[`rem()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
+(root em). Instead of making the setting relative to the size of the
+current element it makes it relative to the size in the base element of
+the document.
+
+### Side values
+
+A style has three settings that relates to the four sides of a box.
+`margin`, `padding`, and `border_width`. These are set to values
+constructed with
+[`trbl()`](https://marquee.r-lib.org/dev/reference/style_helpers.md),
+which works like margin settings in CSS. If you provide it with 1 value
+it will set all sides to that value. If you provide it with two values
+and it will set top and bottom to the first and left and right to the
+second. If you provide it with three values it will set the top to the
+first, left and right to the second, and bottom to the third. If you
+provide it with four values it will set the **t**op to the first,
+**r**ight to the second, **b**ottom to the third, and **l**eft to the
+fourth (the bold first letters gives a clue to why the constructor is
+named as it is).

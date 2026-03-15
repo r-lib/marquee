@@ -1,0 +1,120 @@
+# marquee
+
+marquee is a markdown parser and renderer for the R graphics engine. It
+can be used to render rich text formatted as markdown (CommonMark)
+inside R graphics such as ggplot2 or other graphics built on grid.
+
+## Installation
+
+``` r
+# You can install marquee from CRAN
+install.packages("marquee")
+
+# Or get the development version from Github using pak
+pak::pak("r-lib/marquee")
+```
+
+## Examples
+
+The main function of the package is
+[`marquee_grob()`](https://marquee.r-lib.org/dev/reference/marquee_grob.md)
+which creates a grob based on markdown text and a style that can be
+rendered with grid:
+
+``` r
+# Let's render this readme
+readme <- paste(readLines("README.Rmd")[-seq_len(17)], collapse = "\n")
+
+library(marquee)
+library(grid)
+
+fancy_style <- classic_style(
+  body_font = "baskerville",
+  header_font = "marker felt",
+  code_font = "fira code"
+) |>
+  modify_style("cb", background = linearGradient(
+    colours = c("lightblue", "white"),
+    x1 = 0, y1 = 1, x2 = 0, y2 = 0
+  ))
+grob <- marquee_grob(readme, style = fancy_style)
+grid.draw(grob)
+```
+
+![](reference/figures/README-unnamed-chunk-2-1.png)
+
+(*The above is an image – go ahead and check*)
+
+## Prior art
+
+I would be remiss to not mention
+[gridtext](https://github.com/wilkelab/gridtext) and
+[ggtext](https://github.com/wilkelab/ggtext), both by Claus Wilke. These
+packages aim to solve much the same problem as marquee, but work in a
+different way and don’t have the same powerful textshaping backend as
+marquee. Most notably from a user perspective is perhaps that gridtext
+understands HTML to some degree, whereas marquee is oblivious to both
+HTML and CSS. Instead, it supports the [full CommonMark
+spec](https://spec.commonmark.org/) with the plan to add support for
+custom span elements as well.
+
+# Package index
+
+## Rendering
+
+These functions all help render markdown in various ways
+
+- [`marquee_grob()`](https://marquee.r-lib.org/dev/reference/marquee_grob.md)
+  : Construct a grob rendering one or more markdown texts
+- [`geom_marquee()`](https://marquee.r-lib.org/dev/reference/geom_marquee.md)
+  : Draw text formatted with marquee
+- [`element_marquee()`](https://marquee.r-lib.org/dev/reference/element_marquee.md)
+  : ggplot2 theme element supporting marquee syntax
+- [`marquefy_theme()`](https://marquee.r-lib.org/dev/reference/marquefy_theme.md)
+  : Convert all text elements in a theme to marquee elements
+- [`guide_marquee()`](https://marquee.r-lib.org/dev/reference/guide_marquee.md)
+  : Marquee subtitle guide
+- [`ink()`](https://marquee.r-lib.org/dev/reference/ink.md) : Make
+  justifications relative to the ink extent of the text
+
+## Styling
+
+These functions helps you specify the visual style used during rendering
+
+- [`style()`](https://marquee.r-lib.org/dev/reference/style.md)
+  [`base_style()`](https://marquee.r-lib.org/dev/reference/style.md) :
+  Create a style specification for a single tag
+- [`style_set()`](https://marquee.r-lib.org/dev/reference/style_set.md)
+  [`modify_style()`](https://marquee.r-lib.org/dev/reference/style_set.md)
+  [`remove_style()`](https://marquee.r-lib.org/dev/reference/style_set.md)
+  : Create or modify a style set that describes a full markdown text
+- [`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md)
+  : Classic styling for markdown
+- [`relative()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
+  [`em()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
+  [`rem()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
+  [`trbl()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
+  [`skip_inherit()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
+  [`marquee_bullets`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
+  : Helpers for defining styles
+
+## Parsing
+
+While often not needed, these functions helps you work with markdown
+text before it is rendered
+
+- [`marquee_parse()`](https://marquee.r-lib.org/dev/reference/marquee_parse.md)
+  : Parse a text as marquee
+- [`marquee_glue()`](https://marquee.r-lib.org/dev/reference/marquee_glue.md)
+  [`marquee_glue_data()`](https://marquee.r-lib.org/dev/reference/marquee_glue.md)
+  : Marquee-aware string interpolation
+
+# Articles
+
+### All vignettes
+
+- [Marquee
+  Styling](https://marquee.r-lib.org/dev/articles/marquee_style.md):
+- [Marquee
+  Syntax](https://marquee.r-lib.org/dev/articles/marquee_syntax.md):
+- [marquee](https://marquee.r-lib.org/dev/articles/marquee.md):
