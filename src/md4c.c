@@ -262,6 +262,11 @@ struct MD_CTX_tag {
 
   /* Contextual info for line analysis. */
   SZ code_fence_length;   /* For checking closing fence length. */
+  SZ custom_fence_lengths[16]; /* Stack of custom fence lengths for nesting. */
+  SZ custom_fence_length;      /* Pending fence length for opening fence. */
+  OFF custom_block_cls_beg;    /* Offset of class name start in text. */
+  SZ custom_block_cls_size;    /* Size of class name string. */
+  int custom_block_depth;      /* Nesting depth of custom blocks (max 16). */
   int html_block_type;    /* For checking closing raw HTML condition. */
   int last_line_has_list_loosening_effect;
   int last_list_item_starts_with_two_blank_lines;
@@ -275,6 +280,7 @@ enum MD_LINETYPE_tag {
   MD_LINE_SETEXTUNDERLINE,
   MD_LINE_INDENTEDCODE,
   MD_LINE_FENCEDCODE,
+  MD_LINE_CUSTOMBLOCK,
   MD_LINE_HTML,
   MD_LINE_TEXT,
   MD_LINE_TABLE,
@@ -4994,6 +5000,7 @@ md_process_all_blocks(MD_CTX* ctx)
       MD_BLOCK_UL_DETAIL ul;
       MD_BLOCK_OL_DETAIL ol;
       MD_BLOCK_LI_DETAIL li;
+      MD_BLOCK_CUSTOM_DETAIL custom;
     } det;
 
     switch(block->type) {
@@ -5014,6 +5021,11 @@ md_process_all_blocks(MD_CTX* ctx)
       det.li.task_mark_offset = (OFF) block->n_lines;
       break;
 
+    case MD_BLOCK_CUSTOM:
+      det.custom.cls = STR(block->n_lines);  /* n_lines stores cls offset */
+      det.custom.size = block->data;         /* data stores cls size */
+      break;
+
     default:
       /* noop */
       break;
@@ -5023,7 +5035,8 @@ md_process_all_blocks(MD_CTX* ctx)
       if(block->flags & MD_BLOCK_CONTAINER_CLOSER) {
         MD_LEAVE_BLOCK(block->type, &det);
 
-        if(block->type == MD_BLOCK_UL || block->type == MD_BLOCK_OL || block->type == MD_BLOCK_QUOTE)
+        if(block->type == MD_BLOCK_UL || block->type == MD_BLOCK_OL ||
+           block->type == MD_BLOCK_QUOTE)
           ctx->n_containers--;
       }
 
@@ -5040,6 +5053,9 @@ md_process_all_blocks(MD_CTX* ctx)
           ctx->containers[ctx->n_containers].is_loose = TRUE;
           ctx->n_containers++;
         }
+        /* Note: MD_BLOCK_CUSTOM is not tracked in containers array
+         * because it's not pushed during line analysis. Content inside
+         * custom blocks is processed normally. */
       }
     } else {
       MD_CHECK(md_process_leaf_block(ctx, block));
@@ -5489,6 +5505,92 @@ md_is_closing_code_fence(MD_CTX* ctx, CHAR ch, OFF beg, OFF* p_end)
      * would eat the line anyway without any parsing. */
     *p_end = off;
     return ret;
+}
+
+static int
+md_is_opening_custom_fence(MD_CTX* ctx, OFF beg, OFF* p_end)
+{
+    OFF off = beg;
+    SZ fence_length;
+
+    /* Count colons - must be at least 3 */
+    while(off < ctx->size && CH(off) == _T(':'))
+        off++;
+    fence_length = off - beg;
+    if(fence_length < 3)
+        return FALSE;
+
+    /* Check for max nesting depth */
+    if(ctx->custom_block_depth >= 16)
+        return FALSE;
+
+    /* Store fence length for later use */
+    ctx->custom_fence_length = fence_length;
+
+    /* Skip optional spaces */
+    while(off < ctx->size && CH(off) == _T(' '))
+        off++;
+
+    /* Must have {.class} */
+    if(off >= ctx->size || CH(off) != _T('{'))
+        return FALSE;
+    off++;
+
+    if(off >= ctx->size || CH(off) != _T('.'))
+        return FALSE;
+    off++;  /* Skip the '.' */
+
+    /* Find end of class name */
+    {
+        OFF cls_beg = off;
+        while(off < ctx->size && CH(off) != _T('}') && !ISNEWLINE(off) && !ISBLANK(off))
+            off++;
+
+        if(off >= ctx->size || CH(off) != _T('}') || off == cls_beg)
+            return FALSE;  /* Empty class name not allowed */
+
+        ctx->custom_block_cls_beg = cls_beg;
+        ctx->custom_block_cls_size = off - cls_beg;
+    }
+    off++;
+
+    /* Rest must be whitespace/newline */
+    while(off < ctx->size && ISBLANK(off))
+        off++;
+    if(off < ctx->size && !ISNEWLINE(off))
+        return FALSE;
+
+    *p_end = off;
+    return TRUE;
+}
+
+static int
+md_is_closing_custom_fence(MD_CTX* ctx, OFF beg, OFF* p_end)
+{
+    OFF off = beg;
+    SZ required_length;
+
+    /* Get the fence length from the stack (current nesting level) */
+    if(ctx->custom_block_depth <= 0)
+        return FALSE;
+    required_length = ctx->custom_fence_lengths[ctx->custom_block_depth - 1];
+
+    /* Must have at least as many colons as opening */
+    while(off < ctx->size && CH(off) == _T(':'))
+        off++;
+    if(off - beg < required_length)
+        return FALSE;
+
+    /* Skip optional spaces */
+    while(off < ctx->size && CH(off) == _T(' '))
+        off++;
+
+    /* Nothing else allowed */
+    if(off < ctx->size && !ISNEWLINE(off))
+        return FALSE;
+
+    *p_end = off;
+    return TRUE;
 }
 
 
@@ -5991,6 +6093,21 @@ md_analyze_line(MD_CTX* ctx, OFF beg, OFF* p_end,
       }
     }
 
+    /* Check whether we are inside a custom block. */
+    if(ctx->custom_block_depth > 0) {
+      /* Check for closing fence */
+      if(line->indent < ctx->code_indent_offset && CH(off) == _T(':')) {
+        if(md_is_closing_custom_fence(ctx, off, &off)) {
+          line->type = MD_LINE_CUSTOMBLOCK;
+          line->data = 0;  /* Mark as closing fence */
+          break;
+        }
+      }
+
+      /* Content line - continue checking for other block types normally.
+       * This allows markdown content inside custom blocks. */
+    }
+
     /* Check whether we are HTML block continuation. */
     if(pivot_line->type == MD_LINE_HTML  &&  ctx->html_block_type > 0) {
       if(n_parents < ctx->n_containers) {
@@ -6231,6 +6348,18 @@ md_analyze_line(MD_CTX* ctx, OFF beg, OFF* p_end,
       }
     }
 
+    /* Check whether we are starting custom block fence. */
+    if(line->indent < ctx->code_indent_offset  &&
+    off < ctx->size  &&  CH(off) == _T(':'))
+    {
+      if(md_is_opening_custom_fence(ctx, off, &off)) {
+        line->type = MD_LINE_CUSTOMBLOCK;
+        line->data = 1;  /* Mark as opening fence */
+        line->enforce_new_block = TRUE;
+        break;
+      }
+    }
+
     /* Check for start of raw HTML block. */
     if(off < ctx->size  &&  CH(off) == _T('<')
          &&  !(ctx->parser.flags & MD_FLAG_NOHTMLBLOCKS))
@@ -6408,6 +6537,29 @@ md_process_line(MD_CTX* ctx, const MD_LINE_ANALYSIS** p_pivot_line, MD_LINE_ANAL
     return 0;
   }
 
+  /* Custom block fences are handled specially - they create container blocks. */
+  if(line->type == MD_LINE_CUSTOMBLOCK) {
+    MD_CHECK(md_end_current_block(ctx));
+
+    if(line->data == 1) {
+      /* Opening fence - push fence length onto stack and container opener */
+      ctx->custom_fence_lengths[ctx->custom_block_depth] = ctx->custom_fence_length;
+      ctx->custom_block_depth++;
+      MD_CHECK(md_push_container_bytes(ctx, MD_BLOCK_CUSTOM,
+               ctx->custom_block_cls_beg, ctx->custom_block_cls_size,
+               MD_BLOCK_CONTAINER_OPENER));
+    } else {
+      /* Closing fence - push container closer and pop fence length from stack */
+      MD_CHECK(md_push_container_bytes(ctx, MD_BLOCK_CUSTOM,
+               ctx->custom_block_cls_beg, ctx->custom_block_cls_size,
+               MD_BLOCK_CONTAINER_CLOSER));
+      ctx->custom_block_depth--;
+    }
+
+    *p_pivot_line = &md_dummy_blank_line;
+    return 0;
+  }
+
   if(line->enforce_new_block)
     MD_CHECK(md_end_current_block(ctx));
 
@@ -6491,6 +6643,13 @@ md_process_doc(MD_CTX *ctx)
   }
 
   md_end_current_block(ctx);
+
+  /* Close any unclosed custom blocks. */
+  while(ctx->custom_block_depth > 0) {
+    MD_CHECK(md_push_container_bytes(ctx, MD_BLOCK_CUSTOM, 0, 0,
+             MD_BLOCK_CONTAINER_CLOSER));
+    ctx->custom_block_depth--;
+  }
 
   MD_CHECK(md_build_ref_def_hashtable(ctx));
 

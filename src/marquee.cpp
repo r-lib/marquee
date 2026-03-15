@@ -261,6 +261,7 @@ static int enter_block_callback(MD_BLOCKTYPE type, void* detail, void* userdata)
   case MD_BLOCK_CODE:     push_info(ud, "cb", true); break;
   case MD_BLOCK_P:        push_info(ud, "p", true); break;
   case MD_BLOCK_QUOTE:    push_info(ud, "qb", true); break;
+  case MD_BLOCK_CUSTOM:   push_info(ud, std::string(((MD_BLOCK_CUSTOM_DETAIL *) detail)->cls, ((MD_BLOCK_CUSTOM_DETAIL *) detail)->size), true); break;
   case MD_BLOCK_HTML:
   case MD_BLOCK_TABLE:
   case MD_BLOCK_THEAD:
@@ -291,6 +292,7 @@ static int leave_block_callback(MD_BLOCKTYPE type, void* detail, void* userdata)
   case MD_BLOCK_CODE:     pop_info(ud, "cb", true); break;
   case MD_BLOCK_P:        pop_info(ud, "p", true); break;
   case MD_BLOCK_QUOTE:    pop_info(ud, "qb", true); break;
+  case MD_BLOCK_CUSTOM:   pop_info(ud, std::string(((MD_BLOCK_CUSTOM_DETAIL *) detail)->cls, ((MD_BLOCK_CUSTOM_DETAIL *) detail)->size), true); break;
   case MD_BLOCK_HTML:
   case MD_BLOCK_TABLE:
   case MD_BLOCK_THEAD:

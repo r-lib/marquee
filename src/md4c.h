@@ -99,7 +99,13 @@ extern "C" {
     MD_BLOCK_TBODY,
     MD_BLOCK_TR,
     MD_BLOCK_TH,
-    MD_BLOCK_TD
+    MD_BLOCK_TD,
+
+    /* <div class="...">...</div>
+     * Custom block with class attribute.
+     * Detail: Structure MD_BLOCK_CUSTOM_DETAIL.
+     * Added by Thomas Lin Pedersen for marquee. */
+    MD_BLOCK_CUSTOM
   } MD_BLOCKTYPE;
 
   /* Span represents an in-line piece of a document which should be rendered with
@@ -309,6 +315,12 @@ extern "C" {
     const MD_CHAR* cls;
     MD_SIZE size;
   } MD_SPAN_CUSTOM_DETAIL;
+
+  /* Detailed info for MD_BLOCK_CUSTOM. */
+  typedef struct MD_BLOCK_CUSTOM_DETAIL {
+    const MD_CHAR* cls;     /* Class name (e.g., "warning", "note") */
+    MD_SIZE size;           /* Length of cls string */
+  } MD_BLOCK_CUSTOM_DETAIL;
 
   /* Flags specifying extensions/deviations from CommonMark specification.
    *
