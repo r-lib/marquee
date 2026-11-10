@@ -50,7 +50,7 @@ test_that("guide_marquee can recolour text", {
   params <- b$plot$guides$get_params("colour")
 
   grob <- GuideMarquee$draw(ggplot2::theme_get(), params = params)$grobs[[1]]
-    dev.off()
+  dev.off()
 
   expect_equal(
     grob$text$text,
@@ -73,4 +73,39 @@ test_that("guide_marquee can recolour text", {
       "black"
     )
   )
+})
+
+test_that("guide_marquee handles NA title width from marquefy_theme (#95)", {
+  skip_if_not_installed("ggplot2", "4.0.0")
+  base <- ggplot2::ggplot(ggplot2::mpg, ggplot2::aes(displ, hwy)) +
+    ggplot2::geom_point()
+
+  p <- base +
+    ggplot2::aes(shape = drv) +
+    ggplot2::scale_shape_discrete(
+      name = "Cars with four wheel <<4>>, forward <<f>> or reverse <<r>> drive.",
+      guide = "marquee"
+    ) +
+    marquefy_theme(ggplot2::theme_bw())
+  expect_no_error(ggplot2::ggplotGrob(p))
+
+  p_right <- base +
+    ggplot2::aes(shape = drv) +
+    ggplot2::scale_shape_discrete(
+      name = "Cars with four wheel <<4>>, forward <<f>> or reverse <<r>> drive.",
+      guide = guide_marquee(position = "right")
+    ) +
+    marquefy_theme(ggplot2::theme_bw()) +
+    ggplot2::theme(legend.position = "right")
+  expect_no_error(ggplot2::ggplotGrob(p_right))
+
+  # An explicit width is still honoured
+  p_width <- base +
+    ggplot2::aes(shape = drv) +
+    ggplot2::scale_shape_discrete(
+      name = "Cars with four wheel <<4>> drive.",
+      guide = guide_marquee(width = grid::unit(5, "cm"))
+    ) +
+    marquefy_theme(ggplot2::theme_bw())
+  expect_no_error(ggplot2::ggplotGrob(p_width))
 })

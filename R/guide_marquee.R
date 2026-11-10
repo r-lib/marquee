@@ -234,13 +234,16 @@ make_marquee_guide <- function() {
       style <- elems$title$style %||% classic_style()
       style <- recolour_style(style, text, params)
 
-      width <- elems$title$width %||%
-        switch(
+      width <- elems$title$width
+      # A scalar NA (e.g. from marquefy_theme()) means "no explicit width"
+      if (is.null(width) || (length(width) == 1 && is.na(width))) {
+        width <- switch(
           params$position,
           top = ,
           bottom = unit(1, "npc"),
           ggplot2::calc_element("legend.key.width", theme) * 5
         )
+      }
 
       # TODO: this is a hack until #24 is solved
       f <- element_grob.element_marquee
