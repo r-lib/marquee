@@ -10,6 +10,15 @@
 #' small shifts in the visuals when going from `element_text()` to
 #' `element_marquee()` as size reporting may differ between the two elements.
 #'
+#' If a margin is set on the element it replaces any padding on the body tag
+#' of the style, so a base-level padding in the style has no effect in this
+#' context. Note also that in [classic_style()] the paragraph (`p`) and list
+#' item (`li`) tags set their own padding explicitly, so base-level padding
+#' only reaches the body (and a few header tags), not individual paragraphs.
+#' To control spacing between paragraphs, modify the paragraph style directly,
+#' e.g. `modify_style(style, "p", padding = trbl(bottom = em(1)))` (the same
+#' applies to margins).
+#'
 #' @note grid, which marquee, ggplot2, etc are build upon contains a bug that
 #' means that the height of a grob is calculated before the grob knows it's
 #' width. The result of this is that if the width of an `element_marquee()` is

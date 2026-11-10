@@ -123,3 +123,4 @@ test_that("element_grob falls back to the style's base values", {
   )$lineheight[1]
   expect_equal(grob$text$lineheight[1], expected)
 })
+

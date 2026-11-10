@@ -65,6 +65,16 @@ as expected with rotated text (you may get lucky). Note that you may see
 small shifts in the visuals when going from \code{element_text()} to
 \code{element_marquee()} as size reporting may differ between the two elements.
 }
+\details{
+If a margin is set on the element it replaces any padding on the body tag
+of the style, so a base-level padding in the style has no effect in this
+context. Note also that in \code{\link[=classic_style]{classic_style()}} the paragraph (\code{p}) and list
+item (\code{li}) tags set their own padding explicitly, so base-level padding
+only reaches the body (and a few header tags), not individual paragraphs.
+To control spacing between paragraphs, modify the paragraph style directly,
+e.g. \code{modify_style(style, "p", padding = trbl(bottom = em(1)))} (the same
+applies to margins).
+}
 \note{
 grid, which marquee, ggplot2, etc are build upon contains a bug that
 means that the height of a grob is calculated before the grob knows it's
@@ -75,13 +85,13 @@ eyeball the width it has available and pass that to the element (e.g.
 \code{element_marquee(width = grid::unit(10, "cm"))})
 }
 \examples{
-\dontshow{if (rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("ggplot2")) withAutoprint(\{ # examplesIf}
 library(ggplot2)
 p <- ggplot(mtcars) +
   geom_point(aes(mpg, disp)) +
   labs(title = "A {.red *marquee*} title\n* Look at this bullet list\n\n* great, huh?") +
   theme_gray(base_size = 6) +
-  theme(title = element_marquee())
+  theme(plot.title = element_marquee())
 
 plot(p)
 
@@ -93,6 +103,6 @@ ggplot(mtcars) +
 ![](p)
 
 What more could you _possibly_ want?") +
-  theme(title = element_marquee())
+  theme(plot.title = element_marquee())
 \dontshow{\}) # examplesIf}
 }
