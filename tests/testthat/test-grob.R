@@ -71,20 +71,16 @@ test_that("inline padding is not double-counted in span rects (#93)", {
   grob <- marquee_grob("aaa {.button bbb} ccc", width = NA, style = style)
   grob <- makeContent(grob)
 
-  # The rect should extend exactly one padding beyond the text on each side
-  bare_extent <- grid::convertWidth(
-    grid::grobWidth(grid::textGrob("bbb")),
-    "pt",
-    valueOnly = TRUE
-  )
-  lead_in <- grid::convertWidth(
-    grid::grobWidth(grid::textGrob("aaa ")),
-    "pt",
-    valueOnly = TRUE
-  )
+  # The rect should extend exactly one padding beyond the text on each side.
+  # Glyph extents are taken from the grob itself so the test is independent
+  # of platform-specific font metrics
+  span_id <- which(grob$text$text == "bbb")
+  span_glyphs <- grob$shape[grob$shape$string_id == span_id, ]
+  text_left <- min(span_glyphs$x_offset)
+  text_right <- max(span_glyphs$x_offset + span_glyphs$advance)
 
-  expect_equal(unname(grob$rects$width), bare_extent + 20, tolerance = 0.1)
-  expect_equal(unname(grob$rects$x), lead_in, tolerance = 0.1)
+  expect_equal(unname(grob$rects$width), text_right - text_left + 20, tolerance = 0.01)
+  expect_equal(unname(grob$rects$x), text_left - 10, tolerance = 0.01)
 
   # One-sided padding also gets spacers
   grob_left <- marquee_grob(
@@ -93,5 +89,10 @@ test_that("inline padding is not double-counted in span rects (#93)", {
     style = modify_style(style, "button", padding = trbl(0, 0, 0, 10))
   )
   grob_left <- makeContent(grob_left)
-  expect_equal(unname(grob_left$rects$width), bare_extent + 10, tolerance = 0.1)
+  span_glyphs_left <- grob_left$shape[grob_left$shape$string_id == span_id, ]
+  text_width_left <- max(
+    span_glyphs_left$x_offset + span_glyphs_left$advance
+  ) -
+    min(span_glyphs_left$x_offset)
+  expect_equal(unname(grob_left$rects$width), text_width_left + 10, tolerance = 0.01)
 })
