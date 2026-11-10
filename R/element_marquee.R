@@ -159,7 +159,7 @@ make_element_marquee_s7 <- function() {
       inherit.blank = FALSE
     ) {
       if (!ggplot2::is_margin(margin) && !is.null(margin)) {
-        margin <- getFromNamespace("as_margin", "ggplot2")(margin)
+        margin <- utils::getFromNamespace("as_margin", "ggplot2")(margin)
         cli::cli_warn(
           "The {.arg margin} argument should be constructed using the \\
           {.fn margin} function."
