@@ -929,19 +929,15 @@ makeContext.marquee_grob <- function(x) {
   span_rects <- inject(rbind(!!!unlist(span_rects, recursive = FALSE)))
 
   ### Combine block and span rects
+  # Horizontal padding is not added here: add_inline_padding() has already
+  # inserted spacer glyphs at the span boundaries, so the glyph extent above
+  # includes it (spans starting a block get no spacers and lose horizontal
+  # padding in their rect — an accepted edge case)
   x$rects <- list(
     id = c(block_rects$id, x$text$id[span_rects[, 1]]),
-    x = c(
-      block_rects$x,
-      span_rects[, 2] - x$text$padding_left[span_rects[, 1]]
-    ),
+    x = c(block_rects$x, span_rects[, 2]),
     y = c(block_rects$y, span_rects[, 3] + x$text$padding_top[span_rects[, 1]]),
-    width = c(
-      block_rects$width,
-      span_rects[, 4] +
-        x$text$padding_left[span_rects[, 1]] +
-        x$text$padding_right[span_rects[, 1]]
-    ),
+    width = c(block_rects$width, span_rects[, 4]),
     height = c(
       block_rects$height,
       span_rects[, 5] +
@@ -1374,7 +1370,14 @@ get_last <- function(tree, background, border) {
     tree$element
   }
 }
-set_margins <- function(tree, margins, has_background, has_top, has_bottom, forced_margin = NULL) {
+set_margins <- function(
+  tree,
+  margins,
+  has_background,
+  has_top,
+  has_bottom,
+  forced_margin = NULL
+) {
   tops <- get_first(tree, has_background, has_top)
   margins$top[tops[1]] <- forced_margin %||% max(margins$top[tops])
   margins$top[tops[-1]] <- 0
@@ -1384,7 +1387,14 @@ set_margins <- function(tree, margins, has_background, has_top, has_bottom, forc
   for (i in seq_along(tree$children)) {
     child <- tree$children[[i]]
     is_last <- i == length(tree$children)
-    margins <- set_margins(child, margins, has_background, has_top, has_bottom, if (is_last) forced_margin else NULL)
+    margins <- set_margins(
+      child,
+      margins,
+      has_background,
+      has_top,
+      has_bottom,
+      if (is_last) forced_margin else NULL
+    )
   }
   for (i in seq_along(tree$children)[-1]) {
     margins$bottom[tree$children[[i - 1]]$element] <- max(
@@ -1422,8 +1432,8 @@ has_identical_background <- function(a, b, style) {
 add_inline_padding <- function(parsed) {
   has_background <- which(
     parsed$block == c(0, parsed$block[seq_len(nrow(parsed) - 1)]) &
-      parsed$padding_right != 0 &
-      parsed$padding_left != 0
+      (parsed$padding_right != 0 |
+        parsed$padding_left != 0)
   )
   needs_padding <- parsed$block[has_background] !=
     parsed$block[has_background - 1] |

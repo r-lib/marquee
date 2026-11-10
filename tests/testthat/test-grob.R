@@ -58,3 +58,40 @@ test_that("grob looks as it should (sadly too complex to test other way)", {
 
   expect_snapshot_file(file, "marquee_grob.png")
 })
+
+test_that("inline padding is not double-counted in span rects (#93)", {
+  style <- classic_style() |>
+    modify_style(
+      "button",
+      border = "black",
+      border_width = trbl(1),
+      padding = trbl(10)
+    )
+
+  grob <- marquee_grob("aaa {.button bbb} ccc", width = NA, style = style)
+  grob <- makeContent(grob)
+
+  # The rect should extend exactly one padding beyond the text on each side
+  bare_extent <- grid::convertWidth(
+    grid::grobWidth(grid::textGrob("bbb")),
+    "pt",
+    valueOnly = TRUE
+  )
+  lead_in <- grid::convertWidth(
+    grid::grobWidth(grid::textGrob("aaa ")),
+    "pt",
+    valueOnly = TRUE
+  )
+
+  expect_equal(unname(grob$rects$width), bare_extent + 20, tolerance = 0.1)
+  expect_equal(unname(grob$rects$x), lead_in, tolerance = 0.1)
+
+  # One-sided padding also gets spacers
+  grob_left <- marquee_grob(
+    "aaa {.button bbb} ccc",
+    width = NA,
+    style = modify_style(style, "button", padding = trbl(0, 0, 0, 10))
+  )
+  grob_left <- makeContent(grob_left)
+  expect_equal(unname(grob_left$rects$width), bare_extent + 10, tolerance = 0.1)
+})
