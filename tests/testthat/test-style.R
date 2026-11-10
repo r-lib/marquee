@@ -210,3 +210,15 @@ test_that("base_style() creates a complete style", {
   expect_s3_class(s, "marquee_style")
   expect_false(any(vapply(s, is.null, logical(1))))
 })
+
+test_that("classic_style() treats a bullets vector as a single value (#99)", {
+  s <- classic_style(bullets = rep("•", 6L))
+  expect_length(s, 1)
+  expect_identical(s[[1]]$base$bullets, rep("•", 6L))
+  expect_no_error(marquee_grob("Test", style = s))
+
+  # Vectorised form: one bullet vector per style set
+  s <- classic_style(base_size = c(12, 20), bullets = list("x", "y"))
+  expect_length(s, 2)
+  expect_identical(s[[2]]$base$bullets, "y")
+})
