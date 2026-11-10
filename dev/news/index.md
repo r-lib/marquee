@@ -2,6 +2,10 @@
 
 ## marquee (development version)
 
+- HTML entities now return the correct symbols
+  ([@clauswilke](https://github.com/clauswilke),
+  [\#89](https://github.com/r-lib/marquee/issues/89))
+
 ## marquee 1.2.1
 
 CRAN release: 2025-09-15
