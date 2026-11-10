@@ -6,6 +6,8 @@
 * Fixed a crash (session abort) when using `guide_marquee()` together with
   `marquefy_theme()`, caused by an `NA` title width being used instead of the
   default width (#95)
+* `geom_marquee()` now takes its default font family, size, and colour from
+  the theme, like other text geoms do on ggplot2 >= 4.0.0 (#106)
 
 # marquee 1.2.1
 
