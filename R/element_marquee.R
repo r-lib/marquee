@@ -97,6 +97,21 @@ element_marquee <- function(
       i = "Results may be unexpected or may change in future versions of ggplot2."
     ))
   }
+  if (!is.null(element_env$s7_class)) {
+    return(element_env$s7_class(
+      family = family,
+      colour = colour,
+      size = size,
+      hjust = hjust,
+      vjust = vjust,
+      angle = angle,
+      lineheight = lineheight,
+      margin = margin,
+      style = style,
+      width = width,
+      inherit.blank = inherit.blank
+    ))
+  }
   structure(
     list(
       family = family,
@@ -112,6 +127,80 @@ element_marquee <- function(
       inherit.blank = inherit.blank
     ),
     class = c("element_marquee", "element_text", "element")
+  )
+}
+
+element_env <- new_environment(list(s7_class = NULL))
+
+# From ggplot2 4.0.0 theme elements are S7 classes. For inheritance to work
+# correctly (e.g. `title` passing its class on to `plot.title`), element_marquee
+# must be a proper S7 subclass of ggplot2::element_text (#97). On older ggplot2
+# versions we fall back to the S3 implementation above.
+make_element_marquee_s7 <- function() {
+  element_env$s7_class <- S7::new_class(
+    "element_marquee",
+    package = "marquee",
+    parent = ggplot2::element_text,
+    properties = list(
+      style = S7::class_any,
+      width = S7::class_any
+    ),
+    constructor = function(
+      family = NULL,
+      colour = NULL,
+      size = NULL,
+      hjust = NULL,
+      vjust = NULL,
+      angle = NULL,
+      lineheight = NULL,
+      margin = NULL,
+      style = NULL,
+      width = NULL,
+      inherit.blank = FALSE
+    ) {
+      if (!ggplot2::is_margin(margin) && !is.null(margin)) {
+        margin <- getFromNamespace("as_margin", "ggplot2")(margin)
+        cli::cli_warn(
+          "The {.arg margin} argument should be constructed using the \\
+          {.fn margin} function."
+        )
+      }
+      obj <- S7::new_object(
+        S7::S7_object(),
+        family = family,
+        face = NULL,
+        colour = colour,
+        size = size,
+        hjust = hjust,
+        vjust = vjust,
+        angle = angle,
+        lineheight = lineheight,
+        margin = margin,
+        debug = NULL,
+        inherit.blank = inherit.blank,
+        italic = NA_character_,
+        fontweight = NA_real_,
+        fontwidth = NA_real_,
+        style = style,
+        width = width
+      )
+      # ggplot2's own element constructors add the plain S3 aliases to the
+      # class vector like this; they are needed for inheritance and S3
+      # dispatch (e.g. element_grob) to work
+      class(obj) <- union(
+        union(
+          c(
+            "marquee::element_marquee",
+            "element_marquee",
+            "ggplot2::element_text",
+            "element_text"
+          ),
+          class(obj)
+        ),
+        "element"
+      )
+      obj
+    }
   )
 }
 
@@ -273,7 +362,31 @@ on_load({
   )
   if (requireNamespace("ggplot2", quietly = TRUE)) {
     if (S7::S7_inherits(ggplot2::element_text)) {
+      make_element_marquee_s7()
       merge_element <- ggplot2::merge_element
+      # ggplot2's own method tries to fill all empty props of new from old,
+      # which fails for the style and width props that a plain element_text
+      # doesn't have
+      S7::method(
+        merge_element,
+        list(element_env$s7_class, S7::class_any)
+      ) <- function(new, old, ...) {
+        idx <- lengths(S7::props(new)) == 0
+        idx <- names(idx[idx])
+        old_names <- if (S7::S7_inherits(old)) {
+          S7::prop_names(old)
+        } else {
+          names(unclass(old))
+        }
+        idx <- intersect(idx, old_names)
+        if (S7::S7_inherits(old)) {
+          S7::props(new)[idx] <- S7::props(old, idx)
+        } else {
+          S7::props(new)[idx] <- unclass(old)[idx]
+        }
+        new
+      }
+      # Support merging legacy S3 element_marquee objects
       S7::method(
         merge_element,
         list(ggplot2::element_text, S7::new_S3_class("element_marquee"))

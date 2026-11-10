@@ -124,3 +124,27 @@ test_that("element_grob falls back to the style's base values", {
   expect_equal(grob$text$lineheight[1], expected)
 })
 
+
+test_that("element_marquee propagates to child theme elements (#97)", {
+  skip_if_not_installed("ggplot2", "4.0.0")
+  theme <- ggplot2::theme_gray() +
+    ggplot2::theme(title = element_marquee(style = classic_style()))
+
+  # plot.title takes on the class and style of the parent title element
+  el <- ggplot2:::calc_element("plot.title", theme)
+  expect_true(inherits(el, "element_marquee"))
+  expect_s3_class(el$style, "marquee_style_set")
+
+  # ... and renders markdown, including custom span colours
+  p <- ggplot2::ggplot(mtcars) +
+    ggplot2::geom_point(ggplot2::aes(mpg, disp)) +
+    ggplot2::labs(title = "A {.red *marquee*} title") +
+    ggplot2::theme_gray(base_size = 6) +
+    ggplot2::theme(title = element_marquee())
+  gt <- ggplot2::ggplotGrob(p)
+  title_grob <- gt$grobs[[which(gt$layout$name == "title")]]
+  expect_s3_class(title_grob, "marquee_grob")
+  red <- title_grob$text$text == "marquee"
+  expect_identical(title_grob$text$color[red], "red")
+  expect_true(title_grob$text$italic[red])
+})
