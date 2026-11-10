@@ -42,7 +42,7 @@
 #'   geom_point(aes(mpg, disp)) +
 #'   labs(title = "A {.red *marquee*} title\n* Look at this bullet list\n\n* great, huh?") +
 #'   theme_gray(base_size = 6) +
-#'   theme(title = element_marquee())
+#'   theme(plot.title = element_marquee())
 #'
 #' plot(p)
 #'
@@ -54,7 +54,7 @@
 #' ![](p)
 #'
 #' What more could you _possibly_ want?") +
-#'   theme(title = element_marquee())
+#'   theme(plot.title = element_marquee())
 #'
 element_marquee <- function(
   family = NULL,
