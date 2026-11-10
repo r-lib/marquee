@@ -46,9 +46,10 @@ test_that("element_marquee() observes customs around margin_x/margin_y", {
 })
 
 test_that("hjust controls multi-line alignment when style align is auto (#104)", {
-  png(tempfile())
+  skip_if_not_installed("ragg")
+  ragg::agg_png(tempfile(fileext = ".png"))
   grob <- element_grob.element_marquee(
-    element_marquee(hjust = 0.5, margin = ggplot2::margin(0, 0, 0, 0)),
+    element_marquee(hjust = 0.5, vjust = 1, margin = ggplot2::margin(0, 0, 0, 0)),
     "line one\nlonger line two",
     x = 0.5,
     y = 0.5
@@ -56,7 +57,7 @@ test_that("hjust controls multi-line alignment when style align is auto (#104)",
   expect_identical(grob$text$align[1], "center")
 
   grob <- element_grob.element_marquee(
-    element_marquee(hjust = 1, margin = ggplot2::margin(0, 0, 0, 0)),
+    element_marquee(hjust = 1, vjust = 1, margin = ggplot2::margin(0, 0, 0, 0)),
     "line one\nlonger line two",
     x = 0.5,
     y = 0.5
@@ -67,6 +68,7 @@ test_that("hjust controls multi-line alignment when style align is auto (#104)",
   grob <- element_grob.element_marquee(
     element_marquee(
       hjust = 0.5,
+      vjust = 1,
       style = classic_style(align = "left"),
       margin = ggplot2::margin(0, 0, 0, 0)
     ),
@@ -101,7 +103,8 @@ test_that("marquefy_theme() lets parent elements propagate style (#104)", {
 })
 
 test_that("element_grob falls back to the style's base values", {
-  png(tempfile())
+  skip_if_not_installed("ragg")
+  ragg::agg_png(tempfile(fileext = ".png"))
   grob <- element_grob.element_marquee(
     element_marquee(
       style = classic_style(base_size = 20, body_font = "serif"),
