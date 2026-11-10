@@ -3,6 +3,9 @@
 * HTML entities now return the correct symbols (@clauswilke, #89)
 * Fixed a regression where a vector of bullets passed to `classic_style()` or
   `modify_style()` was recycled into multiple style sets (#99)
+* Fixed a crash (session abort) when using `guide_marquee()` together with
+  `marquefy_theme()`, caused by an `NA` title width being used instead of the
+  default width (#95)
 
 # marquee 1.2.1
 
