@@ -1,6 +1,7 @@
 # Marquee Styling
 
 ``` r
+
 library(marquee)
 ```
 
@@ -64,6 +65,7 @@ style must be complete). As an example, let’s look at the style for the
 [`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md):
 
 ``` r
+
 classic_style()[[1]]$em
 #> <marquee_style[1]>
 #> italic: TRUE

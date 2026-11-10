@@ -7,6 +7,7 @@ inside R graphics such as ggplot2 or other graphics built on grid.
 ## Installation
 
 ``` r
+
 # You can install marquee from CRAN
 install.packages("marquee")
 
@@ -22,6 +23,7 @@ which creates a grob based on markdown text and a style that can be
 rendered with grid:
 
 ``` r
+
 # Let's render this readme
 readme <- paste(readLines("README.Rmd")[-seq_len(17)], collapse = "\n")
 

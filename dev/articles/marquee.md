@@ -1,6 +1,7 @@
 # marquee
 
 ``` r
+
 library(marquee)
 library(grid)
 library(ggplot2)
@@ -29,6 +30,7 @@ time.
 ## An example
 
 ``` r
+
 md_text <-
 "# Lorem Ipsum
 Lorem ipsum dolor sit amet, *consectetur* adipiscing elit, sed do eiusmod tempor incididunt ut
@@ -61,6 +63,7 @@ The function itself allows you to modify the final style, and you could
 also modify it after construction to create a completely new style:
 
 ``` r
+
 new_style <- classic_style(body_font = "serif", header_font = "mono", hanging = em(1))
 
 new_style <- modify_style(
@@ -84,6 +87,7 @@ contains a nifty feature where, if the class matches a recognized color
 name or hex-code, it will be automatically coloured.
 
 ``` r
+
 md_text_custom <-
 "# Lorem Ipsum
 Lorem ipsum dolor {.red sit amet, *consectetur* adipiscing elit, sed do} eiusmod tempor
@@ -104,6 +108,7 @@ If you provide a styling for the custom class it takes precedence over
 any matching color name
 
 ``` r
+
 grid.draw(
   marquee_grob(md_text_custom, modify_style(classic_style(), "red", tracking = 400))
 )
@@ -133,6 +138,7 @@ styling of
 is much more capable:
 
 ``` r
+
 fancy_font <- classic_style(
   weight = "semibold",
   features = systemfonts::font_feature(
@@ -150,6 +156,7 @@ However, the main use will probably be to mix in italicized, bold, or
 colored fonts in labels, which marquee makes very easy
 
 ``` r
+
 cars <- sub("(\\w+)", "{.red ***\\1***}", rownames(mtcars))
 cars
 #>  [1] "{.red ***Mazda***} RX4"          
@@ -196,6 +203,7 @@ annotations. Let’s make a textbox style and add some lorem ipsum to our
 plot
 
 ``` r
+
 text_box_style <- modify_style(
   classic_style(base_size = 2),
   "body",
@@ -232,6 +240,7 @@ a drop-in substitute for
 which will format and style any non-plotting text.
 
 ``` r
+
 ggplot(mtcars) + aes(disp, mpg, label = cars) +
   geom_marquee(size = 2) +
   ggtitle(md_text) +
@@ -251,6 +260,7 @@ natural value here, but you can set it to any
 [`grid::unit()`](https://rdrr.io/r/grid/unit.html) value you wish.
 
 ``` r
+
 ggplot(mtcars) + aes(disp, mpg, label = cars) +
   geom_marquee(size = 2) +
   ggtitle(md_text) +
@@ -272,6 +282,7 @@ itself, it expands to fill the provided width, width the height being
 calculated to match the aspect ratio of the image.
 
 ``` r
+
 md_text_fig <-
 "# Lorem Ipsum ![](https://cran.r-project.org/Rlogo.svg)
 Lorem ipsum dolor {.red sit amet, *consectetur* adipiscing elit, sed do} eiusmod tempor
@@ -289,6 +300,7 @@ grid.draw(marquee_grob(md_text_fig, classic_style()))
 Compare that to
 
 ``` r
+
 md_text_fig2 <-
 "# Lorem Ipsum
 
@@ -312,6 +324,7 @@ accepts R graphic objects (currently grid grobs, ggplot2 plots and
 patchwork plots). It all works as you’d expect:
 
 ``` r
+
 p <- ggplot(mtcars) +
   geom_histogram(aes(x = gear))
 
@@ -346,6 +359,7 @@ specification taken from the [gt
 introduction](https://gt.rstudio.com/articles/gt.html):
 
 ``` r
+
 library(gt)
 airquality_m <- airquality[1:10, ]
 airquality_m$Year <- 1973L
@@ -365,6 +379,7 @@ table <- tab_spanner(table,
 ```
 
 ``` r
+
 md_text_table <-
 "# Lorem Ipsum
 Below we have a table created with gt

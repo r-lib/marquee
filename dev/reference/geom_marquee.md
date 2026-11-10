@@ -191,6 +191,7 @@ content disappears. In that case, you must provide a width.
 ## Examples
 
 ``` r
+
 library(ggplot2)
 # Standard use
 p <- ggplot(mtcars, aes(wt, mpg))
