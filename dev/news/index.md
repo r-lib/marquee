@@ -5,6 +5,18 @@
 - HTML entities now return the correct symbols
   ([@clauswilke](https://github.com/clauswilke),
   [\#89](https://github.com/r-lib/marquee/issues/89))
+- Fixed a regression where a vector of bullets passed to
+  [`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md)
+  or
+  [`modify_style()`](https://marquee.r-lib.org/dev/reference/style_set.md)
+  was recycled into multiple style sets
+  ([\#99](https://github.com/r-lib/marquee/issues/99))
+- Fixed a crash (session abort) when using
+  [`guide_marquee()`](https://marquee.r-lib.org/dev/reference/guide_marquee.md)
+  together with
+  [`marquefy_theme()`](https://marquee.r-lib.org/dev/reference/marquefy_theme.md),
+  caused by an `NA` title width being used instead of the default width
+  ([\#95](https://github.com/r-lib/marquee/issues/95))
 
 ## marquee 1.2.1
 
