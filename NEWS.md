@@ -8,6 +8,9 @@
   default width (#95)
 * `geom_marquee()` now takes its default font family, size, and colour from
   the theme, like other text geoms do on ggplot2 >= 4.0.0 (#106)
+* Fixed horizontal inline padding being applied twice to background and border
+  rectangles of styled spans, so borders no longer spill into neighbouring
+  words. One-sided padding now also correctly adds spacing (#93)
 
 # marquee 1.2.1
 
