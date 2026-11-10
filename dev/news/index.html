@@ -55,6 +55,8 @@
 <li>
 <code><a href="../reference/element_marquee.html">element_marquee()</a></code> now correctly falls back to the base family, colour, size, and lineheight of the provided style when these are not set on the element itself</li>
 <li>Documented that in <code><a href="../reference/element_marquee.html">element_marquee()</a></code> the element margin replaces body padding from the style, and that paragraph spacing must be set on the paragraph style (e.g. via <code>modify_style(style, "p", ...)</code>) rather than through base-level padding (<a href="https://github.com/r-lib/marquee/issues/100" class="external-link">#100</a>)</li>
+<li>
+<code><a href="../reference/element_marquee.html">element_marquee()</a></code> is now an S7 subclass of <code><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">ggplot2::element_text</a></code> on ggplot2 &gt;= 4.0.0, so setting it on a parent theme element (e.g. <code>title</code>) correctly propagates to child elements (e.g. <code>plot.title</code>) instead of rendering the raw markdown as plain text (<a href="https://github.com/r-lib/marquee/issues/97" class="external-link">#97</a>)</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.1" id="marquee-121">marquee 1.2.1<a class="anchor" aria-label="anchor" href="#marquee-121"></a></h2><p class="text-muted">CRAN release: 2025-09-15</p>

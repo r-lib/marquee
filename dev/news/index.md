@@ -46,6 +46,13 @@
   paragraph spacing must be set on the paragraph style (e.g. via
   `modify_style(style, "p", ...)`) rather than through base-level
   padding ([\#100](https://github.com/r-lib/marquee/issues/100))
+- [`element_marquee()`](https://marquee.r-lib.org/dev/reference/element_marquee.md)
+  is now an S7 subclass of
+  [`ggplot2::element_text`](https://ggplot2.tidyverse.org/reference/element.html)
+  on ggplot2 \>= 4.0.0, so setting it on a parent theme element
+  (e.g. `title`) correctly propagates to child elements
+  (e.g. `plot.title`) instead of rendering the raw markdown as plain
+  text ([\#97](https://github.com/r-lib/marquee/issues/97))
 
 ## marquee 1.2.1
 
