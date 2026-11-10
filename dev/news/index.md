@@ -25,6 +25,27 @@
   border rectangles of styled spans, so borders no longer spill into
   neighbouring words. One-sided padding now also correctly adds spacing
   ([\#93](https://github.com/r-lib/marquee/issues/93))
+- Multi-line text in
+  [`element_marquee()`](https://marquee.r-lib.org/dev/reference/element_marquee.md)
+  now follows the element’s `hjust` for line alignment (like
+  [`element_text()`](https://ggplot2.tidyverse.org/reference/element.html)),
+  unless the style sets an explicit alignment. Additionally,
+  [`marquefy_theme()`](https://marquee.r-lib.org/dev/reference/marquefy_theme.md)
+  no longer sets `style` and `width` on every element, so a
+  [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) call
+  on a parent element (e.g. `axis.text`) propagates to its children
+  (e.g. `axis.text.x`)
+  ([\#104](https://github.com/r-lib/marquee/issues/104))
+- [`element_marquee()`](https://marquee.r-lib.org/dev/reference/element_marquee.md)
+  now correctly falls back to the base family, colour, size, and
+  lineheight of the provided style when these are not set on the element
+  itself
+- Documented that in
+  [`element_marquee()`](https://marquee.r-lib.org/dev/reference/element_marquee.md)
+  the element margin replaces body padding from the style, and that
+  paragraph spacing must be set on the paragraph style (e.g. via
+  `modify_style(style, "p", ...)`) rather than through base-level
+  padding ([\#100](https://github.com/r-lib/marquee/issues/100))
 
 ## marquee 1.2.1
 

@@ -92,6 +92,19 @@ element_marquee(
 An `element_marquee` object that can be used in place of `element_text`
 in ggplot2 theme specifications
 
+## Details
+
+If a margin is set on the element it replaces any padding on the body
+tag of the style, so a base-level padding in the style has no effect in
+this context. Note also that in
+[`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md)
+the paragraph (`p`) and list item (`li`) tags set their own padding
+explicitly, so base-level padding only reaches the body (and a few
+header tags), not individual paragraphs. To control spacing between
+paragraphs, modify the paragraph style directly, e.g.
+`modify_style(style, "p", padding = trbl(bottom = em(1)))` (the same
+applies to margins).
+
 ## Note
 
 grid, which marquee, ggplot2, etc are build upon contains a bug that
@@ -110,7 +123,7 @@ p <- ggplot(mtcars) +
   geom_point(aes(mpg, disp)) +
   labs(title = "A {.red *marquee*} title\n* Look at this bullet list\n\n* great, huh?") +
   theme_gray(base_size = 6) +
-  theme(title = element_marquee())
+  theme(plot.title = element_marquee())
 
 plot(p)
 
@@ -123,6 +136,6 @@ ggplot(mtcars) +
 ![](p)
 
 What more could you _possibly_ want?") +
-  theme(title = element_marquee())
+  theme(plot.title = element_marquee())
 #> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
 ```
