@@ -142,7 +142,7 @@ is only an image tag) then the width is zero and the content disappears. In
 that case, you must provide a width.
 }
 \examples{
-\dontshow{if (rlang::is_installed("ggplot2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("ggplot2")) withAutoprint(\{ # examplesIf}
 
 library(ggplot2)
 # Standard use

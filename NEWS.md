@@ -19,6 +19,10 @@
 * `element_marquee()` now correctly falls back to the base family, colour,
   size, and lineheight of the provided style when these are not set on the
   element itself
+* Documented that in `element_marquee()` the element margin replaces body
+  padding from the style, and that paragraph spacing must be set on the
+  paragraph style (e.g. via `modify_style(style, "p", ...)`) rather than
+  through base-level padding (#100)
 
 # marquee 1.2.1
 
