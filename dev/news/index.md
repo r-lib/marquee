@@ -17,6 +17,14 @@
   [`marquefy_theme()`](https://marquee.r-lib.org/dev/reference/marquefy_theme.md),
   caused by an `NA` title width being used instead of the default width
   ([\#95](https://github.com/r-lib/marquee/issues/95))
+- [`geom_marquee()`](https://marquee.r-lib.org/dev/reference/geom_marquee.md)
+  now takes its default font family, size, and colour from the theme,
+  like other text geoms do on ggplot2 \>= 4.0.0
+  ([\#106](https://github.com/r-lib/marquee/issues/106))
+- Fixed horizontal inline padding being applied twice to background and
+  border rectangles of styled spans, so borders no longer spill into
+  neighbouring words. One-sided padding now also correctly adds spacing
+  ([\#93](https://github.com/r-lib/marquee/issues/93))
 
 ## marquee 1.2.1
 

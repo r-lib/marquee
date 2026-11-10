@@ -48,6 +48,9 @@
 <ul><li>HTML entities now return the correct symbols (<a href="https://github.com/clauswilke" class="external-link">@clauswilke</a>, <a href="https://github.com/r-lib/marquee/issues/89" class="external-link">#89</a>)</li>
 <li>Fixed a regression where a vector of bullets passed to <code><a href="../reference/classic_style.html">classic_style()</a></code> or <code><a href="../reference/style_set.html">modify_style()</a></code> was recycled into multiple style sets (<a href="https://github.com/r-lib/marquee/issues/99" class="external-link">#99</a>)</li>
 <li>Fixed a crash (session abort) when using <code><a href="../reference/guide_marquee.html">guide_marquee()</a></code> together with <code><a href="../reference/marquefy_theme.html">marquefy_theme()</a></code>, caused by an <code>NA</code> title width being used instead of the default width (<a href="https://github.com/r-lib/marquee/issues/95" class="external-link">#95</a>)</li>
+<li>
+<code><a href="../reference/geom_marquee.html">geom_marquee()</a></code> now takes its default font family, size, and colour from the theme, like other text geoms do on ggplot2 &gt;= 4.0.0 (<a href="https://github.com/r-lib/marquee/issues/106" class="external-link">#106</a>)</li>
+<li>Fixed horizontal inline padding being applied twice to background and border rectangles of styled spans, so borders no longer spill into neighbouring words. One-sided padding now also correctly adds spacing (<a href="https://github.com/r-lib/marquee/issues/93" class="external-link">#93</a>)</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.1" id="marquee-121">marquee 1.2.1<a class="anchor" aria-label="anchor" href="#marquee-121"></a></h2><p class="text-muted">CRAN release: 2025-09-15</p>
