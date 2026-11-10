@@ -119,6 +119,39 @@ on_load(
 
 geom_env <- new_environment(list(geom = NULL))
 
+# Default aesthetics for GeomMarquee. From ggplot2 4.0.0 onwards geoms are
+# expected to take their base look from the theme, so we reuse GeomText's
+# theme-aware defaults (carrying the correct evaluation environments) for
+# colour, family, and size.
+marquee_default_aes <- function() {
+  default_aes <- ggplot2::aes(
+    fill = NA,
+    angle = 0,
+    hjust = 0.5,
+    vjust = 0.5,
+    alpha = NA,
+    lineheight = 1.2,
+    style = classic_style(),
+    width = NA
+  )
+  if (utils::packageVersion("ggplot2") >= "4.0.0") {
+    text_defaults <- unclass(ggplot2::GeomText$default_aes)
+    default_aes <- structure(
+      c(unclass(default_aes), text_defaults[c("colour", "family", "size")]),
+      class = "uneval"
+    )
+  } else {
+    default_aes <- structure(
+      c(
+        unclass(default_aes),
+        unclass(ggplot2::aes(colour = "black", family = "", size = 3.88))
+      ),
+      class = "uneval"
+    )
+  }
+  default_aes
+}
+
 make_marquee_geom <- function() {
   geom_env$geom <- ggplot2::ggproto(
     "GeomMarquee",
@@ -126,19 +159,7 @@ make_marquee_geom <- function() {
 
     required_aes = c("x", "y", "label"),
 
-    default_aes = ggplot2::aes(
-      colour = "black",
-      fill = NA,
-      size = 3.88,
-      angle = 0,
-      hjust = 0.5,
-      vjust = 0.5,
-      alpha = NA,
-      family = "",
-      lineheight = 1.2,
-      style = classic_style(),
-      width = NA
-    ),
+    default_aes = marquee_default_aes(),
 
     draw_panel = function(
       data,
