@@ -61,3 +61,13 @@ test_that("remove_style() works", {
 
   expect_equal(remove_style(ss, "body"), style_set(base = base_style()))
 })
+
+test_that("modify_style() treats a bullets vector as a single value (#99)", {
+  s <- modify_style(classic_style(), "ul", bullets = c("a", "b"))
+  expect_length(s, 1)
+  expect_identical(s[[1]]$ul$bullets, c("a", "b"))
+
+  s <- modify_style(classic_style(), tag = c("ul", "ol"), bullets = list("x", "y"))
+  expect_identical(s[[1]]$ul$bullets, "x")
+  expect_identical(s[[2]]$ol$bullets, "y")
+})

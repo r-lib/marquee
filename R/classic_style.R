@@ -46,6 +46,10 @@ classic_style <- function(
       x
     }
   })
+  # A character vector of bullets is a single value, not a vector of style sets
+  if (!is.null(settings$bullets) && !is.list(settings$bullets)) {
+    settings$bullets <- list(settings$bullets)
+  }
   settings <- vctrs::vec_recycle_common(!!!settings)
   styles <- lapply(seq_along(settings$base_size), function(i) {
     set <- lapply(settings, function(x) x[[i]])

@@ -95,6 +95,10 @@ modify_style.marquee_style_set <- function(x, tag, ...) {
       x
     }
   })
+  # A character vector of bullets is a single value, not a vector of style sets
+  if (!is.null(opts$bullets) && !is.list(opts$bullets)) {
+    opts$bullets <- list(opts$bullets)
+  }
   opts <- vctrs::vec_recycle_common(x = x, tag = tag, !!!opts)
   x <- opts$x
   tag <- opts$tag
