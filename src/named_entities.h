@@ -6,40 +6,29 @@
 //
 // library(jsonlite)
 // library(tidyverse)
-// 
-// # Function to convert surrogate pairs to \U format
-// # (written by Claude Sonnet. Let's hope it's correct...)
-// convert_surrogates_to_U <- function(text) {
-//   text %>%
-//     str_replace_all(
-//       "\\\\u([Dd][89AaBbCcDdEeFf][0-9A-Fa-f]{2})\\\\u([Dd][CcDdEeFf][0-9A-Fa-f]{2})",
-//       function(match) {
-//         parts <- str_extract_all(match, "[0-9A-Fa-f]{4}")[[1]]
-//         high <- strtoi(parts[1], 16)
-//         low <- strtoi(parts[2], 16)
-//         
-//         # Convert surrogate pair to Unicode code point
-//         codepoint <- 0x10000 + ((high - 0xD800) * 0x400) + (low - 0xDC00)
-//           
-//         # Return as \U format (8 hex digits)
-//         sprintf("\\U%08X", codepoint)
-//       }
-//     )
+//
+// # Escape each character as \uXXXX (BMP) or \UXXXXXXXX (astral plane)
+// escape_cpp <- function(chars) {
+//   map_chr(chars, \(x) {
+//     cp <- utf8ToInt(x)
+//     ifelse(cp <= 0xFFFF, sprintf("\\u%04X", cp), sprintf("\\U%08X", cp)) |>
+//       str_c(collapse = "")
+//   })
 // }
 //
-//   
-// url("https://html.spec.whatwg.org/entities.json") |>
-//   readLines() |>
-//   str_c(collapse = "\n") |>
-//   str_replace_all("\\\\", "\\\\\\\\") |>
+// entries <-
+//   url("https://html.spec.whatwg.org/entities.json") |>
 //   fromJSON() |>
 //   enframe(name = "entity", value = "data") |>
 //   filter(str_ends(entity, ";")) |>
 //   mutate(character = map_chr(data, ~ .x$characters)) |>
-//   transmute(output = str_glue(' {{"{entity}", "{character}" }},')) |>
-//   pull(output) |>
-//   write_lines("entities-map.txt")
-  
+//   transmute(output = str_glue('  {{"{entity}", "{escape_cpp(character)}" }},')) |>
+//   pull(output)
+//
+// # no trailing comma on the last entry
+// entries[length(entries)] <- str_remove(entries[length(entries)], ",$")
+// write_lines(entries, "entities-map.txt")
+
 
 const static std::map<std::string, std::string> entity_map {
   {"&AElig;", "\u00C6" },
