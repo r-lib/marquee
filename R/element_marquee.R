@@ -155,16 +155,42 @@ element_grob.element_marquee <- function(
   style <- modify_style(
     style,
     "base",
-    family = family %||% element$family %||% style$base$family %||% "",
-    color = colour %||% element$colour %||% style$base$color %||% "black",
-    size = size %||% element$size %||% style$base$size %||% 12,
+    family = family %||% element$family %||% style[[1]]$base$family %||% "",
+    color = colour %||% element$colour %||% style[[1]]$base$color %||% "black",
+    size = size %||% element$size %||% style[[1]]$base$size %||% 12,
     lineheight = lineheight %||%
       element$lineheight %||%
-      style$base$lineheight %||%
+      style[[1]]$base$lineheight %||%
       1
   )
   margin <- margin %||% element$margin
   angle <- (angle %||% element$angle %||% 0) %% 360
+
+  # Mirror element_text behaviour: hjust also controls the alignment of
+  # multi-line text, unless the style sets an explicit alignment
+  if (identical(style[[1]]$base$align, "auto")) {
+    hjust_val <- hjust %||% element$hjust
+    align <- if (is.character(hjust_val)) {
+      switch(
+        hjust_val[1],
+        left = "left",
+        center = "center",
+        right = "right",
+        NULL
+      )
+    } else if (is.numeric(hjust_val)) {
+      if (hjust_val[1] == 0) {
+        "left"
+      } else if (hjust_val[1] == 0.5) {
+        "center"
+      } else if (hjust_val[1] == 1) {
+        "right"
+      }
+    }
+    if (!is.null(align)) {
+      style <- modify_style(style, "base", align = align)
+    }
+  }
 
   # Make sure margin doesn't rotate with element as that is how it works for element_text
   new_margin_x <- margin_x
@@ -280,33 +306,41 @@ on_load({
 #'   marquefy_theme(theme_gray())
 #'
 marquefy_theme <- function(theme) {
-  theme[] <- lapply(theme, function(elem) {
-    if (!inherits(elem, "element_text")) {
-      return(elem)
-    }
-    style <- classic_style()
-    if (!is.null(elem$face)) {
-      if (elem$face %in% c("italic", "bold.italic")) {
-        style <- modify_style(style, "base", italic = TRUE)
+  theme[] <- Map(
+    function(elem, name) {
+      if (!inherits(elem, "element_text")) {
+        return(elem)
       }
-      if (elem$face %in% c("bold", "bold.italic")) {
-        style <- modify_style(style, "base", weight = "bold")
+      # Only set style when the face requires one, and width on the root text
+      # element, so that a later theme() call on a parent element can still
+      # propagate these fields to this element
+      style <- NULL
+      if (!is.null(elem$face)) {
+        style <- classic_style()
+        if (elem$face %in% c("italic", "bold.italic")) {
+          style <- modify_style(style, "base", italic = TRUE)
+        }
+        if (elem$face %in% c("bold", "bold.italic")) {
+          style <- modify_style(style, "base", weight = "bold")
+        }
       }
-    }
-    element_marquee(
-      family = elem$family,
-      colour = elem$colour,
-      size = elem$size,
-      hjust = elem$hjust,
-      vjust = elem$vjust,
-      angle = elem$angle,
-      lineheight = elem$lineheight,
-      margin = elem$margin,
-      style = style,
-      width = NA,
-      inherit.blank = elem$inherit.blank
-    )
-  })
+      element_marquee(
+        family = elem$family,
+        colour = elem$colour,
+        size = elem$size,
+        hjust = elem$hjust,
+        vjust = elem$vjust,
+        angle = elem$angle,
+        lineheight = elem$lineheight,
+        margin = elem$margin,
+        style = style,
+        width = if (name == "text") NA else NULL,
+        inherit.blank = elem$inherit.blank
+      )
+    },
+    theme,
+    names(theme)
+  )
   theme
 }
 

@@ -11,6 +11,14 @@
 * Fixed horizontal inline padding being applied twice to background and border
   rectangles of styled spans, so borders no longer spill into neighbouring
   words. One-sided padding now also correctly adds spacing (#93)
+* Multi-line text in `element_marquee()` now follows the element's `hjust` for
+  line alignment (like `element_text()`), unless the style sets an explicit
+  alignment. Additionally, `marquefy_theme()` no longer sets `style` and
+  `width` on every element, so a `theme()` call on a parent element (e.g.
+  `axis.text`) propagates to its children (e.g. `axis.text.x`) (#104)
+* `element_marquee()` now correctly falls back to the base family, colour,
+  size, and lineheight of the provided style when these are not set on the
+  element itself
 
 # marquee 1.2.1
 
