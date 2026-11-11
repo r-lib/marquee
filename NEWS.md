@@ -1,5 +1,9 @@
 # marquee (development version)
 
+* Added support for custom block tags using fenced div syntax: a fence of
+  three or more colons followed by a class (`::: {.name}`) wraps the enclosed
+  content in a block with the given style tag. Fences of different lengths
+  can be nested, allowing whole blocks to be styled with custom styles (#3)
 * HTML entities now return the correct symbols (@clauswilke, #89)
 * Fixed a regression where a vector of bullets passed to `classic_style()` or
   `modify_style()` was recycled into multiple style sets (#99)
