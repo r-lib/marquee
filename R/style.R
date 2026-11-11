@@ -217,7 +217,7 @@ style <- function(
   }
 
   if (lifecycle::is_present(border_size)) {
-    lifecycle::deprecate_soft(
+    lifecycle::deprecate_warn(
       "1.1.2",
       "style(border_size)",
       "style(border_width)"
@@ -455,7 +455,7 @@ base_style <- function(
   border_size = deprecated()
 ) {
   if (lifecycle::is_present(border_size)) {
-    lifecycle::deprecate_soft(
+    lifecycle::deprecate_warn(
       "1.1.2",
       "base_style(border_size)",
       "base_style(border_width)"

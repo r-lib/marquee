@@ -51,7 +51,7 @@ grob <- marquee_grob(readme, style = fancy_style)
 grid.draw(grob)
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-2-1.png" alt="" width="100%" />
 
 (*The above is an image – go ahead and check*)
 
