@@ -172,11 +172,11 @@ power of gt, which is much more flexible than the markdown table syntax.
 
 \section{Math rendering}{
 Math expressions written with standard markdown math syntax are rendered
-using the math shaper in textshaping (\code{\link[textshaping:shape_math]{textshaping::shape_math()}}). This
+using the math shaper in textshaping (\code{textshaping::shape_math()}). This
 functionality is only available if the installed version of textshaping
 provides \code{shape_math()}; if the text contains math expressions and
 textshaping is too old, an error is raised informing you of this. Both
-LaTeX and Typst math syntax are supported (see \code{\link[textshaping:shape_math]{textshaping::shape_math()}}
+LaTeX and Typst math syntax are supported (see \code{textshaping::shape_math()}
 for the full specification).
 
 Inline math (\verb{$expression$}) flows with the surrounding text, while display

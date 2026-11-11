@@ -144,7 +144,7 @@ that case, you must provide a width.
 Labels can contain math expressions written with standard markdown math
 syntax (\verb{$expression$} for inline math and \verb{$$expression$$} for display
 math). It requires a version of textshaping that provides
-\code{\link[textshaping:shape_math]{textshaping::shape_math()}}. See \code{\link[=marquee_grob]{marquee_grob()}} for more information on
+\code{textshaping::shape_math()}. See \code{\link[=marquee_grob]{marquee_grob()}} for more information on
 math rendering.
 }
 \examples{

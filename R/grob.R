@@ -133,11 +133,11 @@
 #'
 #' # Math rendering
 #' Math expressions written with standard markdown math syntax are rendered
-#' using the math shaper in textshaping ([textshaping::shape_math()]). This
+#' using the math shaper in textshaping (`textshaping::shape_math()`). This
 #' functionality is only available if the installed version of textshaping
 #' provides `shape_math()`; if the text contains math expressions and
 #' textshaping is too old, an error is raised informing you of this. Both
-#' LaTeX and Typst math syntax are supported (see [textshaping::shape_math()]
+#' LaTeX and Typst math syntax are supported (see `textshaping::shape_math()`
 #' for the full specification).
 #'
 #' Inline math (`$expression$`) flows with the surrounding text, while display
