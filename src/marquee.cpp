@@ -406,7 +406,11 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
     marquee_parser.flags = ignore_html[i] ? MD_FLAG_STRIKETHROUGH | MD_FLAG_UNDERLINE : MD_FLAG_NOHTML | MD_FLAG_STRIKETHROUGH | MD_FLAG_UNDERLINE;
     userdata.style_stack = std::stack<cpp11::list>();
     if (i != 0) userdata.defined_styles = create_style_map(styles[i]);
-    userdata.style_stack.push(userdata.defined_styles.find("base")->second);
+    auto base_style = userdata.defined_styles.find("base");
+    if (base_style == userdata.defined_styles.end()) {
+      cpp11::stop("Style set must contain a `base` style");
+    }
+    userdata.style_stack.push(base_style->second);
     rem_size.push_back(REAL(userdata.style_stack.top()[0])[0]);
 
     std::string str(text[i]);
@@ -513,6 +517,9 @@ cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent,
         n_ind++;
       }
     }
+    if (bullets[i].size() == 0) {
+      cpp11::stop("Bullet style must contain at least one bullet");
+    }
     cpp11::r_string ul_bullet = bullets[i][n_ind % bullets[i].size()];
 
     stretch_start.push_back(i);
@@ -535,8 +542,11 @@ cpp11::writable::list place_bullets(cpp11::strings type, cpp11::integers indent,
         // Find the first non-empty line for bullet placement
         if (string_is_empty[j]) {
           j++;
-          while (string_is_empty[j] && indent[j] > ind + 1) {
+          while (j < type.size() && string_is_empty[j] && indent[j] > ind + 1) {
             j++;
+          }
+          if (j >= type.size()) {
+            j = type.size() - 1;
           }
         }
         placement.push_back(j + 1);
