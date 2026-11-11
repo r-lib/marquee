@@ -112,7 +112,9 @@ classic look of an HTML rendered markdown document. It contains style
 specifications for all the supported markdown elements as well as a \code{sub} and
 \code{sup} style that can be used for subscripts and superscript respectively.
 These are only accessible through custom spans (e.g. \verb{H\{.sub 2\}O}) as
-markdown doesn't provide a syntax for these formats.
+markdown doesn't provide a syntax for these formats. Math expressions
+(\verb{$...$} and \verb{$$...$$}) are styled with the \code{eq} and \code{eqd} styles, which
+default to the system math font and, for display math, center alignment.
 }
 \examples{
 classic_style(16, "serif", "sans")
