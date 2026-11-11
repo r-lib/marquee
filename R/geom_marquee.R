@@ -34,6 +34,12 @@
 #' is only an image tag) then the width is zero and the content disappears. In
 #' that case, you must provide a width.
 #'
+#' Labels can contain math expressions written with standard markdown math
+#' syntax (`$expression$` for inline math and `$$expression$$` for display
+#' math). It requires a version of textshaping that provides
+#' [textshaping::shape_math()]. See [marquee_grob()] for more information on
+#' math rendering.
+#'
 #' @export
 #'
 #' @examplesIf rlang::is_installed("ggplot2")

@@ -131,6 +131,27 @@
 #' meeans that you can style your tables any way you wish and with the full
 #' power of gt, which is much more flexible than the markdown table syntax.
 #'
+#' # Math rendering
+#' Math expressions written with standard markdown math syntax are rendered
+#' using the math shaper in textshaping ([textshaping::shape_math()]). This
+#' functionality is only available if the installed version of textshaping
+#' provides `shape_math()`; if the text contains math expressions and
+#' textshaping is too old, an error is raised informing you of this. Both
+#' LaTeX and Typst math syntax are supported (see [textshaping::shape_math()]
+#' for the full specification).
+#'
+#' Inline math (`$expression$`) flows with the surrounding text, while display
+#' math (`$$expression$$`) is typeset in display style. A display math
+#' expression standing alone in a block behaves like a block-level image: it
+#' can be aligned through its style (it is centered by default with
+#' [classic_style()]). Math is typeset in the system math font using the size
+#' and color of the surrounding text. A different math font can be selected by
+#' setting the family of the `eq`/`eqd` styles (e.g.
+#' `modify_style(classic_style(), "eq", family = "Latin Modern Math")`); for
+#' best results use a font with an OpenType MATH table. Elements within an
+#' expression can be colored individually with e.g.
+#' `\textcolor{color}{content}`.
+#'
 #' # Textbox justification
 #' The justification options exceeds the classic ones provided by grid. While
 #' numeric values are available as always, the number of possible text values
@@ -248,6 +269,63 @@ marquee_grob <- function(
   env <- caller_env()
   images$grobs <- images_as_grobs(images$path, env)
 
+  # Handle math tags
+  maths <- list(index = which(parsed$type %in% c("eq", "eqd")))
+  if (length(maths$index) != 0) {
+    check_math_support()
+    maths$display <- parsed$type[maths$index] == "eqd"
+    maths$text <- parsed$text[maths$index]
+    parsed$text[maths$index] <- NA
+    ## Determine if tag is inline or on it's own
+    maths$inline <- vapply(
+      maths$index,
+      function(i) {
+        block <- parsed$block == parsed$block[i]
+        sum(block) != 3 || any(nchar(parsed$text[block]) > 0, na.rm = TRUE)
+      },
+      logical(1)
+    )
+    ## If not inline, the prior p tag inherits the math styling so you can
+    ## center it or add padding
+    parsed[maths$index[!maths$inline] - 1, names(style[[1]][[1]])] <- parsed[
+      maths$index[!maths$inline],
+      names(style[[1]][[1]])
+    ]
+    ## Resolve the math font. If the style set provides an explicit family for
+    ## the eq/eqd tag it takes precedence, otherwise the system math font
+    style <- vctrs::vec_recycle(style, max(parsed$id))
+    maths$family <- vapply(
+      seq_along(maths$index),
+      function(i) {
+        tag_style <- style[[parsed$id[maths$index[i]]]][[
+          if (maths$display[i]) "eqd" else "eq"
+        ]]
+        tag_style$family %||% "math"
+      },
+      character(1)
+    )
+    ## Shape the math expressions up front. Width doesn't affect math layout so
+    ## this can be done before the width of the blocks are known
+    maths$shape <- shape_math_safe(
+      maths$text,
+      family = maths$family,
+      size = parsed$size[maths$index],
+      inline = !maths$display,
+      color = parsed$color[maths$index]
+    )
+    ## Failed expressions revert to literal text
+    failed <- !vapply(maths$shape, is.list, logical(1))
+    if (any(failed)) {
+      parsed$text[maths$index[failed]] <- maths$text[failed]
+      maths$index <- maths$index[!failed]
+      maths$display <- maths$display[!failed]
+      maths$inline <- maths$inline[!failed]
+      maths$text <- maths$text[!failed]
+      maths$family <- maths$family[!failed]
+      maths$shape <- maths$shape[!failed]
+    }
+  }
+
   # Determine location of blocks, their indent and location in overall parsed text
   bl <- rle(parsed$block)$lengths
   bs <- cumsum(c(0, bl[-length(bl)])) + 1
@@ -326,6 +404,7 @@ marquee_grob <- function(
     blocks = blocks,
     bullets = bullets,
     images = images,
+    maths = maths,
     x = rep_along(text, x),
     y = rep_along(text, y),
     width = rep_along(text, width),
@@ -477,6 +556,15 @@ makeContext.marquee_grob <- function(x) {
     }
   }
 
+  # Figure out width and height of math expressions
+  maths <- x$maths
+  if (length(maths$index) != 0) {
+    math_metrics <- inject(rbind(!!!lapply(maths$shape, `[[`, "metrics")))
+    ## Set dimensions in size and tracking (this is how it is passed to textshaping)
+    size[maths$index] <- math_metrics$height + math_metrics$depth
+    tracking[maths$index] <- math_metrics$width
+  }
+
   # Shape text using widths
   shape <- textshaping::shape_text(
     strings = x$text$text,
@@ -548,6 +636,66 @@ makeContext.marquee_grob <- function(x) {
     shape$metrics$height[x$text$block[x$images$index[
       !x$images$inline
     ]]] <- size[x$images$index[!x$images$inline]]
+  }
+
+  # Set correct height for block math
+  if (length(maths$index) != 0 && any(!maths$inline)) {
+    block_glyph_match <- match(
+      shape$shape$string_id,
+      maths$index[!maths$inline]
+    )
+    block_glyphs <- !is.na(block_glyph_match)
+    shape$shape$y_offset[block_glyphs] <- -size[maths$index[
+      !maths$inline
+    ][block_glyph_match[block_glyphs]]]
+    shape$shape$descender[block_glyphs] <- 0
+    shape$metrics$height[x$text$block[maths$index[
+      !maths$inline
+    ]]] <- size[maths$index[!maths$inline]]
+  }
+
+  # Align inline math baselines with the text baseline. The placeholder glyph
+  # shares the baseline of the surrounding text but its ascender/descender may
+  # not cover the full extent of the math. Grow the line box to fit
+  if (length(maths$index) != 0 && any(maths$inline)) {
+    ## Keep track of the shifts already applied so multiple math expressions in
+    ## the same block don't over-reserve space
+    top_shift <- rep(0, length(shape$metrics$height))
+    bottom_shift <- top_shift
+    for (i in which(maths$inline)) {
+      idx <- which(shape$shape$string_id == maths$index[i])[1]
+      if (is.na(idx)) {
+        next
+      }
+      block <- shape$shape$metric_id[idx]
+      y0 <- shape$shape$y_offset[idx]
+      ascender <- shape$shape$ascender[idx] + top_shift[block]
+      descender <- shape$shape$descender[idx] - bottom_shift[block]
+      height <- math_metrics$height[i]
+      depth <- math_metrics$depth[i]
+      if (height > ascender) {
+        ### Math extends above the reserved box. Push the whole block down
+        shift <- height - ascender
+        in_block <- shape$shape$metric_id == block
+        shape$shape$y_offset[in_block] <- shape$shape$y_offset[in_block] -
+          shift
+        shape$metrics$height[block] <- shape$metrics$height[block] + shift
+        top_shift[block] <- top_shift[block] + shift
+        y0 <- y0 - shift
+        ascender <- height
+      }
+      if (depth > -descender) {
+        ### Math extends below the reserved box. Push the lines below down
+        shift <- depth + descender
+        below <- shape$shape$metric_id == block & shape$shape$y_offset < y0
+        shape$shape$y_offset[below] <- shape$shape$y_offset[below] - shift
+        shape$metrics$height[block] <- shape$metrics$height[block] + shift
+        bottom_shift[block] <- bottom_shift[block] + shift
+        descender <- -depth
+      }
+      shape$shape$ascender[idx] <- ascender
+      shape$shape$descender[idx] <- descender
+    }
   }
 
   # Inherit color and id from parsed text
@@ -994,6 +1142,82 @@ makeContext.marquee_grob <- function(x) {
     lwd = lines[, 5],
     col = x$text$color[lines[, 1]]
   )
+  # Place math glyphs, lines, and boxes based on the null-glyph placeholders
+  if (length(maths$index) != 0) {
+    math_glyphs <- vector("list", length(maths$index))
+    math_lines <- vector("list", length(maths$index))
+    math_boxes <- vector("list", length(maths$index))
+    for (i in seq_along(maths$index)) {
+      placeholder <- which(x$shape$string_id == maths$index[i])[1]
+      if (is.na(placeholder)) {
+        next
+      }
+      x0 <- x$shape$x_offset[placeholder]
+      ## Inline math sits on the text baseline. Block math is placed like a
+      ## block image, at the bottom of the reserved box plus the depth
+      y0 <- x$shape$y_offset[placeholder]
+      if (!maths$inline[i]) {
+        y0 <- y0 +
+          x$shape$descender[placeholder] +
+          math_metrics$depth[i]
+      }
+      shaped <- maths$shape[[i]]
+      glyphs <- shaped$shape
+      math_glyphs[[i]] <- data.frame(
+        glyph = glyphs$glyph,
+        index = glyphs$index,
+        metric_id = x$shape$metric_id[placeholder],
+        string_id = maths$index[i],
+        x_offset = x0 + glyphs$x_offset,
+        y_offset = y0 + glyphs$y_offset,
+        font_path = glyphs$font_path,
+        font_index = glyphs$font_index,
+        font_size = glyphs$font_size,
+        advance = glyphs$advance,
+        ascender = math_metrics$height[i],
+        descender = -math_metrics$depth[i],
+        col = glyphs$color,
+        id = x$shape$id[placeholder],
+        outline = x$shape$outline[placeholder],
+        outline_width = x$shape$outline_width[placeholder],
+        outline_type = x$shape$outline_type[placeholder],
+        outline_join = x$shape$outline_join[placeholder],
+        outline_mitre = x$shape$outline_mitre[placeholder]
+      )
+      if (nrow(shaped$lines) != 0) {
+        math_lines[[i]] <- data.frame(
+          id = x$shape$id[placeholder],
+          x0 = x0 + shaped$lines$x1,
+          y0 = y0 + shaped$lines$y1,
+          x1 = x0 + shaped$lines$x2,
+          y1 = y0 + shaped$lines$y2,
+          lwd = shaped$lines$thickness * 96 / 72,
+          col = ifelse(
+            is.na(shaped$lines$color) | !nzchar(shaped$lines$color),
+            glyphs$color[1],
+            shaped$lines$color
+          )
+        )
+      }
+      if (nrow(shaped$boxes) != 0) {
+        math_boxes[[i]] <- data.frame(
+          id = x$shape$id[placeholder],
+          x = x0 + shaped$boxes$x,
+          y = y0 + shaped$boxes$y,
+          width = shaped$boxes$width,
+          height = shaped$boxes$height,
+          fill = shaped$boxes$color
+        )
+      }
+    }
+    x$shape <- rbind(x$shape, inject(rbind(!!!math_glyphs)))
+    x$math_lines <- inject(rbind(!!!math_lines))
+    x$math_boxes <- inject(rbind(!!!math_boxes))
+  } else {
+    x$math_lines <- NULL
+    x$math_boxes <- NULL
+  }
+
   # Place images
   image_grobs <- lapply(seq_along(images$grobs), function(i) {
     ## Use the null-glyph to set left-bottom position of image
@@ -1277,6 +1501,37 @@ makeContent.marquee_grob <- function(x) {
       which(x$images$id == grob),
       function(i) x$images$grobs[[i]]
     )
+    ## Construct math boxes (colorbox backgrounds). Drawn below the glyphs
+    box_id <- which(x$math_boxes$id == grob)
+    math_boxes <- if (length(box_id) == 0) {
+      NULL
+    } else {
+      rectGrob(
+        x = unit(x$math_boxes$x[box_id], "bigpts"),
+        y = unit(x$math_boxes$y[box_id], "bigpts"),
+        width = unit(x$math_boxes$width[box_id], "bigpts"),
+        height = unit(x$math_boxes$height[box_id], "bigpts"),
+        just = c(0, 0),
+        gp = gpar(fill = x$math_boxes$fill[box_id], col = NA)
+      )
+    }
+    ## Construct math lines (fraction bars, radical overlines, etc.)
+    math_line_id <- which(x$math_lines$id == grob)
+    math_lines <- if (length(math_line_id) == 0) {
+      NULL
+    } else {
+      segmentsGrob(
+        x0 = unit(x$math_lines$x0[math_line_id], "bigpts"),
+        y0 = unit(x$math_lines$y0[math_line_id], "bigpts"),
+        x1 = unit(x$math_lines$x1[math_line_id], "bigpts"),
+        y1 = unit(x$math_lines$y1[math_line_id], "bigpts"),
+        gp = gpar(
+          col = x$math_lines$col[math_line_id],
+          lwd = x$math_lines$lwd[math_line_id],
+          lineend = "butt"
+        )
+      )
+    }
     ## Construct underline and strikethrough grob. Can be a single segments grob
     line_id <- which(x$lines$id == grob)
     lines <- if (length(line_id) == 0) {
@@ -1299,7 +1554,9 @@ makeContent.marquee_grob <- function(x) {
       grobTree(
         !!!rects,
         !!!images,
+        math_boxes,
         glyphs,
+        math_lines,
         lines,
         vp = viewport(
           x$x[grob],
@@ -1326,6 +1583,67 @@ makeContent.marquee_grob <- function(x) {
 
 #' @export
 makeContent.marquee_precalculated <- function(x) x
+
+# Whether the installed textshaping supports math shaping. Resolved once at
+# load time since getNamespaceExports() doesn't change during a session
+# (barring a textshaping reinstall + reload, which requires an R restart to
+# take full effect anyway)
+math_support <- new_environment(list(supported = FALSE, shape_math = NULL))
+on_load({
+  math_support$supported <- "shape_math" %in%
+    getNamespaceExports("textshaping")
+  if (math_support$supported) {
+    math_support$shape_math <- utils::getFromNamespace(
+      "shape_math",
+      "textshaping"
+    )
+  }
+})
+
+check_math_support <- function(call = caller_env()) {
+  if (!math_support$supported) {
+    cli::cli_abort(
+      c(
+        "Rendering math requires a version of textshaping that provides {.fn textshaping::shape_math}",
+        i = "Please update to the development version of textshaping"
+      ),
+      call = call
+    )
+  }
+}
+
+# Shape each expression separately so that a single malformed expression
+# doesn't bring down the whole text. Failures are returned as FALSE and the
+# caller is expected to reinstate the literal text for these
+shape_math_safe <- function(expr, family, size, inline, color) {
+  shape_math <- math_support$shape_math
+  Map(
+    function(e, f, s, i, col) {
+      tryCatch(
+        shape_math(
+          e,
+          family = f,
+          size = s,
+          res = 72,
+          inline = i,
+          color = col
+        ),
+        error = function(err) {
+          cli::cli_warn(c(
+            "Failed to typeset math expression {.val {e}}",
+            i = conditionMessage(err)
+          ))
+          FALSE
+        }
+      )
+    },
+    expr,
+    family,
+    size,
+    inline,
+    color
+  )
+}
 
 collect_children <- function(elem, block_starts, block_ends, block_indent) {
   if (elem == block_ends[elem]) {

@@ -72,6 +72,12 @@ inside this span is rendered verbatim
 
 \code{del} is text that should have strikethrough
 
+\code{eq} is an inline math expression. The token text is the content of the
+\verb{$...$} span
+
+\code{eqd} is a display math expression. The token text is the content of the
+\verb{$$...$$} span
+
 \emph{custom spans} is a marquee specific extension to the syntax that allows you
 to make up tags on the fly. See the section on marquee syntax for more.
 }

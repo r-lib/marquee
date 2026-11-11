@@ -328,9 +328,9 @@ static int enter_span_callback(MD_SPANTYPE type, void* detail, void* userdata) {
   case MD_SPAN_U:                 push_info(ud, "u"); break;
   case MD_SPAN_DEL:               push_info(ud, "del"); break;
   case MD_SPAN_CUSTOM:            push_info(ud, std::string(((MD_SPAN_CUSTOM_DETAIL *) detail)->cls, ((MD_SPAN_CUSTOM_DETAIL *) detail)->size)); break;
+  case MD_SPAN_LATEXMATH:         push_info(ud, "eq"); break;
+  case MD_SPAN_LATEXMATH_DISPLAY: push_info(ud, "eqd"); break;
   case MD_SPAN_IMG:               // Will never end here
-  case MD_SPAN_LATEXMATH:
-  case MD_SPAN_LATEXMATH_DISPLAY:
   case MD_SPAN_WIKILINK:          return 0;
   }
 
@@ -357,8 +357,8 @@ static int leave_span_callback(MD_SPANTYPE type, void* detail, void* userdata) {
   case MD_SPAN_DEL:               pop_info(ud, "del"); break;
   case MD_SPAN_CUSTOM:            pop_info(ud, std::string(((MD_SPAN_CUSTOM_DETAIL *) detail)->cls, ((MD_SPAN_CUSTOM_DETAIL *) detail)->size)); break;
   case MD_SPAN_IMG:               pop_info(ud, "img"); break;
-  case MD_SPAN_LATEXMATH:
-  case MD_SPAN_LATEXMATH_DISPLAY:
+  case MD_SPAN_LATEXMATH:         pop_info(ud, "eq"); break;
+  case MD_SPAN_LATEXMATH_DISPLAY: pop_info(ud, "eqd"); break;
   case MD_SPAN_WIKILINK:          return 0;
   }
 
@@ -403,7 +403,7 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
   std::vector<double> rem_size;
   for (R_xlen_t i = 0; i < text.size(); ++i) {
     userdata.current_id = i + 1;
-    marquee_parser.flags = ignore_html[i] ? MD_FLAG_STRIKETHROUGH | MD_FLAG_UNDERLINE : MD_FLAG_NOHTML | MD_FLAG_STRIKETHROUGH | MD_FLAG_UNDERLINE;
+    marquee_parser.flags = (ignore_html[i] ? MD_FLAG_STRIKETHROUGH | MD_FLAG_UNDERLINE : MD_FLAG_NOHTML | MD_FLAG_STRIKETHROUGH | MD_FLAG_UNDERLINE) | MD_FLAG_LATEXMATHSPANS;
     userdata.style_stack = std::stack<cpp11::list>();
     if (i != 0) userdata.defined_styles = create_style_map(styles[i]);
     auto base_style = userdata.defined_styles.find("base");

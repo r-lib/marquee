@@ -1,5 +1,12 @@
 # marquee (development version)
 
+* Added support for math expressions written with standard markdown
+  math syntax (`$expression$` for inline math and `$$expression$$` for display
+  math). Rendering is done with the new math shaper in textshaping
+  (`textshaping::shape_math()`) and requires a version of textshaping that
+  provides it; an informative error is raised if the text contains math and
+  the installed textshaping is too old
+
 * Added support for custom block tags using fenced div syntax: a fence of
   three or more colons followed by a class (`::: {.name}`) wraps the enclosed
   content in a block with the given style tag. Fences of different lengths

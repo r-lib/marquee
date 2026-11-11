@@ -5,7 +5,9 @@
 #' specifications for all the supported markdown elements as well as a `sub` and
 #' `sup` style that can be used for subscripts and superscript respectively.
 #' These are only accessible through custom spans (e.g. `H{.sub 2}O`) as
-#' markdown doesn't provide a syntax for these formats.
+#' markdown doesn't provide a syntax for these formats. Math expressions
+#' (`$...$` and `$$...$$`) are styled with the `eq` and `eqd` styles, which
+#' default to the system math font and, for display math, center alignment.
 #'
 #' @param base_size The base font size for the text. All other sizing is based
 #' on this
@@ -168,6 +170,8 @@ classic_style <- function(
       u = style(underline = TRUE),
       del = style(strikethrough = TRUE),
       img = style(align = "center", border = NA),
+      eq = style(family = "math", border = NA),
+      eqd = style(family = "math", align = "center", border = NA),
       sub = style(size = em(0.5), baseline = em(-0.2)),
       sup = style(size = em(0.5), baseline = em(1)),
       out = style(color = "#ffffff", outline = "#000000")

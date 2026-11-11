@@ -170,6 +170,28 @@ meeans that you can style your tables any way you wish and with the full
 power of gt, which is much more flexible than the markdown table syntax.
 }
 
+\section{Math rendering}{
+Math expressions written with standard markdown math syntax are rendered
+using the math shaper in textshaping (\code{\link[textshaping:shape_math]{textshaping::shape_math()}}). This
+functionality is only available if the installed version of textshaping
+provides \code{shape_math()}; if the text contains math expressions and
+textshaping is too old, an error is raised informing you of this. Both
+LaTeX and Typst math syntax are supported (see \code{\link[textshaping:shape_math]{textshaping::shape_math()}}
+for the full specification).
+
+Inline math (\verb{$expression$}) flows with the surrounding text, while display
+math (\verb{$$expression$$}) is typeset in display style. A display math
+expression standing alone in a block behaves like a block-level image: it
+can be aligned through its style (it is centered by default with
+\code{\link[=classic_style]{classic_style()}}). Math is typeset in the system math font using the size
+and color of the surrounding text. A different math font can be selected by
+setting the family of the \code{eq}/\code{eqd} styles (e.g.
+\code{modify_style(classic_style(), "eq", family = "Latin Modern Math")}); for
+best results use a font with an OpenType MATH table. Elements within an
+expression can be colored individually with e.g.
+\verb{\\textcolor\{color\}\{content\}}.
+}
+
 \section{Textbox justification}{
 The justification options exceeds the classic ones provided by grid. While
 numeric values are available as always, the number of possible text values

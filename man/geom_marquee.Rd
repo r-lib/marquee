@@ -140,6 +140,12 @@ most that amount of space. You can use grid units to set it to an absolute
 amount. The default means that if the label contains no text at all (e.g. it
 is only an image tag) then the width is zero and the content disappears. In
 that case, you must provide a width.
+
+Labels can contain math expressions written with standard markdown math
+syntax (\verb{$expression$} for inline math and \verb{$$expression$$} for display
+math). It requires a version of textshaping that provides
+\code{\link[textshaping:shape_math]{textshaping::shape_math()}}. See \code{\link[=marquee_grob]{marquee_grob()}} for more information on
+math rendering.
 }
 \examples{
 \dontshow{if (rlang::is_installed("ggplot2")) withAutoprint(\{ # examplesIf}
