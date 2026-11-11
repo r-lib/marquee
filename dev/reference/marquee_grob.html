@@ -232,6 +232,27 @@ meeans that you can style your tables any way you wish and with the full
 power of gt, which is much more flexible than the markdown table syntax.</p>
     </div>
     <div class="section level2">
+    <h2 id="math-rendering">Math rendering<a class="anchor" aria-label="anchor" href="#math-rendering"></a></h2>
+    <p>Math expressions written with standard markdown math syntax are rendered
+using the math shaper in textshaping (<code>textshaping::shape_math()</code>). This
+functionality is only available if the installed version of textshaping
+provides <code>shape_math()</code>; if the text contains math expressions and
+textshaping is too old, an error is raised informing you of this. Both
+LaTeX and Typst math syntax are supported (see <code>textshaping::shape_math()</code>
+for the full specification).</p>
+<p>Inline math (<code>$expression$</code>) flows with the surrounding text, while display
+math (<code>$$expression$$</code>) is typeset in display style. A display math
+expression standing alone in a block behaves like a block-level image: it
+can be aligned through its style (it is centered by default with
+<code><a href="classic_style.html">classic_style()</a></code>). Math is typeset in the system math font using the size
+and color of the surrounding text. A different math font can be selected by
+setting the family of the <code>eq</code>/<code>eqd</code> styles (e.g.
+<code>modify_style(classic_style(), "eq", family = "Latin Modern Math")</code>); for
+best results use a font with an OpenType MATH table. Elements within an
+expression can be colored individually with e.g.
+<code>\textcolor{color}{content}</code>.</p>
+    </div>
+    <div class="section level2">
     <h2 id="textbox-justification">Textbox justification<a class="anchor" aria-label="anchor" href="#textbox-justification"></a></h2>
     <p>The justification options exceeds the classic ones provided by grid. While
 numeric values are available as always, the number of possible text values

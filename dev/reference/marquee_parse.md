@@ -82,6 +82,12 @@ inside this span is rendered verbatim
 
 `del` is text that should have strikethrough
 
+`eq` is an inline math expression. The token text is the content of the
+`$...$` span
+
+`eqd` is a display math expression. The token text is the content of the
+`$$...$$` span
+
 *custom spans* is a marquee specific extension to the syntax that allows
 you to make up tags on the fly. See the section on marquee syntax for
 more.

@@ -188,6 +188,13 @@ an absolute amount. The default means that if the label contains no text
 at all (e.g. it is only an image tag) then the width is zero and the
 content disappears. In that case, you must provide a width.
 
+Labels can contain math expressions written with standard markdown math
+syntax (`$expression$` for inline math and `$$expression$$` for display
+math). It requires a version of textshaping that provides
+`textshaping::shape_math()`. See
+[`marquee_grob()`](https://marquee.r-lib.org/dev/reference/marquee_grob.md)
+for more information on math rendering.
+
 ## Examples
 
 ``` r

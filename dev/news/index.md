@@ -2,34 +2,47 @@
 
 ## marquee (development version)
 
+- Added support for math expressions written with standard markdown math
+  syntax (`$expression$` for inline math and `$$expression$$` for
+  display math). Rendering is done with the new math shaper in
+  textshaping (`textshaping::shape_math()`) and requires a version of
+  textshaping that provides it; an informative error is raised if the
+  text contains math and the installed textshaping is too old
+
 - Added support for custom block tags using fenced div syntax: a fence
   of three or more colons followed by a class (`::: {.name}`) wraps the
   enclosed content in a block with the given style tag. Fences of
   different lengths can be nested, allowing whole blocks to be styled
   with custom styles ([\#3](https://github.com/r-lib/marquee/issues/3))
+
 - HTML entities now return the correct symbols
   ([@clauswilke](https://github.com/clauswilke),
   [\#89](https://github.com/r-lib/marquee/issues/89))
+
 - Fixed a regression where a vector of bullets passed to
   [`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md)
   or
   [`modify_style()`](https://marquee.r-lib.org/dev/reference/style_set.md)
   was recycled into multiple style sets
   ([\#99](https://github.com/r-lib/marquee/issues/99))
+
 - Fixed a crash (session abort) when using
   [`guide_marquee()`](https://marquee.r-lib.org/dev/reference/guide_marquee.md)
   together with
   [`marquefy_theme()`](https://marquee.r-lib.org/dev/reference/marquefy_theme.md),
   caused by an `NA` title width being used instead of the default width
   ([\#95](https://github.com/r-lib/marquee/issues/95))
+
 - [`geom_marquee()`](https://marquee.r-lib.org/dev/reference/geom_marquee.md)
   now takes its default font family, size, and colour from the theme,
   like other text geoms do on ggplot2 \>= 4.0.0
   ([\#106](https://github.com/r-lib/marquee/issues/106))
+
 - Fixed horizontal inline padding being applied twice to background and
   border rectangles of styled spans, so borders no longer spill into
   neighbouring words. One-sided padding now also correctly adds spacing
   ([\#93](https://github.com/r-lib/marquee/issues/93))
+
 - Multi-line text in
   [`element_marquee()`](https://marquee.r-lib.org/dev/reference/element_marquee.md)
   now follows the element’s `hjust` for line alignment (like
@@ -41,16 +54,19 @@
   on a parent element (e.g. `axis.text`) propagates to its children
   (e.g. `axis.text.x`)
   ([\#104](https://github.com/r-lib/marquee/issues/104))
+
 - [`element_marquee()`](https://marquee.r-lib.org/dev/reference/element_marquee.md)
   now correctly falls back to the base family, colour, size, and
   lineheight of the provided style when these are not set on the element
   itself
+
 - Documented that in
   [`element_marquee()`](https://marquee.r-lib.org/dev/reference/element_marquee.md)
   the element margin replaces body padding from the style, and that
   paragraph spacing must be set on the paragraph style (e.g. via
   `modify_style(style, "p", ...)`) rather than through base-level
   padding ([\#100](https://github.com/r-lib/marquee/issues/100))
+
 - [`element_marquee()`](https://marquee.r-lib.org/dev/reference/element_marquee.md)
   is now an S7 subclass of
   [`ggplot2::element_text`](https://ggplot2.tidyverse.org/reference/element.html)

@@ -284,7 +284,7 @@ calculated to match the aspect ratio of the image.
 ``` r
 
 md_text_fig <-
-"# Lorem Ipsum ![](https://cran.r-project.org/Rlogo.svg)
+"# Lorem Ipsum ![](Rlogo.svg)
 Lorem ipsum dolor {.red sit amet, *consectetur* adipiscing elit, sed do} eiusmod tempor
 incididunt ut labore et dolore magna **aliqua**. Ut enim ad minim {#2af veniam}, quis nostrud
 exercitation ul lamcolaboris nisi ut aliquip ex ea commodo _consequat_. Duis aute irure dolor
@@ -304,7 +304,7 @@ Compare that to
 md_text_fig2 <-
 "# Lorem Ipsum
 
-![](https://cran.r-project.org/Rlogo.svg)
+![](Rlogo.svg)
 
 Lorem ipsum dolor {.red sit amet, *consectetur* adipiscing elit, sed do} eiusmod tempor
 incididunt ut labore et dolore magna **aliqua**. Ut enim ad minim {#2af veniam}, quis nostrud

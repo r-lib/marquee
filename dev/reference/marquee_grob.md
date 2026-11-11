@@ -202,6 +202,30 @@ This meeans that you can style your tables any way you wish and with the
 full power of gt, which is much more flexible than the markdown table
 syntax.
 
+## Math rendering
+
+Math expressions written with standard markdown math syntax are rendered
+using the math shaper in textshaping (`textshaping::shape_math()`). This
+functionality is only available if the installed version of textshaping
+provides `shape_math()`; if the text contains math expressions and
+textshaping is too old, an error is raised informing you of this. Both
+LaTeX and Typst math syntax are supported (see
+`textshaping::shape_math()` for the full specification).
+
+Inline math (`$expression$`) flows with the surrounding text, while
+display math (`$$expression$$`) is typeset in display style. A display
+math expression standing alone in a block behaves like a block-level
+image: it can be aligned through its style (it is centered by default
+with
+[`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md)).
+Math is typeset in the system math font using the size and color of the
+surrounding text. A different math font can be selected by setting the
+family of the `eq`/`eqd` styles (e.g.
+`modify_style(classic_style(), "eq", family = "Latin Modern Math")`);
+for best results use a font with an OpenType MATH table. Elements within
+an expression can be colored individually with e.g.
+`\textcolor{color}{content}`.
+
 ## Textbox justification
 
 The justification options exceeds the classic ones provided by grid.

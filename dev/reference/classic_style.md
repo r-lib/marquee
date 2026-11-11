@@ -6,6 +6,9 @@ style specifications for all the supported markdown elements as well as
 a `sub` and `sup` style that can be used for subscripts and superscript
 respectively. These are only accessible through custom spans (e.g.
 `H{.sub 2}O`) as markdown doesn't provide a syntax for these formats.
+Math expressions (`$...$` and `$$...$$`) are styled with the `eq` and
+`eqd` styles, which default to the system math font and, for display
+math, center alignment.
 
 ## Usage
 
@@ -232,5 +235,5 @@ A style set object
 ``` r
 classic_style(16, "serif", "sans")
 #> <marquee_style_set[1]>
-#> [1] <base, body, ul, ol, li, hr, h1, h2, h3, h4, h5, h6, cb, p, qb, em, str, a, code, u, del, img, sub, sup, out>
+#> [1] <base, body, ul, ol, li, hr, h1, h2, h3, h4, h5, h6, cb, p, qb, em, str, a, code, u, del, img, eq, eqd, sub, sup, out>
 ```
