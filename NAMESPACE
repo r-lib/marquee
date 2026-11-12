@@ -64,6 +64,8 @@ import(grid)
 import(rlang)
 importFrom(S7,S7_inherits)
 importFrom(lifecycle,deprecated)
-importFrom(vctrs,vec_cast)
-importFrom(vctrs,vec_ptype2)
+importFrom(vctrs,
+  vec_cast,
+  vec_ptype2
+)
 useDynLib(marquee, .registration = TRUE)

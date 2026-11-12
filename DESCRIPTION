@@ -27,7 +27,7 @@ Imports:
     rlang (>= 1.1.0),
     S7,
     systemfonts (>= 1.2.0),
-    textshaping (>= 1.0.0),
+    textshaping (>= 1.0.5.9000),
     utils,
     vctrs
 Suggests:
@@ -42,7 +42,7 @@ Suggests:
     testthat (>= 3.0.0)
 LinkingTo:
     cpp11
-VignetteBuilder: 
+VignetteBuilder:
     knitr
 Config/build/compilation-database: true
 Config/Needs/website: tidyverse/tidytemplate
@@ -50,4 +50,6 @@ Config/testthat/edition: 3
 Config/usethis/last-upkeep: 2025-04-23
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+Remotes: 
+    r-lib/textshaping
+Config/roxygen2/version: 8.1.1

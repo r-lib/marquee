@@ -19,6 +19,10 @@
 #' `"ultraexpanded"`)
 #' @param features A [font_feature][systemfonts::font_feature] object specifying
 #' any OpenType font features to apply to the font
+#' @param variation A [font_variation][systemfonts::font_variation] object
+#' specifying the coordinates on the variable font axes to use. Settings here
+#' take precedence over the corresponding `weight`, `italic`, and `width`
+#' settings during shaping and rendering
 #' @param size The size of the font in points. Can be [relative()] or [em()] in
 #' which case it is based on the parent font size (for `size` these are
 #' equivalent) or [rem()] in which case it is based on the font size of the body
@@ -102,6 +106,7 @@ style <- function(
   italic = NULL,
   width = NULL,
   features = NULL,
+  variation = NULL,
   size = NULL,
   color = NULL,
   lineheight = NULL,
@@ -151,6 +156,10 @@ style <- function(
 
   if (!is.null(features) && !inherits(features, "font_feature")) {
     stop_input_type(features, "a font_feature object", allow_null = TRUE)
+  }
+
+  if (!is.null(variation) && !inherits(variation, "font_variation")) {
+    stop_input_type(variation, "a font_variation object", allow_null = TRUE)
   }
 
   if (inherits(size, "marquee_em")) {
@@ -316,6 +325,7 @@ style <- function(
       italic = italic,
       width = width,
       features = features,
+      variation = variation,
       lineheight = lineheight,
       align = align,
       tracking = tracking,
@@ -427,6 +437,7 @@ base_style <- function(
   italic = FALSE,
   width = "normal",
   features = systemfonts::font_feature(),
+  variation = systemfonts::font_variation(),
   size = 12,
   color = "black",
   lineheight = 1.6,
@@ -468,6 +479,7 @@ base_style <- function(
     italic = italic,
     width = width,
     features = features,
+    variation = variation,
     size = size,
     color = color,
     lineheight = lineheight,

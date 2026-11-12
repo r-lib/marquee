@@ -21,8 +21,8 @@ guide_marquee(
 (default), the name of the scale or the name specified in
 \code{\link[ggplot2:labs]{labs()}} is used for the tyle.}
 
-\item{style}{Either a \link[=style_set]{style_set} to override style sets
-inherited from the theme, or a \link[=style]{style} for styling the labels
+\item{style}{Either a \link{style_set} to override style sets
+inherited from the theme, or a \link{style} for styling the labels
 specifically. For \code{colour} or \code{fill} scales, the \code{color}, \code{background} and
 \code{border} style properties are overridden when set as \code{NULL}, see examples.}
 

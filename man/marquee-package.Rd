@@ -24,6 +24,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Thomas Lin Pedersen \email{thomas.pedersen@posit.co} (\href{https://orcid.org/0000-0002-5147-4711}{ORCID})
   \item Martin Mitáš (Author of MD4C)
 }
 

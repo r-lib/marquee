@@ -95,6 +95,10 @@ inline bool is_font_feature(SEXP elem) {
   return Rf_inherits(elem, "font_feature");
 }
 
+inline bool is_font_variation(SEXP elem) {
+  return Rf_inherits(elem, "font_variation");
+}
+
 inline bool is_relative(SEXP elem) {
   return Rf_inherits(elem, "marquee_relative");
 }
@@ -161,6 +165,35 @@ inline cpp11::writable::list combine_styles(cpp11::list parent, cpp11::list def)
       values.names() = features;
       cpp11::writable::list val({features, values});
       val.attr("class") = "font_feature";
+      new_style[i] = val;
+    } else if (is_font_variation(parent_elem)) {
+      if (!is_font_variation(def[i])) {
+        Rf_error("Malformed style object. font variations can only be merged with other font variations");
+      }
+      cpp11::writable::integers axes(VECTOR_ELT(parent_elem, 0));
+      cpp11::writable::integers coords(VECTOR_ELT(parent_elem, 1));
+      R_xlen_t n_old = axes.size();
+      cpp11::integers new_axes(VECTOR_ELT(def[i], 0));
+      cpp11::integers new_coords(VECTOR_ELT(def[i], 1));
+
+      for (R_xlen_t j = 0; j < new_axes.size(); ++j) {
+        int exist = -1;
+        for (R_xlen_t k = 0; k < n_old; ++k) {
+          if (axes[k] == new_axes[j]) {
+            exist = k;
+            break;
+          }
+        }
+        if (exist >= 0) {
+          coords[exist] = new_coords[j];
+        } else {
+          axes.push_back(new_axes[j]);
+          coords.push_back(new_coords[j]);
+        }
+      }
+      cpp11::writable::list val({axes, coords});
+      val.attr("names") = cpp11::writable::strings({"axis", "value"});
+      val.attr("class") = "font_variation";
       new_style[i] = val;
     } else {
       new_style[i] = def[i];
