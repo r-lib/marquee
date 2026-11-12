@@ -11,6 +11,7 @@ style(
   italic = NULL,
   width = NULL,
   features = NULL,
+  variation = NULL,
   size = NULL,
   color = NULL,
   lineheight = NULL,
@@ -45,6 +46,7 @@ base_style(
   italic = FALSE,
   width = "normal",
   features = systemfonts::font_feature(),
+  variation = systemfonts::font_variation(),
   size = 12,
   color = "black",
   lineheight = 1.6,
@@ -91,6 +93,11 @@ base_style(
 
 \item{features}{A \link[systemfonts:font_feature]{font_feature} object specifying
 any OpenType font features to apply to the font}
+
+\item{variation}{A \link[systemfonts:font_variation]{font_variation} object
+specifying the coordinates on the variable font axes to use. Settings here
+take precedence over the corresponding \code{weight}, \code{italic}, and \code{width}
+settings during shaping and rendering}
 
 \item{size}{The size of the font in points. Can be \code{\link[=relative]{relative()}} or \code{\link[=em]{em()}} in
 which case it is based on the parent font size (for \code{size} these are

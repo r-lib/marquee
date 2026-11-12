@@ -385,6 +385,7 @@ marquee_grob <- function(
     weight = parsed$weight[bullets$index],
     width = parsed$width[bullets$index],
     features = parsed$features[bullets$index],
+    variation = parsed$variation[bullets$index],
     size = parsed$size[bullets$index],
     res = 600,
     hjust = 1,
@@ -574,6 +575,7 @@ makeContext.marquee_grob <- function(x) {
     weight = x$text$weight,
     width = x$text$width,
     features = x$text$features,
+    variation = x$text$variation,
     size = size,
     res = 600,
     lineheight = x$text$lineheight,
@@ -702,6 +704,7 @@ makeContext.marquee_grob <- function(x) {
   idx <- shape$shape$string_id
   shape$shape$col <- x$text$color[idx]
   shape$shape$id <- x$text$id[idx]
+  shape$shape$variation <- x$text$variation[idx]
   shape$shape$outline <- x$text$outline[idx]
   shape$shape$outline_width <- x$text$outline_width[idx]
   shape$shape$outline_type <- x$text$outline_type[idx]
@@ -736,6 +739,7 @@ makeContext.marquee_grob <- function(x) {
       weight = x$text$weight[x$bullets$index],
       width = x$text$width[x$bullets$index],
       features = x$text$features[x$bullets$index],
+      variation = x$text$variation[x$bullets$index],
       size = x$text$size[x$bullets$index],
       res = 600,
       hjust = ifelse(shape$metrics$ltr[bullet_blocks], 1, 0),
@@ -748,6 +752,7 @@ makeContext.marquee_grob <- function(x) {
   idx <- x$bullets$index[bshape$shape$metric_id]
   bshape$shape$col <- x$text$color[idx]
   bshape$shape$id <- x$text$id[idx]
+  bshape$shape$variation <- x$text$variation[idx]
   bshape$shape$outline <- x$text$outline[idx]
   bshape$shape$outline_width <- x$text$outline_width[idx]
   bshape$shape$outline_type <- x$text$outline_type[idx]
@@ -1184,6 +1189,10 @@ makeContext.marquee_grob <- function(x) {
         outline_join = x$shape$outline_join[placeholder],
         outline_mitre = x$shape$outline_mitre[placeholder]
       )
+      math_glyphs[[i]]$variation <- rep(
+        x$shape$variation[placeholder],
+        nrow(math_glyphs[[i]])
+      )
       if (nrow(shaped$lines) != 0) {
         math_lines[[i]] <- data.frame(
           id = x$shape$id[placeholder],
@@ -1271,17 +1280,29 @@ makeContent.marquee_grob <- function(x) {
 
   # Create the font list of unique fonts
   if (has_glyphs && nrow(x$shape) > 0) {
-    font_id <- paste0(x$shape$font_path, "&", x$shape$font_index)
+    # Variation coordinates are part of the font identity: the same file can
+    # appear at different axis settings
+    var_key <- vapply(x$shape$variation, format, character(1))
+    font_id <- paste0(x$shape$font_path, "&", x$shape$font_index, "&", var_key)
     font_match <- match(font_id, unique(font_id))
     unique_font <- !duplicated(font_id)
-    fonts <- Map(
-      glyphFont,
+    font_args <- list(
       x$shape$font_path[unique_font],
       x$shape$font_index[unique_font],
       "",
       0,
       ""
     )
+    if (glyph_supports_variation()) {
+      font_args <- c(
+        font_args,
+        list(lapply(
+          x$shape$variation[unique_font],
+          variation_to_font_variation
+        ))
+      )
+    }
+    fonts <- inject(Map(glyphFont, !!!font_args))
     fonts <- inject(glyphFontList(!!!fonts))
   }
 
@@ -1837,4 +1858,37 @@ outline_polygon <- function(polygon, shape) {
       linemitre = shape$outline_mitre[i]
     )
   ))
+}
+
+# Whether the running R supports variations in glyphFont() (R >= 4.6.0)
+glyph_supports_variation <- function() {
+  "variations" %in% names(formals(grDevices::glyphFont))
+}
+
+# Convert a systemfonts::font_variation object to the FontVariation objects
+# that grDevices::glyphFont() expects. systemfonts stores axes as big-endian
+# integer tags and values as 16.16 fixed point numbers
+variation_to_font_variation <- function(v) {
+  # Note: [[/$ on font_variation looks up axes by name, so use .subset2
+  axis_tags <- .subset2(v, "axis")
+  if (length(axis_tags) == 0) {
+    return(NULL)
+  }
+  axes <- vapply(
+    axis_tags,
+    function(tag) {
+      rawToChar(as.raw(c(
+        bitwAnd(bitwShiftR(tag, 24), 255),
+        bitwAnd(bitwShiftR(tag, 16), 255),
+        bitwAnd(bitwShiftR(tag, 8), 255),
+        bitwAnd(tag, 255)
+      )))
+    },
+    character(1)
+  )
+  values <- .subset2(v, "value") / 65536
+  do.call(
+    grDevices::glyphFontVariation,
+    as.list(stats::setNames(values, axes))
+  )
 }

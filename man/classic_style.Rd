@@ -24,7 +24,7 @@ on this}
 \item{code_font}{The font family to use for code and code block text}
 
 \item{...}{
-  Arguments passed on to \code{\link[=base_style]{base_style}}
+  Arguments passed on to \code{\link{base_style}}
   \describe{
     \item{\code{weight}}{The font weight to use. Can either be a number (\code{0}, \code{100},
 \code{200}, \code{300}, \code{400}, \code{500}, \code{600}, \code{700}, \code{800}, or \code{900}) or a strings
@@ -38,6 +38,10 @@ on this}
 `"ultraexpanded"`)}
     \item{\code{features}}{A \link[systemfonts:font_feature]{font_feature} object specifying
 any OpenType font features to apply to the font}
+    \item{\code{variation}}{A \link[systemfonts:font_variation]{font_variation} object
+specifying the coordinates on the variable font axes to use. Settings here
+take precedence over the corresponding \code{weight}, \code{italic}, and \code{width}
+settings during shaping and rendering}
     \item{\code{color}}{Is the color of the font}
     \item{\code{lineheight}}{The spacing between subsequent lines relative to the font
 size. Can be \code{\link[=relative]{relative()}} in which case it is based on the parent lineheight.}
