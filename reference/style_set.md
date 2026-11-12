@@ -1,0 +1,69 @@
+# Create or modify a style set that describes a full markdown text
+
+A style set contains information on how to style the various tags in a
+markdown text. While it is not necessary to provide a style for all tags
+(it will just inherit the parent if missing), it is required to provide
+a complete style for the body tag so an option is avialable through
+inheritance for all tags and all style options. It can often be easier
+to derive a new style set from an existing one rather than building one
+from scratch.
+
+## Usage
+
+``` r
+style_set(...)
+
+modify_style(x, tag, ...)
+
+remove_style(x, tag)
+```
+
+## Arguments
+
+- ...:
+
+  Named arguments providing a style for the specific tags. For
+  `modify_style()` a number of style options to change. If the first
+  argument is a marquee style it will overwrite the tag and subsequent
+  arguments are ignored. This only holds if `x` is a style set.
+
+- x:
+
+  A style or style set to modify
+
+- tag:
+
+  The name of the tag to modify or remove if `x` is a style set. Tags
+  are internally all lowercase and `tag` will be converted to lowercase
+  before matching
+
+## Value
+
+A `marquee_style_set` object
+
+## Examples
+
+``` r
+# Create a style
+s_set <- style_set(base = base_style(), p = style(indent = em(2)))
+
+# Modify an existing tag
+modify_style(s_set, "p", size = 16)
+#> <marquee_style_set[1]>
+#> [1] <base, p>
+
+# Add a new tag, supplying a full style object
+modify_style(s_set, "str", style(weight = "bold"))
+#> <marquee_style_set[1]>
+#> [1] <base, p, str>
+
+# Same as above, but style object created implicitly
+modify_style(s_set, "str", weight = "bold")
+#> <marquee_style_set[1]>
+#> [1] <base, p, str>
+
+# Remove a tag style
+remove_style(s_set, "p")
+#> <marquee_style_set[1]>
+#> [1] <base>
+```
