@@ -326,10 +326,16 @@ marquee_grob <- function(
     }
   }
 
-  # Determine location of blocks, their indent and location in overall parsed text
+  # Determine location of blocks, their indent, direction, and location in
+  # overall parsed text
   bl <- rle(parsed$block)$lengths
   bs <- cumsum(c(0, bl[-length(bl)])) + 1
-  blocks <- list(length = bl, start = bs, indent = parsed$indentation[bs])
+  blocks <- list(
+    length = bl,
+    start = bs,
+    indent = parsed$indentation[bs],
+    direction = parsed$text_direction[bs]
+  )
 
   # Perform margin collapsing
   collapsed_margins <- list(
@@ -389,7 +395,23 @@ marquee_grob <- function(
     res = 600,
     hjust = 1,
     vjust = 1,
-    direction = parsed$text_direction[bullets$index]
+    direction = parsed$text_direction[bullets$index],
+    # Avoid zero-length args when there are no bullets (match.arg fails)
+    mixed = if (length(bullets$index) == 0) {
+      "rotate"
+    } else {
+      parsed$mixed[bullets$index]
+    },
+    kinsoku = if (length(bullets$index) == 0) {
+      "strict"
+    } else {
+      parsed$kinsoku[bullets$index]
+    },
+    kinsoku_style = if (length(bullets$index) == 0) {
+      "hang"
+    } else {
+      parsed$kinsoku_style[bullets$index]
+    }
   )
   ## Inherit color and id from the relevant block
   bullets$shape$shape$col <- parsed$color[bullets$index[
@@ -586,7 +608,10 @@ makeContext.marquee_grob <- function(x) {
     hanging = x$text$hanging / 72,
     space_before = 0,
     space_after = 0,
-    direction = x$text$text_direction
+    direction = x$text$text_direction,
+    mixed = x$text$mixed,
+    kinsoku = x$text$kinsoku,
+    kinsoku_style = x$text$kinsoku_style
   )
   if (nrow(shape$shape) == 0) {
     return(nullGrob())
@@ -740,7 +765,10 @@ makeContext.marquee_grob <- function(x) {
       res = 600,
       hjust = ifelse(shape$metrics$ltr[bullet_blocks], 1, 0),
       vjust = 1,
-      direction = ifelse(shape$metrics$ltr[bullet_blocks], "ltr", "rtl")
+      direction = ifelse(shape$metrics$ltr[bullet_blocks], "ltr", "rtl"),
+      mixed = x$text$mixed[x$bullets$index],
+      kinsoku = x$text$kinsoku[x$bullets$index],
+      kinsoku_style = x$text$kinsoku_style[x$bullets$index]
     )
   }
 
@@ -1176,6 +1204,7 @@ makeContext.marquee_grob <- function(x) {
         advance = glyphs$advance,
         ascender = math_metrics$height[i],
         descender = -math_metrics$depth[i],
+        rotation = 0,
         col = glyphs$color,
         id = x$shape$id[placeholder],
         outline = x$shape$outline[placeholder],

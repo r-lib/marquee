@@ -40,9 +40,11 @@ Suggests:
     rmarkdown,
     rsvg,
     testthat (>= 3.0.0)
+Remotes:
+    r-lib/textshaping
 LinkingTo:
     cpp11
-VignetteBuilder: 
+VignetteBuilder:
     knitr
 Config/build/compilation-database: true
 Config/Needs/website: tidyverse/tidytemplate

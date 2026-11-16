@@ -76,11 +76,27 @@
 #' provided by the image itself
 #' @param text_direction The directional flow of the text. Either `"auto"` to
 #' let it be determined by the content of the text, or `"ltr"`/`"rtl"` to
-#' hard-code it to either left-to-right or right-to-left. This setting will not
-#' change the order of glyphs within a span of text, but rather whether
-#' consequtive blocks of text are laid out left-to-right or right-to-left. It
-#' also affects to which side indentation is applied as well as the meaning of
-#' `"auto"`, and `"justified-auto"` aligment.
+#' hard-code it to either left-to-right or right-to-left. Vertical text is
+#' requested with `"ttb"` (top-to-bottom columns, as used in e.g. Japanese and
+#' traditional Chinese typesetting) or `"btt"` (bottom-to-top columns). This
+#' setting will not change the order of glyphs within a span of text, but
+#' rather how consequtive lines/columns of text are laid out. It also affects
+#' to which side indentation is applied as well as the meaning of `"auto"`,
+#' and `"justified-auto"` aligment.
+#' @param mixed How horizontal-only runs (e.g. Latin script or digits) are set
+#' inside vertical text. One of `"rotate"` (set horizontally and rotate the run
+#' 90 degrees), `"upright"` (set upright using the font's `vert`/`vrt2` glyph
+#' substitutions, falling back to `"rotate"`), `"tate"` (tate-chu-yoko: digit
+#' runs of up to 4 digits are set horizontally within the column), `"combine"`
+#' (generalised tate-chu-yoko for any run of up to 4 characters), or
+#' `"sideways"` (set the whole string horizontally and rotate it). Ignored for
+#' horizontal text.
+#' @param kinsoku The strictness of CJK line break prohibition rules. One of
+#' `"strict"`, `"loose"`, or `"none"`.
+#' @param kinsoku_style How kinsoku violations are resolved when a line is
+#' forced past the last valid break point. One of `"hang"` (offending
+#' punctuation hangs past the line end), `"push-out"` (move to next line and
+#' expand spacing), or `"push-in"` (compress spacing to fit it on the line).
 #' @param border_size `r lifecycle::badge('deprecated')` Use `border_width`
 #' instead
 #'
@@ -127,6 +143,9 @@ style <- function(
   baseline = NULL,
   img_asp = NULL,
   text_direction = NULL,
+  mixed = NULL,
+  kinsoku = NULL,
+  kinsoku_style = NULL,
   border_size = deprecated()
 ) {
   check_string(family, allow_null = TRUE)
@@ -300,7 +319,27 @@ style <- function(
 
   check_number_decimal(img_asp, allow_null = TRUE)
 
-  check_string(text_direction, allow_null = TRUE)
+  if (!is.null(text_direction)) {
+    text_direction <- arg_match0(
+      text_direction,
+      c("auto", "ltr", "rtl", "ttb", "btt")
+    )
+  }
+
+  if (!is.null(mixed)) {
+    mixed <- arg_match0(
+      mixed,
+      c("rotate", "upright", "tate", "combine", "sideways")
+    )
+  }
+
+  if (!is.null(kinsoku)) {
+    kinsoku <- arg_match0(kinsoku, c("strict", "loose", "none"))
+  }
+
+  if (!is.null(kinsoku_style)) {
+    kinsoku_style <- arg_match0(kinsoku_style, c("hang", "push-out", "push-in"))
+  }
 
   if (!is_modifier(baseline)) {
     check_number_decimal(baseline, allow_null = TRUE)
@@ -346,7 +385,10 @@ style <- function(
       strikethrough = strikethrough,
       baseline = baseline,
       img_asp = img_asp,
-      text_direction = text_direction
+      text_direction = text_direction,
+      mixed = mixed,
+      kinsoku = kinsoku,
+      kinsoku_style = kinsoku_style
     ),
     class = "marquee_style"
   )
@@ -452,6 +494,9 @@ base_style <- function(
   baseline = 0,
   img_asp = 1.65,
   text_direction = "auto",
+  mixed = "rotate",
+  kinsoku = "strict",
+  kinsoku_style = "hang",
   border_size = deprecated()
 ) {
   if (lifecycle::is_present(border_size)) {
@@ -492,7 +537,10 @@ base_style <- function(
     strikethrough = strikethrough,
     baseline = baseline,
     img_asp = img_asp,
-    text_direction = text_direction
+    text_direction = text_direction,
+    mixed = mixed,
+    kinsoku = kinsoku,
+    kinsoku_style = kinsoku_style
   )
 }
 
