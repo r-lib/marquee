@@ -15,9 +15,18 @@ test_that("math rendering requires textshaping math support", {
   }
 })
 
+# Detects whether fontconfig can resolve a real math font or silently falls
+# back to the default font (as on minimal CI containers)
+has_math_font <- function() {
+  math_path <- systemfonts::match_fonts("math")$path
+  fallback_path <- systemfonts::match_fonts("marquee_no_such_family_zzz")$path
+  !identical(math_path, fallback_path)
+}
+
 test_that("math grobs place glyphs, lines, and boxes", {
   skip_if_not("shape_math" %in% getNamespaceExports("textshaping"))
   skip_if_not_installed("ragg")
+  skip_if_not(has_math_font(), "No math font available on this system")
 
   ragg::agg_png(tempfile(fileext = ".png"))
   on.exit(dev.off())
