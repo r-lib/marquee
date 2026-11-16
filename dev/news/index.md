@@ -4,6 +4,8 @@
 
 ## marquee 1.3.0
 
+CRAN release: 2026-11-12
+
 - Added support for math expressions written with standard markdown math
   syntax (`$expression$` for inline math and `$$expression$$` for
   display math). Rendering is done with the new math shaper in
