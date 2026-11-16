@@ -1671,7 +1671,8 @@ makeContent.marquee_grob <- function(x) {
           height = -x$heights[grob],
           hAnchor = glyphAnchor(0, "left"),
           vAnchor = glyphAnchor(0, "bottom"),
-          col = x$shape$col[i]
+          col = x$shape$col[i],
+          rot = x$shape$rotation[i]
         )
         outline <- outline_glyphs(glyphs, x$shape[i, , drop = FALSE])
         glyphs <- glyphGrob(
@@ -1696,6 +1697,15 @@ makeContent.marquee_grob <- function(x) {
         if (nrow(glyphs) == 0) {
           glyphs <- nullGrob()
         } else {
+          ## Rotate outlines around the glyph origin (no-op for rotation 0)
+          rot <- x$shape$rotation[i][glyphs$glyph] * pi / 180
+          if (any(rot != 0)) {
+            cos_r <- cos(rot)
+            sin_r <- sin(rot)
+            rot_x <- glyphs$x * cos_r - glyphs$y * sin_r
+            glyphs$y <- glyphs$x * sin_r + glyphs$y * cos_r
+            glyphs$x <- rot_x
+          }
           glyphs <- pathGrob(
             x = glyphs$x + x$shape$x_offset[i][glyphs$glyph],
             y = glyphs$y + x$shape$y_offset[i][glyphs$glyph],
@@ -1715,6 +1725,8 @@ makeContent.marquee_grob <- function(x) {
           x$shape$font_size[need_bitmap],
           col = x$shape$col[need_bitmap]
         )
+        ## NB: bitmap glyphs (e.g. color emoji) are not rotated in the
+        ## fallback path
         raster_glyphs <- Map(
           function(glyph, x, y) {
             systemfonts::glyph_raster_grob(glyph, x, y, interpolate = TRUE)
