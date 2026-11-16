@@ -78,7 +78,9 @@
 #' let it be determined by the content of the text, or `"ltr"`/`"rtl"` to
 #' hard-code it to either left-to-right or right-to-left. Vertical text is
 #' requested with `"ttb"` (top-to-bottom columns, as used in e.g. Japanese and
-#' traditional Chinese typesetting) or `"btt"` (bottom-to-top columns). This
+#' traditional Chinese typesetting) or `"ttb-ltr"` (top-to-bottom columns with
+#' left-to-right column and block order, as used in traditional Mongolian
+#' typesetting). This
 #' setting will not change the order of glyphs within a span of text, but
 #' rather how consequtive lines/columns of text are laid out. It also affects
 #' to which side indentation is applied as well as the meaning of `"auto"`,
@@ -322,7 +324,7 @@ style <- function(
   if (!is.null(text_direction)) {
     text_direction <- arg_match0(
       text_direction,
-      c("auto", "ltr", "rtl", "ttb", "btt")
+      c("auto", "ltr", "rtl", "ttb", "ttb-ltr")
     )
   }
 

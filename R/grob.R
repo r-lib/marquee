@@ -337,18 +337,58 @@ marquee_grob <- function(
     direction = parsed$text_direction[bs]
   )
 
-  # Perform margin collapsing
-  collapsed_margins <- list(
-    top = parsed$margin_top,
-    bottom = parsed$margin_bottom
-  )
+  # Resolve the layout direction and flow axis of each block. "auto" is
+  # treated as horizontal for layout purposes (vertical-only scripts shaped as
+  # ttb under "auto" are not yet transposed). The flow axis is the block
+  # direction of the parent (root blocks flow in their own direction)
+  blocks$direction[blocks$direction == "auto"] <- "ltr"
+  blocks$vertical <- blocks$direction %in% c("ttb", "ttb-ltr")
+  blocks$flow <- blocks$direction
+  dir_stack <- character(max(blocks$indent))
+  for (i in seq_along(blocks$start)) {
+    ind <- blocks$indent[i]
+    if (ind > 1) {
+      blocks$flow[i] <- dir_stack[ind - 1]
+    }
+    dir_stack[ind] <- blocks$direction[i]
+  }
+  blocks$vertical_flow <- blocks$flow %in% c("ttb", "ttb-ltr")
+
+  # Perform margin collapsing. Collapsing happens along the flow axis of the
+  # parent: top/bottom for horizontal flow, right/left for ttb, left/right
+  # for ttb-ltr
+  start_margin <- parsed$margin_top
+  end_margin <- parsed$margin_bottom
   has_background <- vapply(
     parsed$background,
     function(x) !(is.character(x) && is.na(x[1])),
     logical(1)
   )
-  has_top <- !is.na(parsed$border) & parsed$border_width_top != 0
-  has_bottom <- !is.na(parsed$border) & parsed$border_width_bottom != 0
+  has_start_border <- !is.na(parsed$border) & parsed$border_width_top != 0
+  has_end_border <- !is.na(parsed$border) & parsed$border_width_bottom != 0
+  for (i in seq_along(blocks$start)) {
+    j <- blocks$start[i]
+    switch(
+      blocks$flow[i],
+      ttb = {
+        start_margin[j] <- parsed$margin_right[j]
+        end_margin[j] <- parsed$margin_left[j]
+        has_start_border[j] <- !is.na(parsed$border[j]) &
+          parsed$border_width_right[j] != 0
+        has_end_border[j] <- !is.na(parsed$border[j]) &
+          parsed$border_width_left[j] != 0
+      },
+      "ttb-ltr" = {
+        start_margin[j] <- parsed$margin_left[j]
+        end_margin[j] <- parsed$margin_right[j]
+        has_start_border[j] <- !is.na(parsed$border[j]) &
+          parsed$border_width_left[j] != 0
+        has_end_border[j] <- !is.na(parsed$border[j]) &
+          parsed$border_width_right[j] != 0
+      }
+    )
+  }
+  collapsed_margins <- list(start = start_margin, end = end_margin)
   for (root in blocks$start[blocks$indent == 1]) {
     block_tree <- collect_children(
       root,
@@ -360,19 +400,36 @@ marquee_grob <- function(
       block_tree,
       collapsed_margins,
       has_background,
-      has_top,
-      has_bottom,
+      has_start_border,
+      has_end_border,
       if (force_body_margin) 0 else NULL
     )
   }
   # Body margin wins over any collapsing
   if (force_body_margin) {
     roots <- parsed$indentation == 1
-    collapsed_margins$top[roots] <- parsed$margin_top[roots]
-    collapsed_margins$bottom[roots] <- parsed$margin_bottom[roots]
+    collapsed_margins$start[roots] <- start_margin[roots]
+    collapsed_margins$end[roots] <- end_margin[roots]
   }
-  parsed$margin_top <- collapsed_margins$top
-  parsed$margin_bottom <- collapsed_margins$bottom
+  # Map the collapsed start/end margins back to their physical sides
+  for (i in seq_along(blocks$start)) {
+    j <- blocks$start[i]
+    switch(
+      blocks$flow[i],
+      ttb = {
+        parsed$margin_right[j] <- collapsed_margins$start[j]
+        parsed$margin_left[j] <- collapsed_margins$end[j]
+      },
+      "ttb-ltr" = {
+        parsed$margin_left[j] <- collapsed_margins$start[j]
+        parsed$margin_right[j] <- collapsed_margins$end[j]
+      },
+      {
+        parsed$margin_top[j] <- collapsed_margins$start[j]
+        parsed$margin_bottom[j] <- collapsed_margins$end[j]
+      }
+    )
+  }
 
   # Handle bullets
   bullets <- place_bullets(
@@ -470,6 +527,12 @@ makeContext.marquee_grob <- function(x) {
 
   ## Iterate over blocks, calculate offset and width based on parent + margin/padding
   for (i in seq_along(x$blocks$start)) {
+    if (x$blocks$vertical_flow[i]) {
+      ### Blocks in vertical flow are sized by their content, not the
+      ### container. Filled in from the shaping output below
+      indent_stack[x$blocks$indent[i]] <- i
+      next
+    }
     j <- x$blocks$start[i]
     indent <- x$blocks$indent[i]
     if (indent == 1) {
@@ -601,7 +664,9 @@ makeContext.marquee_grob <- function(x) {
     lineheight = x$text$lineheight,
     align = x$text$align,
     hjust = 0,
-    vjust = 1,
+    # For vertical text vjust/hjust swap meaning: vjust controls the cross
+    # (horizontal) axis with 0 putting the content inside the metrics box
+    vjust = ifelse(x$text$text_direction %in% c("ttb", "ttb-ltr"), 0, 1),
     max_width = rep(widths / 72, x$blocks$length),
     tracking = tracking,
     indent = x$text$indent / 72, # These values are provided as bigpts by the style
@@ -617,7 +682,31 @@ makeContext.marquee_grob <- function(x) {
     return(nullGrob())
   }
 
-  # If any widths are not defined we grab the text widths from the shaping and start again
+  # If any widths are not defined we grab the text widths from the shaping
+  if (anyNA(widths) && any(x$blocks$vertical_flow)) {
+    ## Documents with vertical flow derive block sizes from their content, so
+    ## widths can be filled in directly without reshaping
+    pad_mar <- x$text[
+      x$blocks$start,
+      c("padding_left", "padding_right", "margin_left", "margin_right")
+    ]
+    for (i in rev(seq_len(max(x$blocks$indent)))) {
+      for (j in which(x$blocks$indent == i & is.na(widths))) {
+        k <- which(
+          x$blocks$start > x$blocks$start[j] &
+            x$blocks$start <= x$text$ends[x$blocks$start[j]] &
+            x$blocks$indent == i + 1
+        )
+        kid_full <- widths[k] + rowSums(pad_mar[k, , drop = FALSE])
+        widths[j] <- if (x$blocks$vertical[j]) {
+          ### Children are laid out next to each other: widths add up
+          shape$metrics$width[j] + sum(kid_full)
+        } else {
+          max(shape$metrics$width[j], kid_full, na.rm = TRUE)
+        }
+      }
+    }
+  }
   if (anyNA(widths)) {
     added_width <- rowSums(x$text[
       x$blocks$start,
@@ -791,11 +880,106 @@ makeContext.marquee_grob <- function(x) {
   bshape$shape$x_offset <- bshape$shape$x_offset +
     ifelse(bltr, -1, 1) * bshape$shape$font_size / 4
 
+  # Identify blocks in vertical flow (their parent has a vertical direction).
+  # The first such block in a chain is a vertical-flow root: it is laid out
+  # by the recursive transposed algorithm below together with all its
+  # descendants, while the iterative loop treats it as an opaque box (it only
+  # needs its physical height to stack subsequent siblings)
+  n_blocks <- length(x$blocks$start)
+  parent_idx <- integer(n_blocks)
+  p_stack <- integer(max(x$blocks$indent))
+  for (i in seq_len(n_blocks)) {
+    ind <- x$blocks$indent[i]
+    if (ind > 1) {
+      parent_idx[i] <- p_stack[ind - 1]
+    }
+    p_stack[ind] <- i
+  }
+  vflow_root <- x$blocks$vertical_flow &
+    (x$blocks$indent == 1 | !x$blocks$vertical_flow[pmax(parent_idx, 1)])
+  recursive_tree <- vflow_root
+  for (i in seq_len(n_blocks)) {
+    if (
+      !vflow_root[i] && x$blocks$indent[i] > 1 && recursive_tree[parent_idx[i]]
+    ) {
+      recursive_tree[i] <- TRUE
+    }
+  }
+  has_vertical_flow <- any(recursive_tree)
+
+  if (has_vertical_flow) {
+    ## Children of each block
+    kids <- vector("list", n_blocks)
+    for (i in seq_len(n_blocks)) {
+      if (parent_idx[i] != 0) {
+        kids[[parent_idx[i]]] <- c(kids[[parent_idx[i]]], i)
+      }
+    }
+    ## Own content size of each block
+    has_content <- nzchar(x$text$text[x$blocks$start]) | x$blocks$length != 1
+    own_h <- ifelse(has_content, shape$metrics$height, 0)
+    own_w <- ifelse(has_content, shape$metrics$width, 0)
+    ## Full box sizes (content + padding + margin), compounded bottom-up
+    full_h <- rep(NA, n_blocks)
+    full_w <- rep(NA, n_blocks)
+    pad_mar_w <- rowSums(x$text[
+      x$blocks$start,
+      c("padding_left", "padding_right", "margin_left", "margin_right")
+    ])
+    pad_mar_h <- rowSums(x$text[
+      x$blocks$start,
+      c("padding_top", "padding_bottom", "margin_top", "margin_bottom")
+    ])
+    for (i in rev(seq_len(n_blocks))) {
+      if (!recursive_tree[i]) {
+        next
+      }
+      ks <- kids[[i]]
+      full_h[i] <- if (x$blocks$vertical[i]) {
+        max(own_h[i], full_h[ks]) + pad_mar_h[i]
+      } else {
+        own_h[i] + sum(full_h[ks]) + pad_mar_h[i]
+      }
+      full_w[i] <- widths[i] + pad_mar_w[i]
+    }
+  }
+  # The iterative loop only sees horizontal-flow blocks; vertical-flow roots
+  # are included for height bookkeeping (as if they were leaves), their
+  # descendants are fully handled by the recursion
+  h_idx <- which(!recursive_tree | vflow_root)
+
   # Position blocks underneath each other, calculate justification info, and position bullets
-  for (i in seq_along(x$blocks$start)) {
+  for (i in h_idx) {
     ## j is the location in x$text where style is given
     j <- x$blocks$start[i]
     indent <- x$blocks$indent[i]
+
+    if (vflow_root[i]) {
+      ### Opaque box in horizontal flow: only stack it and move on. The
+      ### recursion below positions it and everything inside it
+      if (indent == 1) {
+        cur_offset <- 0
+      }
+      heights[i] <- full_h[i]
+      cur_offset <- cur_offset - heights[i]
+      for (k in seq_len(indent - 1)) {
+        heights[indent_stack[k]] <- heights[indent_stack[k]] + heights[i]
+      }
+      next_indent <- if (i == h_idx[length(h_idx)]) {
+        1
+      } else {
+        x$blocks$indent[h_idx[which(h_idx == i) + 1]]
+      }
+      if (indent > next_indent) {
+        for (k in next_indent + seq_len(indent - next_indent) - 1) {
+          cur_offset <- cur_offset -
+            x$text$padding_bottom[x$blocks$start[indent_stack[k]]] -
+            x$text$margin_bottom[x$blocks$start[indent_stack[k]]]
+        }
+      }
+      indent_stack[indent] <- i
+      next
+    }
 
     ## Position bullet if attached to this block
     bullet_ind <- which(i == bullet_blocks)
@@ -852,10 +1036,11 @@ makeContext.marquee_grob <- function(x) {
       heights[indent_stack[k]] <- heights[indent_stack[k]] + heights[i]
     }
 
-    next_indent <- if (i == length(x$blocks$start)) {
+    h_pos <- which(h_idx == i)
+    next_indent <- if (h_pos == length(h_idx)) {
       1
     } else {
-      x$blocks$indent[i + 1]
+      x$blocks$indent[h_idx[h_pos + 1]]
     }
     if (indent > next_indent) {
       ### If exiting a block, add parent blocks bottom padding + margin to offset
@@ -907,9 +1092,143 @@ makeContext.marquee_grob <- function(x) {
     }
   }
 
+  # Lay out blocks in vertical flow. Blocks are positioned as boxes in
+  # the flow of their parent, which is transposed to the horizontal axis when
+  # the parent's direction is vertical (right-to-left for ttb, left-to-right
+  # for ttb-ltr)
+  if (has_vertical_flow) {
+    ## Place each block, then recurse into children. `edge` is the position
+    ## of the flow-start margin edge (x for vertical flow, y for horizontal
+    ## flow), `cross` is the parent's content-start position on the cross axis
+    ## (content top for vertical flow, content left for horizontal flow)
+    glyph_x_base <- left_offset
+    place_block <- function(i, edge, cross) {
+      j <- x$blocks$start[i]
+      marL <- x$text$margin_left[j]
+      marR <- x$text$margin_right[j]
+      marT <- x$text$margin_top[j]
+      padL <- x$text$padding_left[j]
+      padR <- x$text$padding_right[j]
+      padT <- x$text$padding_top[j]
+      if (x$blocks$vertical_flow[i]) {
+        ttb <- x$blocks$flow[i] == "ttb"
+        if (ttb) {
+          content_right <- edge - marR - padR
+          content_left <- content_right - widths[i]
+        } else {
+          content_left <- edge + marL + padL
+          content_right <- content_left + widths[i]
+        }
+      } else {
+        content_left <- cross + marL + padL
+        content_right <- content_left + widths[i]
+      }
+      left_offset[i] <<- content_left
+      top_offset[i] <<- if (x$blocks$vertical_flow[i]) {
+        cross - marT - padT
+      } else {
+        edge - marT - padT
+      }
+      ## Own content sits at the flow-start side of the content box. ttb-ltr
+      ## glyphs additionally sit left of the shaping origin and must be
+      ## shifted by their width
+      glyph_x_base[i] <<- if (
+        x$blocks$vertical_flow[i] && x$blocks$flow[i] == "ttb"
+      ) {
+        content_right - own_w[i]
+      } else if (x$blocks$vertical_flow[i]) {
+        content_left + own_w[i]
+      } else {
+        content_left
+      }
+      heights[i] <<- full_h[i]
+      ks <- kids[[i]]
+      if (length(ks) > 0) {
+        if (x$blocks$vertical[i]) {
+          child_ttb <- x$blocks$direction[i] == "ttb"
+          cur <- if (child_ttb) {
+            content_right - own_w[i]
+          } else {
+            content_left + own_w[i]
+          }
+          for (c in ks) {
+            place_block(c, cur, top_offset[i])
+            cur <- if (child_ttb) cur - full_w[c] else cur + full_w[c]
+          }
+        } else {
+          cur_y <- top_offset[i] - own_h[i]
+          for (c in ks) {
+            place_block(c, cur_y, content_left)
+            cur_y <- cur_y - full_h[c]
+          }
+        }
+      }
+      ## Record boundaries (same physical interpretation as horizontal flow)
+      text_ind <- x$text$id[j]
+      y_offsets <- shape$shape$y_offset[shape$shape$metric_id == i]
+      if (length(y_offsets) > 0) {
+        if (is.na(ink_top[text_ind])) {
+          ink_top[text_ind] <<- top_offset[i] - shape$metrics$top_bearing[i]
+          first_line[text_ind] <<- top_offset[i] + max(y_offsets)
+        }
+        ink_left[text_ind] <<- min(
+          ink_left[text_ind],
+          left_offset[i] + shape$metrics$left_bearing[i],
+          na.rm = TRUE
+        )
+        ink_right[text_ind] <<- max(
+          ink_right[text_ind],
+          left_offset[i] +
+            shape$metrics$width[i] -
+            shape$metrics$right_bearing[i],
+          na.rm = TRUE
+        )
+        ink_bottom[text_ind] <<- min(
+          ink_bottom[text_ind],
+          top_offset[i] -
+            shape$metrics$height[i] +
+            shape$metrics$bottom_bearing[i],
+          na.rm = TRUE
+        )
+        last_line[text_ind] <<- min(
+          last_line[text_ind],
+          top_offset[i] + min(y_offsets),
+          na.rm = TRUE
+        )
+      }
+    }
+    for (root in which(vflow_root)) {
+      if (x$blocks$indent[root] == 1) {
+        place_block(root, 0, 0)
+      } else {
+        ### Nested root: place it inside its parent's content box, after (in
+        ### flow direction) the parent's own content
+        p <- parent_idx[root]
+        own_parent <- own_w[p]
+        edge <- if (x$blocks$flow[root] == "ttb") {
+          left_offset[p] + widths[p] - own_parent
+        } else {
+          left_offset[p] + own_parent
+        }
+        place_block(root, edge, top_offset[p])
+      }
+    }
+    ### Vertical-direction blocks handled by the iterative loop (horizontal
+    ### flow) keep their own columns at the flow-start side of their box
+    iter_vertical <- which(x$blocks$vertical & !recursive_tree)
+    glyph_x_base[iter_vertical] <- left_offset[iter_vertical] +
+      ifelse(
+        x$blocks$direction[iter_vertical] == "ttb",
+        widths[iter_vertical] - own_w[iter_vertical],
+        own_w[iter_vertical]
+      )
+  } else {
+    glyph_x_base <- left_offset
+  }
+
   # Update offsets based on calculated width and heights
   shape$shape$x_offset <- shape$shape$x_offset +
-    left_offset[shape$shape$metric_id]
+    glyph_x_base[shape$shape$metric_id]
   shape$shape$y_offset <- shape$shape$y_offset +
     top_offset[shape$shape$metric_id] -
     y_adjustment[shape$shape$metric_id]
@@ -939,6 +1258,23 @@ makeContext.marquee_grob <- function(x) {
   x$shape$y_offset <- x$shape$y_offset + x$heights[x$shape$id]
   bshape$shape$y_offset <- bshape$shape$y_offset + x$heights[bshape$shape$id]
   top_offset <- top_offset + x$heights[x$text$id[x$blocks$start]]
+  ## ttb trees are laid out to the left of the origin. Shift them so the
+  ## left-most edge is at zero (ttb-ltr trees are laid out right of the origin)
+  if (has_vertical_flow) {
+    ttb_root <- x$blocks$indent == 1 & x$blocks$flow == "ttb"
+    if (any(ttb_root)) {
+      ttb_texts <- x$text$id[x$blocks$start[ttb_root]]
+      ttb_blocks <- x$text$id[x$blocks$start] %in% ttb_texts
+      x_shift <- rep(0, length(x$x))
+      x_shift[ttb_texts] <- x$widths[ttb_texts]
+      x$shape$x_offset <- x$shape$x_offset + x_shift[x$shape$id]
+      bshape$shape$x_offset <- bshape$shape$x_offset + x_shift[bshape$shape$id]
+      left_offset[ttb_blocks] <- left_offset[ttb_blocks] +
+        x_shift[x$text$id[x$blocks$start[ttb_blocks]]]
+      ink_left[ttb_texts] <- ink_left[ttb_texts] + x_shift[ttb_texts]
+      ink_right[ttb_texts] <- ink_right[ttb_texts] + x_shift[ttb_texts]
+    }
+  }
   ## Combine main text with bullets
   bshape$shape$string_id <- bshape$shape$string_id + max(x$shape$string_id)
   x$shape <- rbind(x$shape, bshape$shape)
@@ -1721,16 +2057,16 @@ set_margins <- function(
   tree,
   margins,
   has_background,
-  has_top,
-  has_bottom,
+  has_start,
+  has_end,
   forced_margin = NULL
 ) {
-  tops <- get_first(tree, has_background, has_top)
-  margins$top[tops[1]] <- forced_margin %||% max(margins$top[tops])
-  margins$top[tops[-1]] <- 0
-  bottoms <- get_last(tree, has_background, has_top)
-  margins$bottom[bottoms[1]] <- forced_margin %||% max(margins$bottom[bottoms])
-  margins$bottom[bottoms[-1]] <- 0
+  starts <- get_first(tree, has_background, has_start)
+  margins$start[starts[1]] <- forced_margin %||% max(margins$start[starts])
+  margins$start[starts[-1]] <- 0
+  ends <- get_last(tree, has_background, has_start)
+  margins$end[ends[1]] <- forced_margin %||% max(margins$end[ends])
+  margins$end[ends[-1]] <- 0
   for (i in seq_along(tree$children)) {
     child <- tree$children[[i]]
     is_last <- i == length(tree$children)
@@ -1738,17 +2074,17 @@ set_margins <- function(
       child,
       margins,
       has_background,
-      has_top,
-      has_bottom,
+      has_start,
+      has_end,
       if (is_last) forced_margin else NULL
     )
   }
   for (i in seq_along(tree$children)[-1]) {
-    margins$bottom[tree$children[[i - 1]]$element] <- max(
-      margins$bottom[tree$children[[i - 1]]$element],
-      margins$top[tree$children[[i]]$element]
+    margins$end[tree$children[[i - 1]]$element] <- max(
+      margins$end[tree$children[[i - 1]]$element],
+      margins$start[tree$children[[i]]$element]
     )
-    margins$top[tree$children[[i]]$element] <- 0
+    margins$start[tree$children[[i]]$element] <- 0
   }
   margins
 }
