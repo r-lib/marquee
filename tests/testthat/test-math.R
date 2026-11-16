@@ -18,6 +18,12 @@ test_that("math rendering requires textshaping math support", {
 test_that("math grobs place glyphs, lines, and boxes", {
   skip_if_not("shape_math" %in% getNamespaceExports("textshaping"))
   skip_if_not_installed("ragg")
+  # Math shaping falls back to a non-math font if no OpenType MATH font is
+  # installed (e.g. on minimal CI images)
+  skip_if_not(
+    grepl("math", systemfonts::match_fonts("math")$path, ignore.case = TRUE),
+    "No OpenType math font available on this system"
+  )
 
   ragg::agg_png(tempfile(fileext = ".png"))
   on.exit(dev.off())
