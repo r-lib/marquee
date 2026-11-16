@@ -71,6 +71,11 @@
 #' `marquee_bullets` provides a selection
 #' @param underline Should text be underlined
 #' @param strikethrough Should text be strikethrough
+#' @param emphasis A single character used as an emphasis mark (kenten/boten),
+#' drawn beside every glyph in the span (to the right of the column in
+#' vertical text, above the line in horizontal text), or `NA` for no mark.
+#' Traditional Japanese typesetting uses marks such as `"●"`, `"﹅"`, or `"・"`
+#' for emphasis instead of italics
 #' @param baseline The baseline shift to apply to the text
 #' @param img_asp The default aspect ratio for block level images if not
 #' provided by the image itself
@@ -142,6 +147,7 @@ style <- function(
   bullets = NULL,
   underline = NULL,
   strikethrough = NULL,
+  emphasis = NULL,
   baseline = NULL,
   img_asp = NULL,
   text_direction = NULL,
@@ -319,6 +325,11 @@ style <- function(
 
   check_bool(strikethrough, allow_null = TRUE)
 
+  check_string(emphasis, allow_null = TRUE, allow_na = TRUE)
+  if (!is.null(emphasis) && is.na(emphasis)) {
+    emphasis[] <- NA_character_
+  }
+
   check_number_decimal(img_asp, allow_null = TRUE)
 
   if (!is.null(text_direction)) {
@@ -385,6 +396,7 @@ style <- function(
       bullets = bullets,
       underline = underline,
       strikethrough = strikethrough,
+      emphasis = emphasis,
       baseline = baseline,
       img_asp = img_asp,
       text_direction = text_direction,
@@ -493,6 +505,7 @@ base_style <- function(
   bullets = marquee_bullets,
   underline = FALSE,
   strikethrough = FALSE,
+  emphasis = NA_character_,
   baseline = 0,
   img_asp = 1.65,
   text_direction = "auto",
@@ -537,6 +550,7 @@ base_style <- function(
     bullets = bullets,
     underline = underline,
     strikethrough = strikethrough,
+    emphasis = emphasis,
     baseline = baseline,
     img_asp = img_asp,
     text_direction = text_direction,

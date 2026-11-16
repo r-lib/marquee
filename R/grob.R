@@ -1245,6 +1245,46 @@ makeContext.marquee_grob <- function(x) {
     top_offset[bullet_blocks[bshape$shape$metric_id]] -
     y_bullet_adjustment[bshape$shape$metric_id]
 
+  ## Bullets in vertical flow sit at the inline start (top) of the first
+  ## column, offset to the side by 0.25em (right for ttb, left for ttb-ltr)
+  vert_bullet <- x$blocks$vertical_flow[bullet_blocks]
+  if (any(vert_bullet)) {
+    for (b in which(vert_bullet)) {
+      i <- bullet_blocks[b]
+      gl <- which(shape$shape$metric_id == i)
+      if (length(gl) == 0) {
+        next
+      }
+      ttb <- x$blocks$flow[i] == "ttb"
+      first_col <- gl[
+        if (ttb) {
+          which.max(shape$shape$x_offset[gl])
+        } else {
+          which.min(shape$shape$glyph[gl])
+        }
+      ]
+      bgl <- which(bshape$shape$metric_id == b)
+      size <- x$text$size[x$blocks$start[i]]
+      target_x <- if (ttb) {
+        shape$shape$x_offset[first_col] +
+          shape$shape$ascender[first_col] +
+          0.25 * size
+      } else {
+        shape$shape$x_offset[first_col] +
+          shape$shape$descender[first_col] -
+          0.25 * size -
+          max(bshape$shape$advance[bgl])
+      }
+      target_y <- shape$shape$y_offset[first_col] +
+        shape$shape$ascender[first_col] -
+        bshape$shape$ascender[bgl[1]]
+      bshape$shape$x_offset[bgl] <- bshape$shape$x_offset[bgl] +
+        (target_x - bshape$shape$x_offset[bgl[1]])
+      bshape$shape$y_offset[bgl] <- bshape$shape$y_offset[bgl] +
+        (target_y - bshape$shape$y_offset[bgl[1]])
+    }
+  }
+
   # Store info in object
   x$shape <- shape$shape
   widths <- widths +
@@ -1425,18 +1465,33 @@ makeContext.marquee_grob <- function(x) {
   span_rects <- lapply(span_bg, function(i) {
     ### Find the glyphs related to the span
     span_ind <- which(x$shape$string_id %in% i)
-    ### Split up by line and make a rect for each
-    lapply(split(span_ind, x$shape$y_offset[span_ind]), function(j) {
-      left <- min(x$shape$x_offset[j])
-      top <- max(x$shape$y_offset[j] + x$shape$ascender[j])
-      c(
-        i[1],
-        left,
-        top,
-        max(x$shape$x_offset[j] + x$shape$advance[j]) - left,
-        top - min(x$shape$y_offset[j] + x$shape$descender[j])
-      )
-    })
+    if (x$text$text_direction[i[1]] %in% c("ttb", "ttb-ltr")) {
+      ### Vertical text: split up by column and make a rect for each
+      lapply(split(span_ind, x$shape$x_offset[span_ind]), function(j) {
+        left <- min(x$shape$x_offset[j] + x$shape$descender[j])
+        top <- max(x$shape$y_offset[j])
+        c(
+          i[1],
+          left,
+          top,
+          max(x$shape$x_offset[j] + x$shape$ascender[j]) - left,
+          top - min(x$shape$y_offset[j] - x$shape$advance[j])
+        )
+      })
+    } else {
+      ### Split up by line and make a rect for each
+      lapply(split(span_ind, x$shape$y_offset[span_ind]), function(j) {
+        left <- min(x$shape$x_offset[j])
+        top <- max(x$shape$y_offset[j] + x$shape$ascender[j])
+        c(
+          i[1],
+          left,
+          top,
+          max(x$shape$x_offset[j] + x$shape$advance[j]) - left,
+          top - min(x$shape$y_offset[j] + x$shape$descender[j])
+        )
+      })
+    }
   })
   span_rects <- inject(rbind(!!!unlist(span_rects, recursive = FALSE)))
 
@@ -1469,43 +1524,168 @@ makeContext.marquee_grob <- function(x) {
   ## Extract position of underline and strikethrough
   lines <- lapply(which(x$text$underline | x$text$strikethrough), function(i) {
     span_ind <- which(x$shape$string_id == i)
-    ### Like span rects we split by line
-    lapply(split(span_ind, x$shape$y_offset[span_ind]), function(j) {
-      ### Line width and position is relative to size
-      size <- x$shape$font_size[j[1]]
-      info <- systemfonts::font_info(
-        path = x$shape$font_path[j[1]],
-        index = x$shape$font_index[j[1]],
-        size = size,
-        res = 600
-      )
-      mod <- c(info$underline_pos * 72 / 600, 0.3 * size)
-      mod <- mod[c(x$text$underline[i], x$text$strikethrough[i])]
-      l <- c(
-        i,
-        min(x$shape$x_offset[j]),
-        max(x$shape$x_offset[j] + x$shape$advance[j]),
-        x$shape$y_offset[j[1]],
-        info$underline_size * 72 / 600
-      )
-      if (length(mod) == 2) {
-        l <- rbind(l, l)
-        l[, 4] <- l[, 4] + mod
-      } else {
-        l[4] <- l[4] + mod
+    vertical <- x$text$text_direction[i] %in% c("ttb", "ttb-ltr")
+    ### Like span rects we split by line (column for vertical text)
+    lapply(
+      split(
+        span_ind,
+        if (vertical) x$shape$x_offset[span_ind] else x$shape$y_offset[span_ind]
+      ),
+      function(j) {
+        ### Line width and position is relative to size
+        size <- x$shape$font_size[j[1]]
+        info <- systemfonts::font_info(
+          path = x$shape$font_path[j[1]],
+          index = x$shape$font_index[j[1]],
+          size = size,
+          res = 600
+        )
+        lwd <- info$underline_size * 72 / 600
+        if (vertical) {
+          ### Underlines are drawn on the "under" side of the column (right
+          ### for ttb, left for ttb-ltr), strikethrough through its center
+          ttb <- x$text$text_direction[i] == "ttb"
+          side <- if (ttb) {
+            max(x$shape$x_offset[j] + x$shape$ascender[j])
+          } else {
+            min(x$shape$x_offset[j] + x$shape$descender[j])
+          }
+          center <- mean(
+            range(
+              x$shape$x_offset[j] +
+                x$shape$ascender[j] / 2 +
+                x$shape$descender[j] / 2
+            )
+          )
+          offset <- if (ttb) {
+            -info$underline_pos * 72 / 600
+          } else {
+            info$underline_pos * 72 / 600
+          }
+          mod <- c(offset, 0) + c(0, center - side)
+          mod <- mod[c(x$text$underline[i], x$text$strikethrough[i])]
+          l <- c(
+            i,
+            side,
+            max(x$shape$y_offset[j]),
+            min(x$shape$y_offset[j] - x$shape$advance[j]),
+            lwd
+          )
+          if (length(mod) == 2) {
+            l <- rbind(l, l)
+            l[, 2] <- l[, 2] + mod
+          } else {
+            l[2] <- l[2] + mod
+          }
+        } else {
+          mod <- c(info$underline_pos * 72 / 600, 0.3 * size)
+          mod <- mod[c(x$text$underline[i], x$text$strikethrough[i])]
+          l <- c(
+            i,
+            min(x$shape$x_offset[j]),
+            max(x$shape$x_offset[j] + x$shape$advance[j]),
+            x$shape$y_offset[j[1]],
+            lwd
+          )
+          if (length(mod) == 2) {
+            l <- rbind(l, l)
+            l[, 4] <- l[, 4] + mod
+          } else {
+            l[4] <- l[4] + mod
+          }
+        }
+        l
       }
-      l
-    })
+    )
   })
   lines <- inject(rbind(!!!unlist(lines, recursive = FALSE)))
+  ### Horizontal tuples are (i, x0, x1, y, lwd), vertical ones are
+  ### (i, x, ytop, ybot, lwd)
+  horizontal_line <- !x$text$text_direction[lines[, 1]] %in% c("ttb", "ttb-ltr")
   x$lines <- list(
     id = x$text$id[lines[, 1]],
-    x0 = lines[, 2],
-    x1 = lines[, 3],
-    y = lines[, 4],
+    x0 = ifelse(horizontal_line, lines[, 2], lines[, 2]),
+    y0 = ifelse(horizontal_line, lines[, 4], lines[, 3]),
+    x1 = ifelse(horizontal_line, lines[, 3], lines[, 2]),
+    y1 = ifelse(horizontal_line, lines[, 4], lines[, 4]),
     lwd = lines[, 5],
     col = x$text$color[lines[, 1]]
   )
+  # Emphasis marks (kenten). One small mark glyph per character, placed
+  # beside the glyph (right of the column for ttb, left for ttb-ltr, above
+  # the line for horizontal text)
+  em_tokens <- which(!is.na(x$text$emphasis))
+  if (length(em_tokens) != 0) {
+    em_glyphs <- lapply(em_tokens, function(i) {
+      ind <- which(x$shape$string_id == i & x$shape$font_path != "")
+      if (length(ind) == 0) {
+        return(NULL)
+      }
+      vertical <- x$text$text_direction[i] %in% c("ttb", "ttb-ltr")
+      size <- x$text$size[i]
+      mark <- textshaping::shape_text(
+        x$text$emphasis[i],
+        family = x$text$family[i],
+        italic = x$text$italic[i],
+        weight = x$text$weight[i],
+        size = size / 2,
+        res = 600,
+        vjust = 0
+      )
+      mark_w <- mark$metrics$width[1]
+      mark_h <- mark$metrics$height[1]
+      gap <- size / 10
+      if (vertical) {
+        center_x <- x$shape$x_offset[ind] +
+          (x$shape$ascender[ind] + x$shape$descender[ind]) / 2
+        center_y <- x$shape$y_offset[ind] - x$shape$advance[ind] / 2
+        if (x$text$text_direction[i] == "ttb") {
+          center_x <- x$shape$x_offset[ind] +
+            x$shape$ascender[ind] +
+            gap +
+            mark_w / 2
+        } else {
+          center_x <- x$shape$x_offset[ind] +
+            x$shape$descender[ind] -
+            gap -
+            mark_w / 2
+        }
+      } else {
+        center_x <- x$shape$x_offset[ind] + x$shape$advance[ind] / 2
+        center_y <- x$shape$y_offset[ind] +
+          x$shape$ascender[ind] +
+          gap +
+          mark_h / 2
+      }
+      n <- length(ind)
+      data.frame(
+        glyph = seq_len(n),
+        index = mark$shape$index[1],
+        metric_id = x$shape$metric_id[ind],
+        string_id = i,
+        x_offset = center_x - mark$shape$x_offset[1] - mark_w / 2,
+        y_offset = center_y - mark$shape$y_offset[1] - mark_h / 2,
+        font_path = mark$shape$font_path[1],
+        font_index = mark$shape$font_index[1],
+        font_size = mark$shape$font_size[1],
+        advance = 0,
+        ascender = mark$shape$ascender[1],
+        descender = mark$shape$descender[1],
+        rotation = 0,
+        col = x$shape$col[ind],
+        id = x$shape$id[ind],
+        outline = x$shape$outline[ind],
+        outline_width = x$shape$outline_width[ind],
+        outline_type = x$shape$outline_type[ind],
+        outline_join = x$shape$outline_join[ind],
+        outline_mitre = x$shape$outline_mitre[ind]
+      )
+    })
+    x$shape <- rbind(
+      x$shape,
+      inject(rbind(!!!em_glyphs[!vapply(em_glyphs, is.null, logical(1))]))
+    )
+  }
   # Place math glyphs, lines, and boxes based on the null-glyph placeholders
   if (length(maths$index) != 0) {
     math_glyphs <- vector("list", length(maths$index))
@@ -1574,6 +1754,39 @@ makeContext.marquee_grob <- function(x) {
           fill = shaped$boxes$color
         )
       }
+      ## Inline math in vertical text is set horizontally and rotated 90
+      ## degrees like Latin runs (mixed = "rotate")
+      if (
+        maths$inline[i] &&
+          x$text$text_direction[maths$index[i]] %in% c("ttb", "ttb-ltr")
+      ) {
+        g <- math_glyphs[[i]]
+        x_rot <- x0 + (g$y_offset - y0)
+        g$y_offset <- y0 - (g$x_offset - x0)
+        g$x_offset <- x_rot
+        g$rotation <- -90
+        math_glyphs[[i]] <- g
+        if (!is.null(math_lines[[i]])) {
+          l <- math_lines[[i]]
+          x0_rot <- x0 + (l$y0 - y0)
+          l$y0 <- y0 - (l$x0 - x0)
+          l$x0 <- x0_rot
+          x1_rot <- x0 + (l$y1 - y0)
+          l$y1 <- y0 - (l$x1 - x0)
+          l$x1 <- x1_rot
+          math_lines[[i]] <- l
+        }
+        if (!is.null(math_boxes[[i]])) {
+          b <- math_boxes[[i]]
+          x_rot <- x0 + (b$y - y0)
+          b$y <- y0 - (b$x - x0 + b$width)
+          b$x <- x_rot
+          w <- b$width
+          b$width <- b$height
+          b$height <- w
+          math_boxes[[i]] <- b
+        }
+      }
     }
     x$shape <- rbind(x$shape, inject(rbind(!!!math_glyphs)))
     x$math_lines <- inject(rbind(!!!math_lines))
@@ -1588,12 +1801,22 @@ makeContext.marquee_grob <- function(x) {
     ## Use the null-glyph to set left-bottom position of image
     glyph <- which(x$shape$string_id == images$index[i])
     grob <- images$grobs[[i]]
-    grob$vp$x <- unit(x$shape$x_offset[glyph], "bigpts")
     descend <- x$shape$descender[glyph]
-    grob$vp$y <- unit(
-      x$shape$y_offset[glyph] + descend + images$y_adjust[i],
-      "bigpts"
-    )
+    if (x$text$text_direction[images$index[i]] %in% c("ttb", "ttb-ltr")) {
+      ## In vertical text the placeholder slot extends downward from the
+      ## glyph origin and the image is placed at the left edge of the column
+      grob$vp$x <- unit(x$shape$x_offset[glyph] + descend, "bigpts")
+      grob$vp$y <- unit(
+        x$shape$y_offset[glyph] - as_bigpts(grob$vp$height),
+        "bigpts"
+      )
+    } else {
+      grob$vp$x <- unit(x$shape$x_offset[glyph], "bigpts")
+      grob$vp$y <- unit(
+        x$shape$y_offset[glyph] + descend + images$y_adjust[i],
+        "bigpts"
+      )
+    }
     grob
   })
   ## Remove the null-glyphs from the shape
@@ -1916,9 +2139,9 @@ makeContent.marquee_grob <- function(x) {
     } else {
       lines <- segmentsGrob(
         x0 = unit(x$lines$x0[line_id], "bigpts"),
-        y0 = unit(x$lines$y[line_id], "bigpts"),
+        y0 = unit(x$lines$y0[line_id], "bigpts"),
         x1 = unit(x$lines$x1[line_id], "bigpts"),
-        y1 = unit(x$lines$y[line_id], "bigpts"),
+        y1 = unit(x$lines$y1[line_id], "bigpts"),
         gp = gpar(
           col = x$lines$col[line_id],
           lwd = x$lines$lwd[line_id],
