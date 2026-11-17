@@ -274,6 +274,36 @@ grid.draw(marquee_grob(md_text_table, classic_style()))
 
 The support is still somewhat experimental as gt-to-grob conversion is getting build out. Some gt features rely on HTML formatting still and will end up looking weird, but standard table inclusion works as expected.
 
+## Vertical typesetting
+
+marquee supports vertical writing modes, as used in Japanese, traditional Chinese, and Mongolian typesetting. The writing direction is part of the style: set `text_direction` to `"ttb"` on the base style to typeset the document in top-to-bottom columns progressing right-to-left, or to `"ttb-ltr"` for the Mongolian convention of left-to-right column progression. Any tag can override the direction, so horizontal and vertical text can be mixed freely — a code block inside vertical text can stay horizontal, and a vertical quotation can sit inside a horizontal document.
+
+The easiest way to get started is the `vertical_style()` constructor, which encodes traditional tategaki conventions: emphasis is set with kenten marks rather than italics, ordered lists are numbered with kanji numerals, bullets hang at the head of each column, and code blocks remain horizontal (yokogaki).
+
+```{r}
+md_vertical <-
+"# 縦書き
+縦書きの*本文*です。句読点や「かぎかっこ」の向きは自動で変わります。
+
+- 項目一
+- 項目二
+
+1. 最初
+2. 次
+
+横書きのコードも混ぜられます。
+
+    y <- 1
+"
+```
+
+```{r}
+#| fig-asp: 0.7
+grid.draw(marquee_grob(md_vertical, vertical_style()))
+```
+
+In vertical mode the constraint axis transposes to the height: columns wrap when they reach it and new columns are added right-to-left (or left-to-right for `"ttb-ltr"`). With the default `width = "auto"`, `height = "auto"` this means vertical text wraps at the available height and derives its width from the content, so it works out of the box. How horizontal-only runs (Latin script, digits) are set inside vertical text is controlled by the `mixed` style property, and CJK line breaking follows the `kinsoku` and `kinsoku_style` properties — see `style()` and the vertical typesetting section of `?marquee_grob` for details.
+
 ## Wrapping up
 
 This should give you enough of an overview to get started. The Marquee Style and Marquee Syntax vignettes provides a bit more detail on their respective areas if you need to dive deeper.

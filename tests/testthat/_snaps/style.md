@@ -184,6 +184,39 @@
 
 ---
 
+    `emphasis` must be a single string, `NA`, or `NULL`, not the number 1.
+
+---
+
+    `emphasis` must be a single string, `NA`, or `NULL`, not `TRUE`.
+
+---
+
+    `text_direction` must be one of "auto", "ltr", "rtl", "ttb", or "ttb-ltr", not "btt".
+
+---
+
+    `text_direction` must be a string or character vector.
+
+---
+
+    `mixed` must be one of "rotate", "upright", "tate", "combine", or "sideways", not "rotated".
+    i Did you mean "rotate"?
+
+---
+
+    `mixed` must be a string or character vector.
+
+---
+
+    `kinsoku` must be one of "strict", "loose", or "none", not "strict-ish".
+
+---
+
+    `kinsoku_style` must be one of "hang", "push-out", or "push-in", not "shove".
+
+---
+
     `baseline` must be a number or `NULL`, not the string "A".
 
 ---

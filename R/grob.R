@@ -171,6 +171,40 @@
 #' expression can be colored individually with e.g.
 #' `\textcolor{color}{content}`.
 #'
+#' # Vertical typesetting
+#' marquee supports vertical writing modes through the `text_direction` style
+#' property: `"ttb"` sets text in top-to-bottom columns that progress
+#' right-to-left (as in Japanese and traditional Chinese typesetting), and
+#' `"ttb-ltr"` sets the same columns with left-to-right progression (the
+#' Mongolian convention). The root writing mode is taken from the base style;
+#' any tag can override it, and the resolved value cascades down the block
+#' tree. A block whose direction differs from its parent's is laid out in its
+#' own transposed coordinate system and positioned as a box in the parent's
+#' flow, which makes it possible to mix directions freely — e.g. a tategaki
+#' quotation in a horizontal document, or a yokogaki code block inside
+#' vertical text.
+#'
+#' In vertical mode both axes transpose: the constraint axis is the height
+#' (columns wrap when they reach it) and the block axis runs horizontally.
+#' Margins and padding remain physical ([trbl()]), so in ttb mode margin
+#' collapsing happens between the right margin of the left block and the left
+#' margin of the right block. Decorations follow the conventions of vertical
+#' typesetting: bullets hang at the column head, underlines are drawn as
+#' bōsen to the right of the column in ttb (left in ttb-ltr), and emphasis
+#' marks (see the `emphasis` argument of [style()]) sit to the right
+#' of each character. Horizontal-only runs (Latin script, digits) inside
+#' vertical text are handled according to the `mixed` style property, and CJK
+#' line breaking follows the `kinsoku`/`kinsoku_style` properties.
+#'
+#' The [vertical_style()] constructor provides a ready-made style set with
+#' traditional defaults (kenten emphasis, kanji list numbering, hanging
+#' bullets, horizontal code blocks) for both directions.
+#'
+#' A few limitations apply: stroked text (the `outline_*` style properties)
+#' does not account for glyph rotation, bitmap glyphs (color emoji) are not
+#' rotated in the fallback rendering path, and the `"first-line"`/
+#' `"last-line"` justification anchors remain y-based for vertical text.
+#'
 #' # Textbox justification
 #' The justification options exceeds the classic ones provided by grid. While
 #' numeric values are available as always, the number of possible text values
@@ -281,11 +315,28 @@ marquee_grob <- function(
   # Add spacing for inline padding
   parsed <- add_inline_padding(parsed)
 
-  # Set bottom margin for tight list `li` elements to match the lineheight
+  # Set flow-end margin for tight list `li` elements to match the lineheight
   is_tight <- parsed$type == "li" & parsed$tight
   parsed$margin_top[is_tight] <- 0
-  parsed$margin_bottom[is_tight] <- parsed$size[is_tight] *
-    (parsed$lineheight[is_tight] - 1)
+  tight_spacing <- parsed$size[is_tight] * (parsed$lineheight[is_tight] - 1)
+  ## In vertical flow the spacing goes on the block-end side (left for ttb,
+  ## right for ttb-ltr), otherwise on the bottom
+  tight_dir <- parsed$text_direction[is_tight]
+  parsed$margin_bottom[is_tight] <- ifelse(
+    tight_dir %in% c("ttb", "ttb-ltr"),
+    0,
+    tight_spacing
+  )
+  parsed$margin_left[is_tight] <- ifelse(
+    tight_dir == "ttb",
+    tight_spacing,
+    parsed$margin_left[is_tight]
+  )
+  parsed$margin_right[is_tight] <- ifelse(
+    tight_dir == "ttb-ltr",
+    tight_spacing,
+    parsed$margin_right[is_tight]
+  )
 
   # Handle image tags
   images <- list(
@@ -521,6 +572,8 @@ marquee_grob <- function(
     parsed$ol_index,
     parsed$bullets
   )
+  ## Apply richer ol numbering (templates and script-based numbering)
+  bullets <- format_ol_bullets(bullets, parsed)
   ## Bullet shape doesn't depend on width so can be calculated up front
   bullets$shape <- textshaping::shape_text(
     bullets$bullet,
@@ -724,60 +777,61 @@ makeContext.marquee_grob <- function(x) {
   for (i in seq_along(images$index)) {
     vp <- images$grobs[[i]]$vp
     scale <- 1
-    ## Start with width
+    ## Start with width. NB: keep these locals away from `width`/`height`,
+    ## which hold the grob-level constraints used below
     if (is.null(vp) || unitType(absolute.size(vp$width)) == "null") {
       if (images$inline[i]) {
         ### No absolute size + inline. set width to 1em
-        width <- x$text$size[images$index[i]]
+        img_w <- x$text$size[images$index[i]]
         # if raster or svg we cap at height instead of width and let aspect ratio determine width
         if (inherits(images$grobs[[i]], "rastergrob")) {
           asp <- ncol(images$grobs[[i]]$raster) / nrow(images$grobs[[i]]$raster)
-          width <- width * asp
+          img_w <- img_w * asp
         } else if (inherits(images$grobs[[i]], "svg_grob")) {
           asp <- images$grob[[i]]$asp
-          width <- width * asp
+          img_w <- img_w * asp
         }
       } else {
         ### Not inline. Use block width
-        width <- widths[x$text$block[images$index[i]]] %|% 0
+        img_w <- widths[x$text$block[images$index[i]]] %|% 0
       }
     } else {
       ### Grob has a width. Use that unless it exceeds the block width
       true_width <- as_bigpts(vp$width)
-      width <- min(widths[x$text$block[images$index[i]]], true_width)
-      scale <- width / true_width
+      img_w <- min(widths[x$text$block[images$index[i]]], true_width)
+      scale <- img_w / true_width
     }
     ## Then height
     if (is.null(vp) || unitType(absolute.size(vp$height)) == "null") {
       if (inherits(images$grobs[[i]], "rastergrob")) {
         ### No size and rastergrob. Use aspect ratio of raster
         asp <- ncol(images$grobs[[i]]$raster) / nrow(images$grobs[[i]]$raster)
-        height <- width / asp
+        img_h <- img_w / asp
       } else if (inherits(images$grobs[[i]], "svg_grob")) {
         asp <- images$grob[[i]]$asp
-        height <- width / asp
+        img_h <- img_w / asp
       } else if (images$inline[i]) {
         ### Inline. We set a square size
-        height <- width
+        img_h <- img_w
       } else {
         ### Not inline. We use the aspect ratio from the style
-        height <- width / x$text$img_asp[images$index[i]]
+        img_h <- img_w / x$text$img_asp[images$index[i]]
       }
     } else {
       ### Grob has height We use that but scale it based on width downscaling
-      height <- as_bigpts(vp$height, width = FALSE) * scale
+      img_h <- as_bigpts(vp$height, width = FALSE) * scale
     }
     ## Set dimensions in size and tracking (this is how it is passed to textshaping)
-    size[images$index[i]] <- height
-    tracking[images$index[i]] <- width
+    size[images$index[i]] <- img_h
+    tracking[images$index[i]] <- img_w
     ## Create a parent viewport with the correct size. Clipping is inherited
     ## so images are clipped by an outer constraint clip but otherwise
     ## unclipped
     outer_vp <- viewport(
       x = 0,
       y = 0,
-      width = unit(width, "bigpts"),
-      height = unit(height, "bigpts"),
+      width = unit(img_w, "bigpts"),
+      height = unit(img_h, "bigpts"),
       just = c(0, 0),
       clip = "inherit"
     )
@@ -994,18 +1048,18 @@ makeContext.marquee_grob <- function(x) {
       y0 <- shape$shape$y_offset[idx]
       ascender <- shape$shape$ascender[idx] + top_shift[block]
       descender <- shape$shape$descender[idx] - bottom_shift[block]
-      height <- math_metrics$height[i]
+      math_h <- math_metrics$height[i]
       depth <- math_metrics$depth[i]
-      if (height > ascender) {
+      if (math_h > ascender) {
         ### Math extends above the reserved box. Push the whole block down
-        shift <- height - ascender
+        shift <- math_h - ascender
         in_block <- shape$shape$metric_id == block
         shape$shape$y_offset[in_block] <- shape$shape$y_offset[in_block] -
           shift
         shape$metrics$height[block] <- shape$metrics$height[block] + shift
         top_shift[block] <- top_shift[block] + shift
         y0 <- y0 - shift
-        ascender <- height
+        ascender <- math_h
       }
       if (depth > -descender) {
         ### Math extends below the reserved box. Push the lines below down
@@ -1432,8 +1486,9 @@ makeContext.marquee_grob <- function(x) {
     top_offset[bullet_blocks[bshape$shape$metric_id]] -
     y_bullet_adjustment[bshape$shape$metric_id]
 
-  ## Bullets in vertical flow sit at the inline start (top) of the first
-  ## column, offset to the side by 0.25em (right for ttb, left for ttb-ltr)
+  ## Bullets in vertical flow occupy the first character cell of the
+  ## indentation at the inline start (top) of the first column — the
+  ## vertical analogue of sitting in the left indent in horizontal lists
   vert_bullet <- x$blocks$vertical_flow[bullet_blocks]
   if (any(vert_bullet)) {
     for (b in which(vert_bullet)) {
@@ -1443,28 +1498,30 @@ makeContext.marquee_grob <- function(x) {
         next
       }
       ttb <- x$blocks$flow[i] == "ttb"
+      ### First column is right-most for ttb, left-most for ttb-ltr
       first_col <- gl[
         if (ttb) {
           which.max(shape$shape$x_offset[gl])
         } else {
-          which.min(shape$shape$glyph[gl])
+          which.min(shape$shape$x_offset[gl])
         }
       ]
       bgl <- which(bshape$shape$metric_id == b)
-      size <- x$text$size[x$blocks$start[i]]
-      target_x <- if (ttb) {
-        shape$shape$x_offset[first_col] +
-          shape$shape$ascender[first_col] +
-          0.25 * size
-      } else {
-        shape$shape$x_offset[first_col] +
-          shape$shape$descender[first_col] -
-          0.25 * size -
-          max(bshape$shape$advance[bgl])
-      }
+      ### Centre the marker run on the text column. x_offset is the pen
+      ### origin at the left edge of the em box, so the column centre is
+      ### half an em box (ascender - descender) to its right
+      text_center <- shape$shape$x_offset[first_col] +
+        (shape$shape$ascender[first_col] - shape$shape$descender[first_col]) /
+          2
+      bullet_w <- max(
+        bshape$shape$x_offset[bgl] + bshape$shape$advance[bgl]
+      ) -
+        min(bshape$shape$x_offset[bgl])
+      target_x <- text_center - bullet_w / 2
+      ## The marker hangs at the column head, in the space vacated by the
+      ## first-column indent (at least one cell above the first glyph)
       target_y <- shape$shape$y_offset[first_col] +
-        shape$shape$ascender[first_col] -
-        bshape$shape$ascender[bgl[1]]
+        max(x$text$indent[x$blocks$start[i]], shape$shape$advance[first_col])
       bshape$shape$x_offset[bgl] <- bshape$shape$x_offset[bgl] +
         (target_x - bshape$shape$x_offset[bgl[1]])
       bshape$shape$y_offset[bgl] <- bshape$shape$y_offset[bgl] +
@@ -1671,17 +1728,34 @@ makeContext.marquee_grob <- function(x) {
     ### Find the glyphs related to the span
     span_ind <- which(x$shape$string_id %in% i)
     if (x$text$text_direction[i[1]] %in% c("ttb", "ttb-ltr")) {
-      ### Vertical text: split up by column and make a rect for each
+      ### Vertical text: split up by column and make a rect for each.
+      ### Anchoring depends on rotation: upright glyphs have their pen
+      ### origin at the left edge of the em box with cells extending up
+      ### from y_offset, while rotated glyphs have cells extending down
+      ### from y_offset and span [descender, ascender] across the origin
       lapply(split(span_ind, x$shape$x_offset[span_ind]), function(j) {
-        left <- min(x$shape$x_offset[j] + x$shape$descender[j])
-        top <- max(x$shape$y_offset[j])
-        c(
-          i[1],
-          left,
-          top,
-          max(x$shape$x_offset[j] + x$shape$ascender[j]) - left,
-          top - min(x$shape$y_offset[j] - x$shape$advance[j])
-        )
+        up <- x$shape$rotation[j] == 0
+        left <- min(ifelse(
+          up,
+          x$shape$x_offset[j],
+          x$shape$x_offset[j] + x$shape$descender[j]
+        ))
+        right <- max(ifelse(
+          up,
+          x$shape$x_offset[j] + x$shape$ascender[j] - x$shape$descender[j],
+          x$shape$x_offset[j] + x$shape$ascender[j]
+        ))
+        top <- max(ifelse(
+          up,
+          x$shape$y_offset[j] + x$shape$advance[j],
+          x$shape$y_offset[j]
+        ))
+        bottom <- min(ifelse(
+          up,
+          x$shape$y_offset[j],
+          x$shape$y_offset[j] - x$shape$advance[j]
+        ))
+        c(i[1], left, top, right - left, top - bottom)
       })
     } else {
       ### Split up by line and make a rect for each
@@ -1748,20 +1822,26 @@ makeContext.marquee_grob <- function(x) {
         lwd <- info$underline_size * 72 / 600
         if (vertical) {
           ### Underlines are drawn on the "under" side of the column (right
-          ### for ttb, left for ttb-ltr), strikethrough through its center
+          ### for ttb, left for ttb-ltr), strikethrough through its center.
+          ### Anchoring depends on rotation: upright glyphs have their pen
+          ### origin at the left edge of the em box (cross-axis extent
+          ### ascender - descender) and are bottom-anchored along the
+          ### column, while rotated glyphs span [descender, ascender]
+          ### across the origin and are top-anchored
           ttb <- x$text$text_direction[i] == "ttb"
-          side <- if (ttb) {
-            max(x$shape$x_offset[j] + x$shape$ascender[j])
-          } else {
-            min(x$shape$x_offset[j] + x$shape$descender[j])
-          }
-          center <- mean(
-            range(
-              x$shape$x_offset[j] +
-                x$shape$ascender[j] / 2 +
-                x$shape$descender[j] / 2
-            )
+          up <- x$shape$rotation[j] == 0
+          glyph_left <- ifelse(
+            up,
+            x$shape$x_offset[j],
+            x$shape$x_offset[j] + x$shape$descender[j]
           )
+          glyph_right <- ifelse(
+            up,
+            x$shape$x_offset[j] + x$shape$ascender[j] - x$shape$descender[j],
+            x$shape$x_offset[j] + x$shape$ascender[j]
+          )
+          side <- if (ttb) max(glyph_right) else min(glyph_left)
+          center <- mean(range((glyph_left + glyph_right) / 2))
           offset <- if (ttb) {
             -info$underline_pos * 72 / 600
           } else {
@@ -1769,11 +1849,21 @@ makeContext.marquee_grob <- function(x) {
           }
           mod <- c(offset, 0) + c(0, center - side)
           mod <- mod[c(x$text$underline[i], x$text$strikethrough[i])]
+          ### Anchor the line to the glyph extents along the column:
+          ### the em box (upright) or the advance cell (rotated)
           l <- c(
             i,
             side,
-            max(x$shape$y_offset[j]),
-            min(x$shape$y_offset[j] - x$shape$advance[j]),
+            max(ifelse(
+              up,
+              x$shape$y_offset[j] + x$shape$ascender[j],
+              x$shape$y_offset[j]
+            )),
+            min(ifelse(
+              up,
+              x$shape$y_offset[j] + x$shape$descender[j],
+              x$shape$y_offset[j] - x$shape$advance[j]
+            )),
             lwd
           )
           if (length(mod) == 2) {
@@ -1827,6 +1917,10 @@ makeContext.marquee_grob <- function(x) {
         return(NULL)
       }
       vertical <- x$text$text_direction[i] %in% c("ttb", "ttb-ltr")
+      ### x_offset is the pen origin at the left edge of the em box; the
+      ### ink edge is near x_offset + ascender - descender, so anchor the
+      ### marks to the em-box edge, not the ascender
+      em_w <- x$shape$ascender[ind] - x$shape$descender[ind]
       size <- x$text$size[i]
       mark <- textshaping::shape_text(
         x$text$emphasis[i],
@@ -1841,19 +1935,27 @@ makeContext.marquee_grob <- function(x) {
       mark_h <- mark$metrics$height[1]
       gap <- size / 10
       if (vertical) {
-        center_x <- x$shape$x_offset[ind] +
-          (x$shape$ascender[ind] + x$shape$descender[ind]) / 2
-        center_y <- x$shape$y_offset[ind] - x$shape$advance[ind] / 2
+        ### Upright cells extend up from y_offset, rotated cells down, so
+        ### the cell centre is half an advance either way. Cross-axis the
+        ### em-box edge is ascender - descender out from the pen origin
+        ### for upright glyphs and ascender/descender for rotated ones
+        up <- x$shape$rotation[ind] == 0
+        center_y <- x$shape$y_offset[ind] +
+          ifelse(up, 1, -1) * x$shape$advance[ind] / 2
+        right_edge <- ifelse(
+          up,
+          x$shape$x_offset[ind] + em_w,
+          x$shape$x_offset[ind] + x$shape$ascender[ind]
+        )
+        left_edge <- ifelse(
+          up,
+          x$shape$x_offset[ind],
+          x$shape$x_offset[ind] + x$shape$descender[ind]
+        )
         if (x$text$text_direction[i] == "ttb") {
-          center_x <- x$shape$x_offset[ind] +
-            x$shape$ascender[ind] +
-            gap +
-            mark_w / 2
+          center_x <- right_edge + gap + mark_w / 2
         } else {
-          center_x <- x$shape$x_offset[ind] +
-            x$shape$descender[ind] -
-            gap -
-            mark_w / 2
+          center_x <- left_edge - gap - mark_w / 2
         }
       } else {
         center_x <- x$shape$x_offset[ind] + x$shape$advance[ind] / 2
@@ -2009,8 +2111,9 @@ makeContext.marquee_grob <- function(x) {
     descend <- x$shape$descender[glyph]
     if (x$text$text_direction[images$index[i]] %in% c("ttb", "ttb-ltr")) {
       ## In vertical text the placeholder slot extends downward from the
-      ## glyph origin and the image is placed at the left edge of the column
-      grob$vp$x <- unit(x$shape$x_offset[glyph] + descend, "bigpts")
+      ## glyph origin and the image is placed at the left edge of the
+      ## column (the pen origin, not the descender edge)
+      grob$vp$x <- unit(x$shape$x_offset[glyph], "bigpts")
       grob$vp$y <- unit(
         x$shape$y_offset[glyph] - as_bigpts(grob$vp$height),
         "bigpts"

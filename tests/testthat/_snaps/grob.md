@@ -32,6 +32,26 @@
       $indent
        [1] 1 2 2 2 2 3 3 4 4 3 2 2 2 2 2 3 4 3 4 4 5 6 6 7 8 8 6 7 3 4 2 2
       
+      $direction
+       [1] "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr"
+      [13] "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr"
+      [25] "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr"
+      
+      $vertical
+       [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+      [13] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+      [25] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+      
+      $flow
+       [1] "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr"
+      [13] "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr"
+      [25] "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr" "ltr"
+      
+      $vertical_flow
+       [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+      [13] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+      [25] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+      
 
 ---
 
@@ -49,7 +69,7 @@
       
       $shape
       $shape$shape
-      # A tibble: 13 x 14
+      # A tibble: 13 x 15
          glyph index metric_id string_id x_offset y_offset font_path        font_index
          <int> <int>     <int>     <int>    <dbl>    <dbl> <chr>                 <int>
        1     1    20         1         1   -10.0     -9.24 /System/Library~          0
@@ -65,11 +85,11 @@
       11     1   135         6         6    -4.20    -9.24 /System/Library~          0
       12     1    20         7         7   -10.0     -9.24 /System/Library~          0
       13     2    17         7         7    -3.33    -9.24 /System/Library~          0
-      # i 6 more variables: font_size <dbl>, advance <dbl>, ascender <dbl>,
-      #   descender <dbl>, col <chr>, id <int>
+      # i 7 more variables: font_size <dbl>, advance <dbl>, ascender <dbl>,
+      #   descender <dbl>, rotation <dbl>, col <chr>, id <int>
       
       $shape$metrics
-      # A tibble: 7 x 12
+      # A tibble: 7 x 13
         string width height left_bearing right_bearing top_bearing bottom_bearing
         <chr>  <dbl>  <dbl>        <dbl>         <dbl>       <dbl>          <dbl>
       1 1.     10.0      12        1.15          1.08        0.885           2.76
@@ -79,8 +99,8 @@
       5 3.     10.0      12        0.287         1.08        0.838           2.53
       6 •       4.20     12        0.874         0.739       3.65            2.76
       7 1.     10.0      12        1.15          1.08        0.885           2.76
-      # i 5 more variables: left_border <dbl>, top_border <dbl>, pen_x <dbl>,
-      #   pen_y <dbl>, ltr <lgl>
+      # i 6 more variables: left_border <dbl>, top_border <dbl>, pen_x <dbl>,
+      #   pen_y <dbl>, ltr <lgl>, direction <chr>
       
       
 

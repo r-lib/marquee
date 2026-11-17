@@ -74,8 +74,10 @@
 #' @param emphasis A single character used as an emphasis mark (kenten/boten),
 #' drawn beside every glyph in the span (to the right of the column in
 #' vertical text, above the line in horizontal text), or `NA` for no mark.
-#' Traditional Japanese typesetting uses marks such as `"●"`, `"﹅"`, or `"・"`
-#' for emphasis instead of italics
+#' Traditional Japanese typesetting uses emphasis marks instead of italics.
+#' Common marks to copy-paste: `"●"` (the most common), `"○"`, `"◎"`, `"▲"`,
+#' `"△"`, `"■"`, `"□"`, `"★"`, `"☆"`, `"・"`, `"﹅"` (sesame dot), and `"※"`
+#' (common in Korean texts)
 #' @param baseline The baseline shift to apply to the text
 #' @param img_asp The default aspect ratio for block level images if not
 #' provided by the image itself

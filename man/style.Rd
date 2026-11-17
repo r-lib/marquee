@@ -33,9 +33,13 @@ style(
   bullets = NULL,
   underline = NULL,
   strikethrough = NULL,
+  emphasis = NULL,
   baseline = NULL,
   img_asp = NULL,
   text_direction = NULL,
+  mixed = NULL,
+  kinsoku = NULL,
+  kinsoku_style = NULL,
   border_size = deprecated()
 )
 
@@ -67,9 +71,13 @@ base_style(
   bullets = marquee_bullets,
   underline = FALSE,
   strikethrough = FALSE,
+  emphasis = NA_character_,
   baseline = 0,
   img_asp = 1.65,
   text_direction = "auto",
+  mixed = "rotate",
+  kinsoku = "strict",
+  kinsoku_style = "hang",
   border_size = deprecated()
 )
 }
@@ -166,6 +174,14 @@ outer corner at a join) if \code{outline_join = "mitre"}.}
 
 \item{strikethrough}{Should text be strikethrough}
 
+\item{emphasis}{A single character used as an emphasis mark (kenten/boten),
+drawn beside every glyph in the span (to the right of the column in
+vertical text, above the line in horizontal text), or \code{NA} for no mark.
+Traditional Japanese typesetting uses emphasis marks instead of italics.
+Common marks to copy-paste: \code{"●"} (the most common), \code{"○"}, \code{"◎"}, \code{"▲"},
+\code{"△"}, \code{"■"}, \code{"□"}, \code{"★"}, \code{"☆"}, \code{"・"}, \code{"﹅"} (sesame dot), and \code{"※"}
+(common in Korean texts)}
+
 \item{baseline}{The baseline shift to apply to the text}
 
 \item{img_asp}{The default aspect ratio for block level images if not
@@ -173,11 +189,32 @@ provided by the image itself}
 
 \item{text_direction}{The directional flow of the text. Either \code{"auto"} to
 let it be determined by the content of the text, or \code{"ltr"}/\code{"rtl"} to
-hard-code it to either left-to-right or right-to-left. This setting will not
-change the order of glyphs within a span of text, but rather whether
-consequtive blocks of text are laid out left-to-right or right-to-left. It
-also affects to which side indentation is applied as well as the meaning of
-\code{"auto"}, and \code{"justified-auto"} aligment.}
+hard-code it to either left-to-right or right-to-left. Vertical text is
+requested with \code{"ttb"} (top-to-bottom columns, as used in e.g. Japanese and
+traditional Chinese typesetting) or \code{"ttb-ltr"} (top-to-bottom columns with
+left-to-right column and block order, as used in traditional Mongolian
+typesetting). This
+setting will not change the order of glyphs within a span of text, but
+rather how consequtive lines/columns of text are laid out. It also affects
+to which side indentation is applied as well as the meaning of \code{"auto"},
+and \code{"justified-auto"} aligment.}
+
+\item{mixed}{How horizontal-only runs (e.g. Latin script or digits) are set
+inside vertical text. One of \code{"rotate"} (set horizontally and rotate the run
+90 degrees), \code{"upright"} (set upright using the font's \code{vert}/\code{vrt2} glyph
+substitutions, falling back to \code{"rotate"}), \code{"tate"} (tate-chu-yoko: digit
+runs of up to 4 digits are set horizontally within the column), \code{"combine"}
+(generalised tate-chu-yoko for any run of up to 4 characters), or
+\code{"sideways"} (set the whole string horizontally and rotate it). Ignored for
+horizontal text.}
+
+\item{kinsoku}{The strictness of CJK line break prohibition rules. One of
+\code{"strict"}, \code{"loose"}, or \code{"none"}.}
+
+\item{kinsoku_style}{How kinsoku violations are resolved when a line is
+forced past the last valid break point. One of \code{"hang"} (offending
+punctuation hangs past the line end), \code{"push-out"} (move to next line and
+expand spacing), or \code{"push-in"} (compress spacing to fit it on the line).}
 
 \item{border_size}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{border_width}
 instead}
