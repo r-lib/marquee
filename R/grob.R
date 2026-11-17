@@ -11,12 +11,31 @@
 #' @inheritParams marquee_parse
 #' @param force_body_margin Should the body margin override margin collapsing
 #' calculations. See Details.
+#' @param clip Should content that overflows a `width`/`height` constraint be
+#' clipped at the constraint box? Either `"on"` (clip, the default), `"off"`
+#' (never clip), or `"inherit"` (defer to the clipping state of the drawing
+#' context). Note that clipping also cuts intentional overflow such as
+#' emphasis marks and hanging punctuation.
 #' @param x,y The location of the markdown text in the graphics. If numeric it
-#' will be converted to units using `default.units`
-#' @param width The width of each markdown text. If numeric it will be converted
-#' to units using `default.units`. `NULL` is equivalent to the width of the
-#' parent container. `NA` uses the width of the text as the full width of the
-#' grob and will thus avoid any soft breaking of lines.
+#' will be converted to units using `default.units`. The default is the
+#' flow-start corner: `x = 0` for horizontal and ttb-ltr text, `x = 1` for ttb
+#' text, `y = 1` always.
+#' @param width,height The width and height of each markdown text. If numeric
+#' they are converted to units using `default.units`. Both accept the same
+#' three kinds of values:
+#'
+#' * `"auto"` (the default): resolve per writing direction. The constraint
+#' axis (width for horizontal text, height for vertical text) takes the
+#' extent of the parent container; the block axis (height for horizontal,
+#' width for vertical) is sized by the content. This makes vertical text
+#' work out of the box, wrapping columns at the container height.
+#' * `NULL`: the extent of the parent container — a hard constraint.
+#' * `NA`: derive the size from the content (for width this avoids soft
+#' breaking of lines).
+#'
+#' Setting both to `NULL` thus clips the content to the available space (see
+#' `clip`). Note that clipping also cuts decorations that intentionally
+#' overflow the text box (emphasis marks, hanging punctuation).
 #' @param default.units A string giving the default units to apply to `x`, `y`,
 #' and `width`
 #' @param hjust The horizontal justification of the markdown with respect to
@@ -168,16 +187,36 @@ marquee_grob <- function(
   style = classic_style(),
   ignore_html = TRUE,
   force_body_margin = FALSE,
-  x = 0,
+  clip = "on",
+  x = NULL,
   y = 1,
-  width = NULL,
+  width = "auto",
+  height = "auto",
   default.units = "npc",
-  hjust = "left",
+  hjust = NULL,
   vjust = "top",
   angle = 0,
   vp = NULL,
   name = NULL
 ) {
+  # Resolve direction-dependent defaults
+  if (is.null(hjust) || is.null(x)) {
+    ### Default anchor and justification are at the flow-start corner: right
+    ### for ttb, left otherwise
+    root_dir <- if (is_parsed(text)) {
+      text$text_direction[text$indentation == 1]
+    } else {
+      style[[1]]$base$text_direction %||% "auto"
+    }
+    ttb <- root_dir == "ttb"
+    if (is.null(hjust)) {
+      hjust <- ifelse(ttb, "right", "left")
+    }
+    if (is.null(x)) {
+      x <- ifelse(ttb, 1, 0)
+    }
+  }
+
   # Basic input checking
   if (
     is.character(hjust) &&
@@ -217,6 +256,7 @@ marquee_grob <- function(
     cli::cli_abort("{.arg vjust} must either be numeric or a character vector")
   }
   check_bool(force_body_margin)
+  clip <- arg_match0(clip, c("on", "off", "inherit"))
 
   if (!is.unit(x)) {
     x <- unit(x, default.units)
@@ -224,9 +264,11 @@ marquee_grob <- function(
   if (!is.unit(y)) {
     y <- unit(y, default.units)
   }
-  width <- width %||% unit(1, "npc")
-  if (!is.unit(width)) {
-    width <- unit(width, default.units)
+  if (identical(width, NULL)) {
+    width <- unit(1, "npc")
+  }
+  if (identical(height, NULL)) {
+    height <- unit(1, "npc")
   }
 
   # Parse input
@@ -336,6 +378,45 @@ marquee_grob <- function(
     indent = parsed$indentation[bs],
     direction = parsed$text_direction[bs]
   )
+
+  # Resolve "auto" sizing per root direction: parent extent on the constraint
+  # axis (width for horizontal, height for vertical), content on the block
+  # axis. Explicit NULL means parent extent on both axes, NA content-sized
+  root_vertical <- blocks$direction[blocks$indent == 1] %in%
+    c("ttb", "ttb-ltr")
+  resolve_auto <- function(vert) {
+    if (all(vert)) {
+      return(list(unit(NA, "npc"), unit(1, "npc")))
+    }
+    if (!any(vert)) {
+      return(list(unit(1, "npc"), unit(NA, "npc")))
+    }
+    list(
+      inject(unit.c(
+        !!!lapply(vert, function(v) {
+          if (v) unit(NA, "npc") else unit(1, "npc")
+        })
+      )),
+      inject(unit.c(
+        !!!lapply(vert, function(v) {
+          if (v) unit(1, "npc") else unit(NA, "npc")
+        })
+      ))
+    )
+  }
+  auto_size <- resolve_auto(root_vertical)
+  if (identical(width, "auto")) {
+    width <- auto_size[[1]]
+  }
+  if (identical(height, "auto")) {
+    height <- auto_size[[2]]
+  }
+  if (!is.unit(width)) {
+    width <- unit(width, default.units)
+  }
+  if (!is.unit(height)) {
+    height <- unit(height, default.units)
+  }
 
   # Resolve the layout direction and flow axis of each block. "auto" is
   # treated as horizontal for layout purposes (vertical-only scripts shaped as
@@ -487,8 +568,10 @@ marquee_grob <- function(
     x = rep_along(text, x),
     y = rep_along(text, y),
     width = rep_along(text, width),
+    height = rep_along(text, height),
     hjust = rep_along(text, hjust),
     vjust = rep_along(text, vjust),
+    clip = rep_along(text, clip),
     angle = rep_along(text, angle),
     vp = vp,
     name = name,
@@ -500,7 +583,12 @@ marquee_grob <- function(
       all(
         is.na(grob$width) |
           !unitType(absolute.size(grob$width)) %in%
-            c("null", "sum", "min", "max")
+            c("null", "sum", "min", "max", "npc")
+      ) &&
+      all(
+        is.na(grob$height) |
+          !unitType(absolute.size(grob$height)) %in%
+            c("null", "sum", "min", "max", "npc")
       )
   ) {
     grob <- makeContent.marquee_grob(makeContext.marquee_grob(grob))
@@ -519,11 +607,69 @@ makeContext.marquee_grob <- function(x) {
     as_bigpts(x$width),
     as_bigpts(x$width, width = FALSE)
   )
+  # Height only constrains vertical text (column length), where it mirrors
+  # the handling of width
+  height <- ifelse(
+    findInterval(x$angle, c(0, c(0, 90, 180, 270) + 45)) %% 2 == 1,
+    as_bigpts(x$height, width = FALSE),
+    as_bigpts(x$height)
+  )
 
   # Calculate width of each block
   widths <- rep(NA, length(x$blocks$start))
   left_offset <- widths
   indent_stack <- rep(NA, max(x$blocks$indent))
+
+  ## Allocate the column-length constraint down vertical-flow trees, mirroring
+  ## the width recursion: each block gets the parent's allocated height minus
+  ## its own top/bottom margin and padding
+  heights_alloc <- rep(NA_real_, length(x$blocks$start))
+  h_stack <- rep(NA_real_, max(x$blocks$indent))
+  for (i in seq_along(x$blocks$start)) {
+    j <- x$blocks$start[i]
+    indent <- x$blocks$indent[i]
+    if (indent == 1) {
+      heights_alloc[i] <- height[x$text$id[j]] -
+        x$text$margin_top[j] -
+        x$text$padding_top[j] -
+        x$text$padding_bottom[j] -
+        x$text$margin_bottom[j]
+    } else if (x$blocks$vertical_flow[i]) {
+      heights_alloc[i] <- h_stack[indent - 1] -
+        x$text$margin_top[j] -
+        x$text$padding_top[j] -
+        x$text$padding_bottom[j] -
+        x$text$margin_bottom[j]
+    }
+    h_stack[indent] <- heights_alloc[i]
+  }
+
+  # Identify blocks in vertical flow (their parent has a vertical direction).
+  # The first such block in a chain is a vertical-flow root: it is laid out
+  # by the recursive transposed algorithm below together with all its
+  # descendants, while the iterative loop treats it as an opaque box (it only
+  # needs its physical height to stack subsequent siblings)
+  n_blocks <- length(x$blocks$start)
+  parent_idx <- integer(n_blocks)
+  p_stack <- integer(max(x$blocks$indent))
+  for (i in seq_len(n_blocks)) {
+    ind <- x$blocks$indent[i]
+    if (ind > 1) {
+      parent_idx[i] <- p_stack[ind - 1]
+    }
+    p_stack[ind] <- i
+  }
+  vflow_root <- x$blocks$vertical_flow &
+    (x$blocks$indent == 1 | !x$blocks$vertical_flow[pmax(parent_idx, 1)])
+  recursive_tree <- vflow_root
+  for (i in seq_len(n_blocks)) {
+    if (
+      !vflow_root[i] && x$blocks$indent[i] > 1 && recursive_tree[parent_idx[i]]
+    ) {
+      recursive_tree[i] <- TRUE
+    }
+  }
+  has_vertical_flow <- any(recursive_tree)
 
   ## Iterate over blocks, calculate offset and width based on parent + margin/padding
   for (i in seq_along(x$blocks$start)) {
@@ -624,14 +770,16 @@ makeContext.marquee_grob <- function(x) {
     ## Set dimensions in size and tracking (this is how it is passed to textshaping)
     size[images$index[i]] <- height
     tracking[images$index[i]] <- width
-    ## Create a parent viewport with the correct size
+    ## Create a parent viewport with the correct size. Clipping is inherited
+    ## so images are clipped by an outer constraint clip but otherwise
+    ## unclipped
     outer_vp <- viewport(
       x = 0,
       y = 0,
       width = unit(width, "bigpts"),
       height = unit(height, "bigpts"),
       just = c(0, 0),
-      clip = "off"
+      clip = "inherit"
     )
     ## Use parent vp directly if no vp, otherwise wrap the grob
     if (is.null(vp)) {
@@ -650,60 +798,121 @@ makeContext.marquee_grob <- function(x) {
     tracking[maths$index] <- math_metrics$width
   }
 
-  # Shape text using widths
-  shape <- textshaping::shape_text(
-    strings = x$text$text,
-    id = x$text$block,
-    family = x$text$family,
-    italic = x$text$italic,
-    weight = x$text$weight,
-    width = x$text$width,
-    features = x$text$features,
-    size = size,
-    res = 600,
-    lineheight = x$text$lineheight,
-    align = x$text$align,
-    hjust = 0,
-    # For vertical text vjust/hjust swap meaning: vjust controls the cross
-    # (horizontal) axis with 0 putting the content inside the metrics box
-    vjust = ifelse(x$text$text_direction %in% c("ttb", "ttb-ltr"), 0, 1),
-    max_width = rep(widths / 72, x$blocks$length),
-    tracking = tracking,
-    indent = x$text$indent / 72, # These values are provided as bigpts by the style
-    hanging = x$text$hanging / 72,
-    space_before = 0,
-    space_after = 0,
-    direction = x$text$text_direction,
-    mixed = x$text$mixed,
-    kinsoku = x$text$kinsoku,
-    kinsoku_style = x$text$kinsoku_style
-  )
+  # Shape text using widths (heights for vertical blocks, where the
+  # constraint is the column length)
+  shape_all <- function(heights_alloc, widths) {
+    block_max_width <- ifelse(
+      x$blocks$vertical,
+      heights_alloc / 72,
+      widths / 72
+    )
+    textshaping::shape_text(
+      strings = x$text$text,
+      id = x$text$block,
+      family = x$text$family,
+      italic = x$text$italic,
+      weight = x$text$weight,
+      width = x$text$width,
+      features = x$text$features,
+      size = size,
+      res = 600,
+      lineheight = x$text$lineheight,
+      align = x$text$align,
+      hjust = 0,
+      # For vertical text vjust/hjust swap meaning: vjust controls the cross
+      # (horizontal) axis with 0 putting the content inside the metrics box
+      vjust = ifelse(x$text$text_direction %in% c("ttb", "ttb-ltr"), 0, 1),
+      max_width = rep(block_max_width, x$blocks$length),
+      tracking = tracking,
+      indent = x$text$indent / 72, # These values are provided as bigpts by the style
+      hanging = x$text$hanging / 72,
+      space_before = 0,
+      space_after = 0,
+      direction = x$text$text_direction,
+      mixed = x$text$mixed,
+      kinsoku = x$text$kinsoku,
+      kinsoku_style = x$text$kinsoku_style
+    )
+  }
+  shape <- shape_all(heights_alloc, widths)
   if (nrow(shape$shape) == 0) {
     return(nullGrob())
   }
 
   # If any widths are not defined we grab the text widths from the shaping
-  if (anyNA(widths) && any(x$blocks$vertical_flow)) {
+  if (any(x$blocks$vertical_flow)) {
     ## Documents with vertical flow derive block sizes from their content, so
     ## widths can be filled in directly without reshaping
-    pad_mar <- x$text[
+    pad_mar_lr <- rowSums(x$text[
       x$blocks$start,
       c("padding_left", "padding_right", "margin_left", "margin_right")
-    ]
-    for (i in rev(seq_len(max(x$blocks$indent)))) {
-      for (j in which(x$blocks$indent == i & is.na(widths))) {
-        k <- which(
-          x$blocks$start > x$blocks$start[j] &
-            x$blocks$start <= x$text$ends[x$blocks$start[j]] &
-            x$blocks$indent == i + 1
-        )
-        kid_full <- widths[k] + rowSums(pad_mar[k, , drop = FALSE])
-        widths[j] <- if (x$blocks$vertical[j]) {
-          ### Children are laid out next to each other: widths add up
-          shape$metrics$width[j] + sum(kid_full)
-        } else {
-          max(shape$metrics$width[j], kid_full, na.rm = TRUE)
+    ])
+    fill_widths <- function() {
+      widths[x$blocks$vertical_flow] <<- NA
+      for (i in rev(seq_len(max(x$blocks$indent)))) {
+        for (j in which(x$blocks$indent == i & is.na(widths))) {
+          k <- which(
+            x$blocks$start > x$blocks$start[j] &
+              x$blocks$start <= x$text$ends[x$blocks$start[j]] &
+              x$blocks$indent == i + 1
+          )
+          kid_full <- widths[k] +
+            pad_mar_lr[k]
+          widths[j] <<- if (x$blocks$vertical[j]) {
+            ### Children are laid out next to each other: widths add up
+            shape$metrics$width[j] + sum(kid_full)
+          } else {
+            max(shape$metrics$width[j], kid_full, na.rm = TRUE)
+          }
         }
+      }
+    }
+    if (anyNA(widths)) {
+      fill_widths()
+    }
+    ## Nested vertical blocks in a horizontal parent get the minimal column
+    ## length that keeps their laid-out width inside the allocated parent
+    ## width. Unbounded shaping produces a single column (minimal width,
+    ## maximal height); the minimal height is thus found by spreading the
+    ## content over as many columns as the parent width allows
+    nested_root <- which(vflow_root & x$blocks$indent > 1)
+    if (length(nested_root) != 0) {
+      for (iter in seq_len(8)) {
+        avail <- widths[parent_idx[nested_root]] - pad_mar_lr[nested_root]
+        needs_fit <- nested_root[is.na(heights_alloc[nested_root])]
+        overflowing <- nested_root[
+          !is.na(heights_alloc[nested_root]) &
+            widths[nested_root] > avail
+        ]
+        if (length(needs_fit) == 0 && length(overflowing) == 0) {
+          break
+        }
+        for (r in unique(c(needs_fit, overflowing))) {
+          a <- max(avail[which(nested_root == r)], 1)
+          if (is.na(heights_alloc[r])) {
+            ### First pass: spread the single-column length over as many
+            ### columns as fit the parent width
+            n_cols <- max(floor(a / max(shape$metrics$width[r], 1)), 1)
+            est <- shape$metrics$height[r] / n_cols * 1.02
+          } else {
+            ### Later passes: scale by the remaining overflow
+            est <- heights_alloc[r] * (widths[r] / a) * 1.05
+          }
+          ## Constrain the root and its vertical descendants alike
+          desc <- which(
+            x$blocks$start > x$blocks$start[r] &
+              x$blocks$start <= x$text$ends[x$blocks$start[r]] &
+              x$blocks$vertical
+          )
+          targets <- c(r, desc)
+          heights_alloc[targets] <- pmax(
+            est,
+            heights_alloc[targets],
+            na.rm = TRUE
+          )
+        }
+        shape <- shape_all(heights_alloc, widths)
+        fill_widths()
       }
     }
   }
@@ -880,33 +1089,6 @@ makeContext.marquee_grob <- function(x) {
   bshape$shape$x_offset <- bshape$shape$x_offset +
     ifelse(bltr, -1, 1) * bshape$shape$font_size / 4
 
-  # Identify blocks in vertical flow (their parent has a vertical direction).
-  # The first such block in a chain is a vertical-flow root: it is laid out
-  # by the recursive transposed algorithm below together with all its
-  # descendants, while the iterative loop treats it as an opaque box (it only
-  # needs its physical height to stack subsequent siblings)
-  n_blocks <- length(x$blocks$start)
-  parent_idx <- integer(n_blocks)
-  p_stack <- integer(max(x$blocks$indent))
-  for (i in seq_len(n_blocks)) {
-    ind <- x$blocks$indent[i]
-    if (ind > 1) {
-      parent_idx[i] <- p_stack[ind - 1]
-    }
-    p_stack[ind] <- i
-  }
-  vflow_root <- x$blocks$vertical_flow &
-    (x$blocks$indent == 1 | !x$blocks$vertical_flow[pmax(parent_idx, 1)])
-  recursive_tree <- vflow_root
-  for (i in seq_len(n_blocks)) {
-    if (
-      !vflow_root[i] && x$blocks$indent[i] > 1 && recursive_tree[parent_idx[i]]
-    ) {
-      recursive_tree[i] <- TRUE
-    }
-  }
-  has_vertical_flow <- any(recursive_tree)
-
   if (has_vertical_flow) {
     ## Children of each block
     kids <- vector("list", n_blocks)
@@ -960,7 +1142,12 @@ makeContext.marquee_grob <- function(x) {
       if (indent == 1) {
         cur_offset <- 0
       }
-      heights[i] <- full_h[i]
+      heights[i] <- if (!is.na(heights_alloc[i])) {
+        ### A given height constrains the column length; the grob occupies it
+        heights_alloc[i] + pad_mar_h[i]
+      } else {
+        full_h[i]
+      }
       cur_offset <- cur_offset - heights[i]
       for (k in seq_len(indent - 1)) {
         heights[indent_stack[k]] <- heights[indent_stack[k]] + heights[i]
@@ -1292,8 +1479,26 @@ makeContext.marquee_grob <- function(x) {
       x$blocks$start,
       c("padding_left", "padding_right", "margin_left", "margin_right")
     ])
-  x$widths <- widths[x$blocks$indent == 1]
+  root_content_width <- widths[x$blocks$indent == 1]
+  x$widths <- root_content_width
   x$heights <- heights[x$blocks$indent == 1]
+  ## Hard constraints: a given width clips vertical text at the block axis, a
+  ## given height clips horizontal text (NA means content-sized). For vertical
+  ## roots a given height constrains column length (handled in shaping)
+  root_vertical <- x$blocks$vertical_flow[x$blocks$indent == 1]
+  constrained <- rep(FALSE, length(x$x))
+  for (t in seq_along(x$x)) {
+    if (root_vertical[t]) {
+      if (!is.na(width[t])) {
+        x$widths[t] <- width[t]
+        constrained[t] <- TRUE
+      }
+    } else if (!is.na(height[t])) {
+      x$heights[t] <- height[t]
+      constrained[t] <- TRUE
+    }
+  }
+  x$clip <- constrained & x$clip == "on"
   ## Adjust y so it is zero-justified
   x$shape$y_offset <- x$shape$y_offset + x$heights[x$shape$id]
   bshape$shape$y_offset <- bshape$shape$y_offset + x$heights[bshape$shape$id]
@@ -2149,21 +2354,34 @@ makeContent.marquee_grob <- function(x) {
         )
       )
     }
-    ## Combine to a single grob
-    inject(
+    ## Combine to a single grob, clipping at the constraint box if one is set
+    content <- inject(
       grobTree(
         !!!rects,
         !!!images,
         math_boxes,
         glyphs,
         math_lines,
-        lines,
-        vp = viewport(
-          x$x[grob],
-          x$y[grob],
-          just = c(0, 0),
-          angle = x$angle[grob]
-        )
+        lines
+      )
+    )
+    if (isTRUE(x$clip[grob])) {
+      clip_rect <- rectGrob(
+        x = unit(-x$hjust[grob] * x$widths[grob], "bigpts"),
+        y = unit(-x$vjust[grob] * x$heights[grob], "bigpts"),
+        width = unit(x$widths[grob], "bigpts"),
+        height = unit(x$heights[grob], "bigpts"),
+        just = c(0, 0)
+      )
+      content <- grobTree(content, vp = viewport(clip = clip_rect))
+    }
+    grobTree(
+      content,
+      vp = viewport(
+        x$x[grob],
+        x$y[grob],
+        just = c(0, 0),
+        angle = x$angle[grob]
       )
     )
   })
