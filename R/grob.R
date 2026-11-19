@@ -1241,7 +1241,7 @@ makeContext.marquee_grob <- function(x) {
     grob
   })
   ## Remove the null-glyphs from the shape
-  x$shape <- x$shape[x$shape$font_path != "", ]
+  x$shape <- x$shape[!is.na(x$shape$font_path) & x$shape$font_path != "", ]
   x$images <- list(
     id = x$text$id[images$index],
     grobs = image_grobs
