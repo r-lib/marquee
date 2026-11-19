@@ -1,3 +1,12 @@
+test_that("element_marquee() inherits from element_text", {
+  skip_if_not_installed("ggplot2", "4.0.0")
+
+  element <- element_marquee(colour = "red", width = 0.5)
+  expect_true(S7::S7_inherits(element, ggplot2::element_text))
+  expect_identical(element$colour, "red")
+  expect_identical(element$width, 0.5)
+})
+
 test_that("element_marquee() inserts aesthetics into the style", {
   elem <- element_marquee(
     "serif",

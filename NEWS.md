@@ -1,5 +1,7 @@
 # marquee (development version)
 
+* `element_marquee()` now works with S7 1.0.0.
+
 # marquee 1.3.0
 
 * Added support for math expressions written with standard markdown

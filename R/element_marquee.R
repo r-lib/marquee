@@ -82,21 +82,6 @@ element_marquee <- function(
   if (!is.null(color)) {
     colour <- color
   }
-  n <- max(
-    length(family),
-    length(colour),
-    length(size),
-    length(hjust),
-    length(vjust),
-    length(angle),
-    length(lineheight)
-  )
-  if (n > 1) {
-    cli::cli_warn(c(
-      "Vectorized input to {.fn element_text} is not officially supported.",
-      i = "Results may be unexpected or may change in future versions of ggplot2."
-    ))
-  }
   if (!is.null(element_env$s7_class)) {
     return(element_env$s7_class(
       family = family,
@@ -110,6 +95,21 @@ element_marquee <- function(
       style = style,
       width = width,
       inherit.blank = inherit.blank
+    ))
+  }
+  n <- max(
+    length(family),
+    length(colour),
+    length(size),
+    length(hjust),
+    length(vjust),
+    length(angle),
+    length(lineheight)
+  )
+  if (n > 1) {
+    cli::cli_warn(c(
+      "Vectorized input to {.fn element_text} is not officially supported.",
+      i = "Results may be unexpected or may change in future versions of ggplot2."
     ))
   }
   structure(
@@ -158,29 +158,18 @@ make_element_marquee_s7 <- function() {
       width = NULL,
       inherit.blank = FALSE
     ) {
-      if (!ggplot2::is_margin(margin) && !is.null(margin)) {
-        margin <- utils::getFromNamespace("as_margin", "ggplot2")(margin)
-        cli::cli_warn(
-          "The {.arg margin} argument should be constructed using the \\
-          {.fn margin} function."
-        )
-      }
       obj <- S7::new_object(
-        S7::S7_object(),
-        family = family,
-        face = NULL,
-        colour = colour,
-        size = size,
-        hjust = hjust,
-        vjust = vjust,
-        angle = angle,
-        lineheight = lineheight,
-        margin = margin,
-        debug = NULL,
-        inherit.blank = inherit.blank,
-        italic = NA_character_,
-        fontweight = NA_real_,
-        fontwidth = NA_real_,
+        ggplot2::element_text(
+          family = family,
+          colour = colour,
+          size = size,
+          hjust = hjust,
+          vjust = vjust,
+          angle = angle,
+          lineheight = lineheight,
+          margin = margin,
+          inherit.blank = inherit.blank
+        ),
         style = style,
         width = width
       )
