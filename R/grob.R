@@ -2483,8 +2483,8 @@ makeContent.marquee_grob <- function(x) {
           x$shape$font_size[i]
         )
         need_bitmap <- i[attr(glyphs, "missing")]
-        outline <- outline_polygon(glyphs, x$shape[i, , drop = FALSE])
         if (nrow(glyphs) == 0) {
+          outline <- NULL
           glyphs <- nullGrob()
         } else {
           ## Rotate outlines around the glyph origin (no-op for rotation 0)
@@ -2496,6 +2496,7 @@ makeContent.marquee_grob <- function(x) {
             glyphs$y <- glyphs$x * sin_r + glyphs$y * cos_r
             glyphs$x <- rot_x
           }
+          outline <- outline_polygon(glyphs, x$shape[i, , drop = FALSE])
           glyphs <- pathGrob(
             x = glyphs$x + x$shape$x_offset[i][glyphs$glyph],
             y = glyphs$y + x$shape$y_offset[i][glyphs$glyph],
@@ -2515,15 +2516,24 @@ makeContent.marquee_grob <- function(x) {
           x$shape$font_size[need_bitmap],
           col = x$shape$col[need_bitmap]
         )
-        ## NB: bitmap glyphs (e.g. color emoji) are not rotated in the
-        ## fallback path
         raster_glyphs <- Map(
-          function(glyph, x, y) {
-            systemfonts::glyph_raster_grob(glyph, x, y, interpolate = TRUE)
+          function(glyph, x, y, rotation) {
+            rotation <- rotation %% 360
+            if (rotation == 0 || rotation %% 90 != 0) {
+              ## NB: bitmap glyphs are only rotated for right angles
+              return(systemfonts::glyph_raster_grob(
+                glyph,
+                x,
+                y,
+                interpolate = TRUE
+              ))
+            }
+            rotate_raster_glyph(glyph, x, y, rotation)
           },
           glyph = raster_glyphs,
           x = x$shape$x_offset[need_bitmap],
-          y = x$shape$y_offset[need_bitmap]
+          y = x$shape$y_offset[need_bitmap],
+          rotation = x$shape$rotation[need_bitmap]
         )
         glyphs <- inject(grobTree(!!!outline, glyphs, !!!raster_glyphs))
       }
@@ -2998,11 +3008,55 @@ outline_glyphs <- function(glyph_info, shape) {
   outlines
 }
 
+# Rotate a bitmap glyph (nativeRaster from systemfonts::glyph_raster()) in
+# counterclockwise 90° steps, updating the offset/size attributes so it lands
+# where the rotated glyph origin demands, and build the rasterGrob
+rotate_raster_glyph <- function(glyph, x, y, rotation) {
+  offset <- attr(glyph, "offset") # c(top, left) corner relative to baseline origin
+  size <- attr(glyph, "size") # c(height, width) in bigpts
+  steps <- (rotation / 90) %% 4
+  for (step in seq_len(steps)) {
+    glyph <- rot90(glyph)
+    offset <- c(offset[2] + size[2], -offset[1])
+    size <- rev(size)
+  }
+  rasterGrob(
+    glyph,
+    x = x + offset[2],
+    y = y + offset[1],
+    just = c("left", "top"),
+    width = size[2],
+    height = size[1],
+    default.units = "bigpts",
+    interpolate = TRUE
+  )
+}
+
+# Rotate a raster matrix 90° counterclockwise, preserving attributes such as
+# class and channels. nativeRaster stores rows bottom-up, so the index
+# rotation is mirrored compared to regular rasters
+rot90 <- function(x) {
+  attrs <- attributes(x)
+  x <- if (inherits(x, "nativeRaster")) {
+    t(x[nrow(x):1, , drop = FALSE])
+  } else {
+    t(x[, ncol(x):1, drop = FALSE])
+  }
+  attrs$dim <- dim(x)
+  attrs$dimnames <- NULL
+  attributes(x) <- attrs
+  x
+}
+
 outline_polygon <- function(polygon, shape) {
   if (NROW(polygon) < 1) {
     return(NULL)
   }
   if (all(is.na(shape$outline))) {
+    return(NULL)
+  }
+  polygon <- polygon[!is.na(shape$outline[polygon$glyph]), , drop = FALSE]
+  if (NROW(polygon) < 1) {
     return(NULL)
   }
   i <- vctrs::vec_unique(polygon$glyph)
@@ -3015,6 +3069,7 @@ outline_polygon <- function(polygon, shape) {
     gp = gpar(
       fill = NA,
       lwd = shape$outline_width[i] * 2,
+      lty = shape$outline_type[i],
       col = shape$outline[i],
       linejoin = shape$outline_join[i],
       linemitre = shape$outline_mitre[i]
