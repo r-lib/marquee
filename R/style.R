@@ -351,8 +351,9 @@ style <- function(
   check_bool(strikethrough, allow_null = TRUE)
 
   check_string(emphasis, allow_null = TRUE, allow_na = TRUE)
-  if (!is.null(emphasis) && is.na(emphasis)) {
-    emphasis[] <- NA_character_
+  # Coerce logical NA to character
+  if (isTRUE(is.na(emphasis))) {
+    emphasis <- NA_character_
   }
 
   check_number_decimal(img_asp, allow_null = TRUE)

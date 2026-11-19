@@ -31,6 +31,9 @@
 * In vertical text, underlines are drawn as bōsen (right of the column in ttb,
   left in ttb-ltr), bullets hang at the column head, span backgrounds split
   per column, and inline math is rotated to match `mixed = "rotate"`
+* `marquee_parse()` no longer crashes on style sets serialized by an older
+  version of marquee that lack newer style properties; missing properties are
+  treated as unset
 
 # marquee 1.3.0
 

@@ -34,8 +34,7 @@
 #' breaking of lines).
 #'
 #' Setting both to `NULL` thus constrains the content to the available space
-#' (clipping it if `clip = "on"`). Note that clipping also cuts decorations that intentionally
-#' overflow the text box (emphasis marks, hanging punctuation).
+#' (clipping it if `clip = "on"`).
 #' @param default.units A string giving the default units to apply to `x`, `y`,
 #' and `width`
 #' @param hjust The horizontal justification of the markdown with respect to
@@ -240,7 +239,12 @@ marquee_grob <- function(
     root_dir <- if (is_parsed(text)) {
       text$text_direction[text$indentation == 1]
     } else {
-      style[[1]]$base$text_direction %||% "auto"
+      vapply(
+        style,
+        function(s) s$base$text_direction %||% "auto",
+        character(1),
+        USE.NAMES = FALSE
+      )
     }
     ttb <- root_dir == "ttb"
     if (is.null(hjust)) {
@@ -500,25 +504,13 @@ marquee_grob <- function(
   has_end_border <- !is.na(parsed$border) & parsed$border_width_bottom != 0
   for (i in seq_along(blocks$start)) {
     j <- blocks$start[i]
-    switch(
-      blocks$flow[i],
-      ttb = {
-        start_margin[j] <- parsed$margin_right[j]
-        end_margin[j] <- parsed$margin_left[j]
-        has_start_border[j] <- !is.na(parsed$border[j]) &
-          parsed$border_width_right[j] != 0
-        has_end_border[j] <- !is.na(parsed$border[j]) &
-          parsed$border_width_left[j] != 0
-      },
-      "ttb-ltr" = {
-        start_margin[j] <- parsed$margin_left[j]
-        end_margin[j] <- parsed$margin_right[j]
-        has_start_border[j] <- !is.na(parsed$border[j]) &
-          parsed$border_width_left[j] != 0
-        has_end_border[j] <- !is.na(parsed$border[j]) &
-          parsed$border_width_right[j] != 0
-      }
-    )
+    sides <- flow_sides(blocks$flow[i])
+    start_margin[j] <- parsed[[paste0("margin_", sides[1])]][j]
+    end_margin[j] <- parsed[[paste0("margin_", sides[2])]][j]
+    has_start_border[j] <- !is.na(parsed$border[j]) &
+      parsed[[paste0("border_width_", sides[1])]][j] != 0
+    has_end_border[j] <- !is.na(parsed$border[j]) &
+      parsed[[paste0("border_width_", sides[2])]][j] != 0
   }
   collapsed_margins <- list(start = start_margin, end = end_margin)
   for (root in blocks$start[blocks$indent == 1]) {
@@ -546,21 +538,9 @@ marquee_grob <- function(
   # Map the collapsed start/end margins back to their physical sides
   for (i in seq_along(blocks$start)) {
     j <- blocks$start[i]
-    switch(
-      blocks$flow[i],
-      ttb = {
-        parsed$margin_right[j] <- collapsed_margins$start[j]
-        parsed$margin_left[j] <- collapsed_margins$end[j]
-      },
-      "ttb-ltr" = {
-        parsed$margin_left[j] <- collapsed_margins$start[j]
-        parsed$margin_right[j] <- collapsed_margins$end[j]
-      },
-      {
-        parsed$margin_top[j] <- collapsed_margins$start[j]
-        parsed$margin_bottom[j] <- collapsed_margins$end[j]
-      }
-    )
+    sides <- flow_sides(blocks$flow[i])
+    parsed[[paste0("margin_", sides[1])]][j] <- collapsed_margins$start[j]
+    parsed[[paste0("margin_", sides[2])]][j] <- collapsed_margins$end[j]
   }
 
   # Handle bullets
@@ -983,6 +963,10 @@ makeContext.marquee_grob <- function(x) {
     ## content over as many columns as the parent width allows
     nested_root <- which(vflow_root & x$blocks$indent > 1)
     if (length(nested_root) != 0) {
+      ## Iterative fit: each reshape changes the column packing, so repeat
+      ## until stable. The 2%/5% inflation factors below compensate for
+      ## columns rarely packing to exactly their estimated length; the
+      ## iteration cap guards against oscillation between two packings
       for (iter in seq_len(8)) {
         avail <- widths[parent_idx[nested_root]] - pad_mar_lr[nested_root]
         needs_fit <- nested_root[is.na(heights_alloc[nested_root])]
@@ -1429,14 +1413,9 @@ makeContext.marquee_grob <- function(x) {
         edge - marT - padT
       }
       ## Own content sits at the flow-start side of the content box, anchored
-      ## by the block's own direction (not the parent's flow). textshaping
-      ## anchors the shaped box at its flow-start corner for all directions,
-      ## so the box origin goes at content_left; for ttb the box is placed
-      ## against the right (flow-start) edge of the content box
-      glyph_x_base[i] <<- if (!x$blocks$vertical[i]) {
-        content_left
-      } else if (x$blocks$direction[i] == "ttb") {
-        content_right - own_w[i]
+      ## by the block's own direction (not the parent's flow)
+      glyph_x_base[i] <<- if (x$blocks$vertical[i]) {
+        glyph_origin_x(x$blocks$direction[i], content_left, widths[i], own_w[i])
       } else {
         content_left
       }
@@ -1445,11 +1424,12 @@ makeContext.marquee_grob <- function(x) {
       if (length(ks) > 0) {
         if (x$blocks$vertical[i]) {
           child_ttb <- x$blocks$direction[i] == "ttb"
-          cur <- if (child_ttb) {
-            content_right - own_w[i]
-          } else {
-            content_left + own_w[i]
-          }
+          cur <- flow_start_x(
+            x$blocks$direction[i],
+            content_left,
+            widths[i],
+            own_w[i]
+          )
           for (c in ks) {
             place_block(c, cur, top_offset[i])
             cur <- if (child_ttb) cur - full_w[c] else cur + full_w[c]
@@ -1503,24 +1483,24 @@ makeContext.marquee_grob <- function(x) {
         ### Nested root: place it inside its parent's content box, after (in
         ### flow direction) the parent's own content
         p <- parent_idx[root]
-        own_parent <- own_w[p]
-        edge <- if (x$blocks$flow[root] == "ttb") {
-          left_offset[p] + widths[p] - own_parent
-        } else {
-          left_offset[p] + own_parent
-        }
+        edge <- flow_start_x(
+          x$blocks$flow[root],
+          left_offset[p],
+          widths[p],
+          own_w[p]
+        )
         place_block(root, edge, top_offset[p])
       }
     }
     ### Vertical-direction blocks handled by the iterative loop (horizontal
     ### flow) keep their own columns at the flow-start side of their box
     iter_vertical <- which(x$blocks$vertical & !recursive_tree)
-    glyph_x_base[iter_vertical] <- left_offset[iter_vertical] +
-      ifelse(
-        x$blocks$direction[iter_vertical] == "ttb",
-        widths[iter_vertical] - own_w[iter_vertical],
-        0
-      )
+    glyph_x_base[iter_vertical] <- glyph_origin_x(
+      x$blocks$direction[iter_vertical],
+      left_offset[iter_vertical],
+      widths[iter_vertical],
+      own_w[iter_vertical]
+    )
   } else {
     glyph_x_base <- left_offset
   }
@@ -1646,7 +1626,8 @@ makeContext.marquee_grob <- function(x) {
     }
   }
   ## Combine main text with bullets
-  bshape$shape$string_id <- bshape$shape$string_id + max(x$shape$string_id)
+  n_text_string_ids <- max(x$shape$string_id)
+  bshape$shape$string_id <- bshape$shape$string_id + n_text_string_ids
   x$shape <- rbind(x$shape, bshape$shape)
 
   first_line <- first_line + x$heights
@@ -2044,10 +2025,10 @@ makeContext.marquee_grob <- function(x) {
   horizontal_line <- !x$text$text_direction[lines[, 1]] %in% c("ttb", "ttb-ltr")
   x$lines <- list(
     id = x$text$id[lines[, 1]],
-    x0 = ifelse(horizontal_line, lines[, 2], lines[, 2]),
+    x0 = lines[, 2],
     y0 = ifelse(horizontal_line, lines[, 4], lines[, 3]),
     x1 = ifelse(horizontal_line, lines[, 3], lines[, 2]),
-    y1 = ifelse(horizontal_line, lines[, 4], lines[, 4]),
+    y1 = lines[, 4],
     lwd = lines[, 5],
     col = x$text$color[lines[, 1]]
   )
@@ -2311,6 +2292,14 @@ makeContext.marquee_grob <- function(x) {
     id = x$text$id[images$index],
     grobs = image_grobs
   )
+  # Write the bullet shape back so `bullets` reflects the final positioned
+  # glyphs, not the stale constructor-time ones
+  if (!is.null(x$bullets)) {
+    bullet_rows <- x$shape$string_id > n_text_string_ids
+    x$bullets$shape$shape <- x$shape[bullet_rows, , drop = FALSE]
+    x$bullets$shape$shape$string_id <- x$bullets$shape$shape$string_id -
+      n_text_string_ids
+  }
   x
 }
 
@@ -2808,7 +2797,7 @@ set_margins <- function(
   starts <- get_first(tree, has_background, has_start)
   margins$start[starts[1]] <- forced_margin %||% max(margins$start[starts])
   margins$start[starts[-1]] <- 0
-  ends <- get_last(tree, has_background, has_start)
+  ends <- get_last(tree, has_background, has_end)
   margins$end[ends[1]] <- forced_margin %||% max(margins$end[ends])
   margins$end[ends[-1]] <- 0
   for (i in seq_along(tree$children)) {
@@ -2929,6 +2918,29 @@ outline_glyphs <- function(glyph_info, shape) {
 
 # Shift a shape data frame (as returned by textshaping::shape_text()) along
 # with its glyph cell boxes, so the two never go out of sync
+## Physical (start, end) sides of the flow axis per direction: right/left
+## for ttb, left/right for ttb-ltr, top/bottom otherwise
+flow_sides <- function(flow) {
+  switch(
+    flow,
+    ttb = c("right", "left"),
+    "ttb-ltr" = c("left", "right"),
+    c("top", "bottom")
+  )
+}
+
+## x position of a vertical block's shaped-box origin within its content
+## box. textshaping anchors the box at its flow-start corner: the right edge
+## for ttb, the left edge for ttb-ltr
+glyph_origin_x <- function(direction, left, width, own_w) {
+  ifelse(direction == "ttb", left + width - own_w, left)
+}
+
+## x of the flow-start edge of a block's own content within its content box
+flow_start_x <- function(direction, left, width, own_w) {
+  ifelse(direction == "ttb", left + width - own_w, left + own_w)
+}
+
 shift_shape <- function(shape, dx = 0, dy = 0) {
   shape$x_offset <- shape$x_offset + dx
   shape$cell_x0 <- shape$cell_x0 + dx

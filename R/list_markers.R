@@ -52,7 +52,7 @@ apply_number_template <- function(template, n, content) {
     ### No digit character: fully automatic numbering with the template as
     ### suffix (preserves the default "1." style when bullets are dots)
     prefix <- ""
-    suffix <- if (any(nchar(chars) > 0) && template %in% marquee_bullets) {
+    suffix <- if (template %in% marquee_bullets) {
       "."
     } else {
       template
@@ -204,7 +204,8 @@ parent_tag <- function(row, type, parsed) {
   candidates[length(candidates)]
 }
 
-# Convert 1-999 to kanji numerals
+# Convert integers to kanji numerals. Only 1-999 is supported; anything else
+# (including NA and non-positive numbers) falls back to arabic numerals
 to_kanji <- function(n) {
   digits <- c("〇", "一", "二", "三", "四", "五", "六", "七", "八", "九")
   vapply(

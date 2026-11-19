@@ -435,6 +435,14 @@ test_that("ttb defaults anchor at the flow-start corner", {
   gh <- marquee_grob("test", classic_style())
   expect_equal(as.numeric(gh$x), 0)
   expect_equal(gh$hjust, "left")
+
+  # Mixed root directions in a single vector resolve per text
+  gm <- marquee_grob(
+    c("テスト", "test"),
+    c(vertical_style(), classic_style())
+  )
+  expect_equal(as.numeric(gm$x), c(1, 0))
+  expect_equal(gm$hjust, c("right", "left"))
 })
 
 test_that("ol bullets auto-detect and format number systems", {

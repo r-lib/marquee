@@ -60,8 +60,7 @@ breaking of lines).
 }
 
 Setting both to \code{NULL} thus constrains the content to the available space
-(clipping it if \code{clip = "on"}). Note that clipping also cuts decorations that intentionally
-overflow the text box (emphasis marks, hanging punctuation).}
+(clipping it if \code{clip = "on"}).}
 
 \item{default.units}{A string giving the default units to apply to \code{x}, \code{y},
 and \code{width}}
