@@ -26,7 +26,7 @@ Imports:
     png,
     rlang (>= 1.1.0),
     S7,
-    systemfonts (>= 1.2.0),
+    systemfonts (>= 1.3.3),
     textshaping (>= 1.0.5.9000),
     utils,
     vctrs
@@ -50,6 +50,7 @@ Config/testthat/edition: 3
 Config/usethis/last-upkeep: 2025-04-23
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-Remotes: 
+Remotes:
+    r-lib/systemfonts,
     r-lib/textshaping
 Config/roxygen2/version: 8.1.1
