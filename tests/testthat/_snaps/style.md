@@ -200,7 +200,7 @@
 
 ---
 
-    `mixed` must be one of "rotate", "upright", "tate", "combine", or "sideways", not "rotated".
+    `mixed` must be one of "rotate", "upright", "tate", "tate2", "tate3", "combine", "combine2", "combine3", or "sideways", not "rotated".
     i Did you mean "rotate"?
 
 ---

@@ -95,11 +95,13 @@ vertical_style <- function(
     indent = em(2),
     hanging = em(2)
   )
-  ## Blockquotes indent from the inline start (top)
+  ## Blockquotes indent from the inline start (top), with the same small
+  ## inset on both block-axis sides as the horizontal style (em(0.2) on
+  ## top and bottom there, i.e. left and right here)
   style <- modify_style(
     style,
     "qb",
-    padding = trbl(em(1), em(0.2), em(0.2), 0),
+    padding = trbl(em(1), em(0.2), em(0.2), em(0.2)),
     border_width = trbl(rem(0.25), 0, 0, 0)
   )
   ## A section break is a rule on the block-end side of the hr block
@@ -126,4 +128,3 @@ vertical_style <- function(
   style <- modify_style(style, "cb", text_direction = "ltr", align = "left")
   style
 }
-

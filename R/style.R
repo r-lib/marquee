@@ -40,6 +40,13 @@
 #' parent hanging, [em()] in which case it is based on the font size in this
 #' style, or [rem()] in which case it is based on the font size of the body
 #' element.
+#' @param marker_width How much space to reserve for list markers so they
+#' never overlap the first line: `"auto"` (the default) reserves the width of
+#' the widest marker in the list uniformly for all items, `"natural"`
+#' reserves each item's own marker width (ragged first lines), and a number
+#' or [grid::unit()] reserves that fixed width uniformly (like a label
+#' length). The reservation raises `indent` and `hanging` as needed, so all
+#' lines stay aligned.
 #' @param margin The margin around the element, given as a call to [trbl()].
 #' Margin refers to the area outside the box that text is placed in. If the
 #' element has a background, the margin area will not be colored.
@@ -96,10 +103,12 @@
 #' inside vertical text. One of `"rotate"` (set horizontally and rotate the run
 #' 90 degrees), `"upright"` (set upright using the font's `vert`/`vrt2` glyph
 #' substitutions, falling back to `"rotate"`), `"tate"` (tate-chu-yoko: digit
-#' runs of up to 4 digits are set horizontally within the column), `"combine"`
-#' (generalised tate-chu-yoko for any run of up to 4 characters), or
-#' `"sideways"` (set the whole string horizontally and rotate it). Ignored for
-#' horizontal text.
+#' runs of up to 4 digits are set horizontally within the column), `"tate2"`
+#' or `"tate3"` (like `"tate"` but capping digit runs at 2 or 3 digits,
+#' respectively), `"combine"` (generalised tate-chu-yoko for any run of up to
+#' 4 characters), `"combine2"` or `"combine3"` (like `"combine"` but capping
+#' runs at 2 or 3 characters), or `"sideways"` (set the whole string
+#' horizontally and rotate it). Ignored for horizontal text.
 #' @param kinsoku The strictness of CJK line break prohibition rules. One of
 #' `"strict"`, `"loose"`, or `"none"`.
 #' @param kinsoku_style How kinsoku violations are resolved when a line is
@@ -134,6 +143,7 @@ style <- function(
   tracking = NULL,
   indent = NULL,
   hanging = NULL,
+  marker_width = NULL,
   margin = NULL,
   padding = NULL,
   background = NULL,
@@ -219,6 +229,19 @@ style <- function(
   }
   if (!is_modifier(hanging)) {
     check_number_decimal(hanging, allow_null = TRUE)
+  }
+
+  if (!is.null(marker_width)) {
+    if (is.unit(marker_width)) {
+      marker_width <- as_bigpts(marker_width)
+    }
+    if (is.character(marker_width)) {
+      marker_width <- arg_match0(marker_width, c("auto", "natural"))
+    } else if (!is_modifier(marker_width)) {
+      check_number_decimal(marker_width, allow_null = TRUE)
+      ## Stored as character so the parsed column is homogeneous
+      marker_width <- as.character(marker_width)
+    }
   }
 
   if (is.null(margin)) {
@@ -344,7 +367,17 @@ style <- function(
   if (!is.null(mixed)) {
     mixed <- arg_match0(
       mixed,
-      c("rotate", "upright", "tate", "combine", "sideways")
+      c(
+        "rotate",
+        "upright",
+        "tate",
+        "tate2",
+        "tate3",
+        "combine",
+        "combine2",
+        "combine3",
+        "sideways"
+      )
     )
   }
 
@@ -375,6 +408,7 @@ style <- function(
       tracking = tracking,
       indent = indent,
       hanging = hanging,
+      marker_width = marker_width,
       margin_top = margin[[1]],
       margin_right = margin[[2]],
       margin_bottom = margin[[3]],
@@ -492,6 +526,7 @@ base_style <- function(
   tracking = 0,
   indent = 0,
   hanging = 0,
+  marker_width = "auto",
   margin = trbl(0, 0, rem(1)),
   padding = trbl(0),
   background = NA,
@@ -537,6 +572,7 @@ base_style <- function(
     tracking = tracking,
     indent = indent,
     hanging = hanging,
+    marker_width = marker_width,
     margin = margin,
     padding = padding,
     background = background,

@@ -106,6 +106,24 @@ test_that("mixed = 'tate' keeps short digit runs upright", {
   expect_equal(unique(g$shape$rotation), 0)
 })
 
+test_that("tate2/tate3 cap digit-run combination", {
+  capped <- function(text, m) {
+    v_grob(
+      paste0("昭和", text, "年"),
+      modify_style(vertical_style(), "base", mixed = m),
+      width = NA,
+      height = grid::unit(200, "bigpts")
+    )
+  }
+  # Runs at or below the cap stay upright, longer runs rotate
+  expect_equal(unique(capped("12", "tate2")$shape$rotation), 0)
+  expect_true(any(capped("123", "tate2")$shape$rotation == -90))
+  expect_equal(unique(capped("123", "tate3")$shape$rotation), 0)
+  expect_true(any(capped("1234", "tate3")$shape$rotation == -90))
+  # Uncapped tate still combines up to 4 digits
+  expect_equal(unique(capped("1234", "tate")$shape$rotation), 0)
+})
+
 test_that("kinsoku settings shape without error", {
   for (k in c("strict", "loose", "none")) {
     style <- modify_style(vertical_style(), "base", kinsoku = k)
@@ -179,6 +197,111 @@ test_that("strikethrough is centered on the column", {
     unname(g$lines$y1),
     min(g$shape$y_offset[s_glyphs] + g$shape$descender[s_glyphs])
   )
+})
+
+test_that("rotated runs are decorated as if unrotated", {
+  # Latin runs rotated into vertical text keep their horizontal decoration
+  # geometry: background spans the em box measured from the run's baseline,
+  # underline sits below the baseline, strikethrough at baseline + 0.3em
+  for (dir in c("ttb", "ttb-ltr")) {
+    g <- v_grob(
+      "縦{.lat abc}書",
+      modify_style(
+        vertical_style(dir),
+        "lat",
+        underline = TRUE,
+        strikethrough = TRUE,
+        background = "grey90"
+      ),
+      width = NA,
+      height = grid::unit(200, "bigpts")
+    )
+    lat <- span_id(g, "abc")
+    run <- g$shape[g$shape$string_id == lat & g$shape$rotation != 0, ]
+    expect_gt(nrow(run), 0)
+    rot <- sign(run$rotation[1])
+    expect_equal(rot, if (dir == "ttb") -1 else 1)
+    base <- run$x_offset[1]
+    expect_equal(run$x_offset, rep(base, nrow(run)))
+
+    # Background spans [baseline + desc, baseline + asc] mirrored by sign
+    lo <- base + min(if (rot < 0) run$descender else -run$ascender)
+    hi <- base + max(if (rot < 0) run$ascender else -run$descender)
+    expect_equal(unname(g$rects$x), lo)
+    expect_equal(unname(g$rects$x + g$rects$width), hi)
+
+    # Lines span exactly the run's advance cells
+    cell_hi <- max(
+      if (rot < 0) {
+        run$y_offset
+      } else {
+        run$y_offset + run$advance
+      }
+    )
+    cell_lo <- min(
+      if (rot < 0) {
+        run$y_offset - run$advance
+      } else {
+        run$y_offset
+      }
+    )
+
+    info <- systemfonts::font_info(
+      path = run$font_path[1],
+      index = run$font_index[1],
+      size = run$font_size[1],
+      res = 600
+    )
+    upos <- info$underline_pos * 72 / 600
+    # -90: underline left of baseline, strike right; +90: mirrored
+    u_x <- base - rot * upos
+    s_x <- base - rot * 0.3 * run$font_size[1]
+    line_x <- sort(unique(g$lines$x0))
+    expect_equal(line_x, sort(c(u_x, s_x)))
+    expect_equal(sort(unique(g$lines$y0)), cell_hi)
+    expect_equal(sort(unique(g$lines$y1)), cell_lo)
+  }
+})
+
+test_that("padded spans decorate continuously across padding spacers", {
+  for (dir in c("ttb", "ttb-ltr")) {
+    g <- v_grob(
+      "縦{.lat abc}書",
+      modify_style(
+        vertical_style(dir),
+        "lat",
+        underline = TRUE,
+        background = "grey90",
+        padding = trbl(4, 8, 4, 8)
+      ),
+      width = NA,
+      height = grid::unit(200, "bigpts")
+    )
+    # Padding segments are decorated at the same position as the run
+    expect_equal(unique(unname(g$lines$x0)), g$lines$x0[1])
+    # Segments tile the padded extent without gaps
+    ord <- order(g$lines$y0, decreasing = TRUE)
+    expect_equal(g$lines$y0[ord][-1], g$lines$y1[ord][-length(ord)])
+
+    # Horizontal padding is included in the background rect through the
+    # spacer glyphs, cross-axis padding through the em-box sides
+    lat <- span_id(g, "abc")
+    run <- g$shape[g$shape$string_id == lat & g$shape$rotation != 0, ]
+    rot <- sign(run$rotation[1])
+    base <- run$x_offset[1]
+    lo <- base + min(if (rot < 0) run$descender else -run$ascender)
+    hi <- base + max(if (rot < 0) run$ascender else -run$descender)
+    pad_asc <- 4
+    pad_desc <- 4
+    expect_equal(
+      unname(g$rects$x),
+      if (rot < 0) lo - pad_desc else lo - pad_asc
+    )
+    expect_equal(
+      unname(g$rects$x + g$rects$width),
+      if (rot < 0) hi + pad_asc else hi + pad_desc
+    )
+  }
 })
 
 test_that("span background rects are split per column", {

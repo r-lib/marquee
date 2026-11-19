@@ -196,7 +196,17 @@ test_that("style checks it's inputs", {
   expect_snapshot_error(style(text_direction = 1))
 
   # Mixed script orientation
-  for (m in c("rotate", "upright", "tate", "combine", "sideways")) {
+  for (m in c(
+    "rotate",
+    "upright",
+    "tate",
+    "tate2",
+    "tate3",
+    "combine",
+    "combine2",
+    "combine3",
+    "sideways"
+  )) {
     expect_silent(s <- style(mixed = m))
     expect_equal(s$mixed, m)
   }

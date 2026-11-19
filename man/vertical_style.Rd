@@ -72,6 +72,13 @@ measured in points. Can be \code{\link[=relative]{relative()}} in which case it 
 parent hanging, \code{\link[=em]{em()}} in which case it is based on the font size in this
 style, or \code{\link[=rem]{rem()}} in which case it is based on the font size of the body
 element.}
+    \item{\code{marker_width}}{How much space to reserve for list markers so they
+never overlap the first line: \code{"auto"} (the default) reserves the width of
+the widest marker in the list uniformly for all items, \code{"natural"}
+reserves each item's own marker width (ragged first lines), and a number
+or \code{\link[grid:unit]{grid::unit()}} reserves that fixed width uniformly (like a label
+length). The reservation raises \code{indent} and \code{hanging} as needed, so all
+lines stay aligned.}
     \item{\code{margin}}{The margin around the element, given as a call to \code{\link[=trbl]{trbl()}}.
 Margin refers to the area outside the box that text is placed in. If the
 element has a background, the margin area will not be colored.}

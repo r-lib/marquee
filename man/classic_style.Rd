@@ -55,6 +55,13 @@ measured in points. Can be \code{\link[=relative]{relative()}} in which case it 
 parent hanging, \code{\link[=em]{em()}} in which case it is based on the font size in this
 style, or \code{\link[=rem]{rem()}} in which case it is based on the font size of the body
 element.}
+    \item{\code{marker_width}}{How much space to reserve for list markers so they
+never overlap the first line: \code{"auto"} (the default) reserves the width of
+the widest marker in the list uniformly for all items, \code{"natural"}
+reserves each item's own marker width (ragged first lines), and a number
+or \code{\link[grid:unit]{grid::unit()}} reserves that fixed width uniformly (like a label
+length). The reservation raises \code{indent} and \code{hanging} as needed, so all
+lines stay aligned.}
     \item{\code{margin}}{The margin around the element, given as a call to \code{\link[=trbl]{trbl()}}.
 Margin refers to the area outside the box that text is placed in. If the
 element has a background, the margin area will not be colored.}
@@ -111,10 +118,12 @@ and \code{"justified-auto"} aligment.}
 inside vertical text. One of \code{"rotate"} (set horizontally and rotate the run
 90 degrees), \code{"upright"} (set upright using the font's \code{vert}/\code{vrt2} glyph
 substitutions, falling back to \code{"rotate"}), \code{"tate"} (tate-chu-yoko: digit
-runs of up to 4 digits are set horizontally within the column), \code{"combine"}
-(generalised tate-chu-yoko for any run of up to 4 characters), or
-\code{"sideways"} (set the whole string horizontally and rotate it). Ignored for
-horizontal text.}
+runs of up to 4 digits are set horizontally within the column), \code{"tate2"}
+or \code{"tate3"} (like \code{"tate"} but capping digit runs at 2 or 3 digits,
+respectively), \code{"combine"} (generalised tate-chu-yoko for any run of up to
+4 characters), \code{"combine2"} or \code{"combine3"} (like \code{"combine"} but capping
+runs at 2 or 3 characters), or \code{"sideways"} (set the whole string
+horizontally and rotate it). Ignored for horizontal text.}
     \item{\code{kinsoku}}{The strictness of CJK line break prohibition rules. One of
 \code{"strict"}, \code{"loose"}, or \code{"none"}.}
     \item{\code{kinsoku_style}}{How kinsoku violations are resolved when a line is
