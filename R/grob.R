@@ -1787,10 +1787,13 @@ makeContext.marquee_grob <- function(x) {
     ### Find the glyphs related to the span
     span_ind <- which(x$shape$string_id %in% i)
     if (x$text$text_direction[i[1]] %in% c("ttb", "ttb-ltr")) {
-      ### Vertical text: split up by column and make a rect for each. All
-      ### glyphs in a column share the cell's cross-axis span regardless of
-      ### type (upright, rotated, spacer), so it identifies the column
-      col_id <- round(x$shape$cell_x0[span_ind], 6)
+      ### Vertical text: split up by column and make a rect for each. Glyph
+      ### order follows reading order, and within a column the cells tile
+      ### downward, so a new column starts when the cell top jumps back up.
+      ### Grouping by flow rather than by cell_x0 is robust to spacer and
+      ### rotated glyphs whose cross-axis cell span can differ by font
+      tops <- x$shape$cell_y1[span_ind]
+      col_id <- cumsum(c(TRUE, diff(tops) > 1e-6))
       lapply(split(span_ind, col_id), function(j) {
         left <- min(x$shape$cell_x0[j])
         right <- max(x$shape$cell_x1[j])

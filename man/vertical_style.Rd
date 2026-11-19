@@ -136,6 +136,6 @@ lists use kanji numerals (一、二、…), and code blocks are set horizontally
 (yokogaki) as is customary in Japanese print.
 }
 \examples{
-vertical_style(16, "Hiragino Mincho ProN")
+vertical_style(base_size = 16, body_font = "Hiragino Mincho ProN")
 
 }

@@ -67,7 +67,7 @@ apply_number_template <- function(template, n, content) {
     system <- detect_number_system(content)
     if (system != "1" && is.na(digit)) {
       ### Script-appropriate suffix for auto-detected CJK
-      suffix <- "、"
+      suffix <- "\u3001"
     }
   }
   paste0(prefix, format_number(n, system), suffix)
@@ -78,28 +78,30 @@ is_number_char <- function(char) {
     grepl("^\\p{Nd}$", char, perl = TRUE) ||
     char %in%
       strsplit(
-        "〇零一二三四五六七八九ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅪⅫⅰⅱⅲⅳⅴⅵⅶⅷⅸⅹⅺⅻIi",
+        "\u3007\u96F6\u4E00\u4E8C\u4E09\u56DB\u4E94\u516D\u4E03\u516B\u4E5D\u2160\u2161\u2162\u2163\u2164\u2165\u2166\u2167\u2168\u2169\u216A\u216B\u2170\u2171\u2172\u2173\u2174\u2175\u2176\u2177\u2178\u2179\u217A\u217BIi",
         "",
         fixed = TRUE
       )[[1]] ||
-    (char >= "①" & char <= "⑳") ||
-    (char >= "㉑" & char <= "㉟") ||
-    (char >= "㊱" & char <= "㊿") ||
-    (char >= "⑴" & char <= "⒇")
+    (char >= "\u2460" & char <= "\u2473") ||
+    (char >= "\u3251" & char <= "\u325F") ||
+    (char >= "\u32B1" & char <= "\u32BF") ||
+    (char >= "\u2474" & char <= "\u2487")
 }
 
 detect_number_system <- function(content) {
   if (is_cjk(content)) {
-    return("一")
+    return("\u4E00")
   }
-  if (grepl("[؀-ۿݐ-ݿࢠ-ࣿ]", content, perl = TRUE)) {
-    return("١")
+  if (
+    grepl("[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]", content, perl = TRUE)
+  ) {
+    return("\u0661")
   }
-  if (grepl("[฀-๿]", content, perl = TRUE)) {
-    return("๑")
+  if (grepl("[\u0E00-\u0E7F]", content, perl = TRUE)) {
+    return("\u0E51")
   }
-  if (grepl("[ऀ-ॿ]", content, perl = TRUE)) {
-    return("१")
+  if (grepl("[\u0900-\u097F]", content, perl = TRUE)) {
+    return("\u0967")
   }
   "1"
 }
@@ -112,14 +114,19 @@ format_number <- function(n, system) {
     digits <- utf8ToInt(as.character(n)) - utf8ToInt("0")
     intToUtf8(zero + digits)
   } else if (
-    system %in% strsplit("〇零一二三四五六七八九", "", fixed = TRUE)[[1]]
+    system %in%
+      strsplit(
+        "\u3007\u96F6\u4E00\u4E8C\u4E09\u56DB\u4E94\u516D\u4E03\u516B\u4E5D",
+        "",
+        fixed = TRUE
+      )[[1]]
   ) {
     to_kanji(n)
-  } else if (system %in% c("Ⅰ", "I", "ⅰ", "i")) {
-    if (system %in% c("ⅰ", "i")) tolower(to_roman(n)) else to_roman(n)
-  } else if (system == "①") {
+  } else if (system %in% c("\u2160", "I", "\u2170", "i")) {
+    if (system %in% c("\u2170", "i")) tolower(to_roman(n)) else to_roman(n)
+  } else if (system == "\u2460") {
     to_circled(n)
-  } else if (system == "⑴") {
+  } else if (system == "\u2474") {
     to_parenthesized(n)
   } else {
     as.character(n)
@@ -128,11 +135,11 @@ format_number <- function(n, system) {
 
 to_circled <- function(n) {
   if (n <= 20) {
-    intToUtf8(utf8ToInt("①") + n - 1)
+    intToUtf8(utf8ToInt("\u2460") + n - 1)
   } else if (n <= 35) {
-    intToUtf8(utf8ToInt("㉑") + n - 21)
+    intToUtf8(utf8ToInt("\u3251") + n - 21)
   } else if (n <= 50) {
-    intToUtf8(utf8ToInt("㊱") + n - 36)
+    intToUtf8(utf8ToInt("\u32B1") + n - 36)
   } else {
     paste0("(", n, ")")
   }
@@ -140,7 +147,7 @@ to_circled <- function(n) {
 
 to_parenthesized <- function(n) {
   if (n <= 20) {
-    intToUtf8(utf8ToInt("⑴") + n - 1)
+    intToUtf8(utf8ToInt("\u2474") + n - 1)
   } else {
     paste0("(", n, ")")
   }
@@ -149,7 +156,7 @@ to_parenthesized <- function(n) {
 # Whether the text contains Han ideographs or kana
 is_cjk <- function(text) {
   grepl(
-    "[぀-ヿ㐀-䶿一-鿿豈-﫿]",
+    "[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]",
     text,
     perl = TRUE
   )
@@ -207,7 +214,18 @@ parent_tag <- function(row, type, parsed) {
 # Convert integers to kanji numerals. Only 1-999 is supported; anything else
 # (including NA and non-positive numbers) falls back to arabic numerals
 to_kanji <- function(n) {
-  digits <- c("〇", "一", "二", "三", "四", "五", "六", "七", "八", "九")
+  digits <- c(
+    "\u3007",
+    "\u4E00",
+    "\u4E8C",
+    "\u4E09",
+    "\u56DB",
+    "\u4E94",
+    "\u516D",
+    "\u4E03",
+    "\u516B",
+    "\u4E5D"
+  )
   vapply(
     n,
     function(n) {
@@ -219,14 +237,14 @@ to_kanji <- function(n) {
       ones <- n %% 10
       paste0(
         if (hundreds == 1) {
-          "百"
+          "\u767E"
         } else if (hundreds > 1) {
-          paste0(digits[hundreds + 1], "百")
+          paste0(digits[hundreds + 1], "\u767E")
         },
         if (tens == 1) {
-          "十"
+          "\u5341"
         } else if (tens > 1) {
-          paste0(digits[tens + 1], "十")
+          paste0(digits[tens + 1], "\u5341")
         },
         if (ones > 0) digits[ones + 1]
       )

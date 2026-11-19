@@ -37,8 +37,9 @@ test_that("ttb text sets in top-to-bottom columns packing right-to-left", {
   first_col <- g$shape[g$shape$x_offset == max(cols), ]
   expect_true(all(diff(first_col$y_offset) < 0))
 
-  # Text starts at the top (largest y)
-  expect_equal(first_col$y_offset[1], max(g$shape$y_offset))
+  # Text starts at the top (largest y). The exact offset depends on the
+  # ascender of the font each glyph resolves to, so allow some slack
+  expect_equal(first_col$y_offset[1], max(g$shape$y_offset), tolerance = 0.5)
 })
 
 test_that("ttb-ltr mirrors ttb: columns pack left-to-right", {

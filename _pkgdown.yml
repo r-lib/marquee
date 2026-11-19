@@ -29,6 +29,7 @@ reference:
   - style
   - style_set
   - classic_style
+  - vertical_style
   - modify_style
   - remove_style
   - em

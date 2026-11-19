@@ -32,7 +32,7 @@
 #' @export
 #'
 #' @examples
-#' vertical_style(16, "Hiragino Mincho ProN")
+#' vertical_style(base_size = 16, body_font = "Hiragino Mincho ProN")
 #'
 vertical_style <- function(
   direction = c("ttb", "ttb-ltr"),
@@ -41,7 +41,7 @@ vertical_style <- function(
   header_font = "",
   code_font = "mono",
   strong_font = NULL,
-  emphasis = "●",
+  emphasis = "\u25CF",
   ...
 ) {
   direction <- arg_match0(direction, c("ttb", "ttb-ltr"))
@@ -83,7 +83,7 @@ vertical_style <- function(
     style,
     "ul",
     padding = trbl(0),
-    bullets = "・",
+    bullets = "\u30FB",
     indent = em(1),
     hanging = em(1)
   )
@@ -91,7 +91,7 @@ vertical_style <- function(
     style,
     "ol",
     padding = trbl(0),
-    bullets = "_、",
+    bullets = "_\u3001",
     indent = em(2),
     hanging = em(2)
   )
