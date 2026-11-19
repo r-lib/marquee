@@ -12,8 +12,8 @@
 #' @param force_body_margin Should the body margin override margin collapsing
 #' calculations. See Details.
 #' @param clip Should content that overflows a `width`/`height` constraint be
-#' clipped at the constraint box? Either `"on"` (clip, the default), `"off"`
-#' (never clip), or `"inherit"` (defer to the clipping state of the drawing
+#' clipped at the constraint box? Either `"off"` (never clip, the default),
+#' `"on"` (clip), or `"inherit"` (defer to the clipping state of the drawing
 #' context). Note that clipping also cuts intentional overflow such as
 #' emphasis marks and hanging punctuation.
 #' @param x,y The location of the markdown text in the graphics. If numeric it
@@ -33,8 +33,8 @@
 #' * `NA`: derive the size from the content (for width this avoids soft
 #' breaking of lines).
 #'
-#' Setting both to `NULL` thus clips the content to the available space (see
-#' `clip`). Note that clipping also cuts decorations that intentionally
+#' Setting both to `NULL` thus constrains the content to the available space
+#' (clipping it if `clip = "on"`). Note that clipping also cuts decorations that intentionally
 #' overflow the text box (emphasis marks, hanging punctuation).
 #' @param default.units A string giving the default units to apply to `x`, `y`,
 #' and `width`
@@ -221,7 +221,7 @@ marquee_grob <- function(
   style = classic_style(),
   ignore_html = TRUE,
   force_body_margin = FALSE,
-  clip = "on",
+  clip = "off",
   x = NULL,
   y = 1,
   width = "auto",

@@ -9,7 +9,7 @@ marquee_grob(
   style = classic_style(),
   ignore_html = TRUE,
   force_body_margin = FALSE,
-  clip = "on",
+  clip = "off",
   x = NULL,
   y = 1,
   width = "auto",
@@ -35,8 +35,8 @@ should be rendered}
 calculations. See Details.}
 
 \item{clip}{Should content that overflows a \code{width}/\code{height} constraint be
-clipped at the constraint box? Either \code{"on"} (clip, the default), \code{"off"}
-(never clip), or \code{"inherit"} (defer to the clipping state of the drawing
+clipped at the constraint box? Either \code{"off"} (never clip, the default),
+\code{"on"} (clip), or \code{"inherit"} (defer to the clipping state of the drawing
 context). Note that clipping also cuts intentional overflow such as
 emphasis marks and hanging punctuation.}
 
@@ -59,8 +59,8 @@ work out of the box, wrapping columns at the container height.
 breaking of lines).
 }
 
-Setting both to \code{NULL} thus clips the content to the available space (see
-\code{clip}). Note that clipping also cuts decorations that intentionally
+Setting both to \code{NULL} thus constrains the content to the available space
+(clipping it if \code{clip = "on"}). Note that clipping also cuts decorations that intentionally
 overflow the text box (emphasis marks, hanging punctuation).}
 
 \item{default.units}{A string giving the default units to apply to \code{x}, \code{y},
