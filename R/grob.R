@@ -943,19 +943,17 @@ makeContext.marquee_grob <- function(x) {
   # If any widths are not defined we grab the text widths from the shaping
   if (any(x$blocks$vertical_flow)) {
     ## Documents with vertical flow derive block sizes from their content, so
-    ## widths can be filled in directly without reshaping. A block whose own
-    ## text is empty (e.g. a quote's or list's start string) shapes to a
-    ## full column width in vertical mode — don't let that phantom column
-    ## inflate the block box (has_content is shape-independent; the own
+    ## widths can be filled in directly without reshaping. Empty blocks (e.g.
+    ## a quote's or list's start string) report zero metrics since
+    ## textshaping 1.0.5.9000, so they don't inflate the block box. The own
     ## widths are recomputed from the current shape inside fill_widths
-    ## because the nested-fit loop reshapes)
-    has_content <- nzchar(x$text$text[x$blocks$start]) | x$blocks$length != 1
+    ## because the nested-fit loop reshapes
     pad_mar_lr <- rowSums(x$text[
       x$blocks$start,
       c("padding_left", "padding_right", "margin_left", "margin_right")
     ])
     fill_widths <- function() {
-      own_w <- ifelse(has_content, shape$metrics$width, 0)
+      own_w <- shape$metrics$width
       widths[x$blocks$vertical_flow] <<- NA
       for (i in rev(seq_len(max(x$blocks$indent)))) {
         for (j in which(x$blocks$indent == i & is.na(widths))) {
@@ -1108,8 +1106,10 @@ makeContext.marquee_grob <- function(x) {
         ### Math extends above the reserved box. Push the whole block down
         shift <- math_h - ascender
         in_block <- shape$shape$metric_id == block
-        shape$shape$y_offset[in_block] <- shape$shape$y_offset[in_block] -
-          shift
+        shape$shape[in_block, ] <- shift_shape(
+          shape$shape[in_block, ],
+          dy = -shift
+        )
         shape$metrics$height[block] <- shape$metrics$height[block] + shift
         top_shift[block] <- top_shift[block] + shift
         y0 <- y0 - shift
@@ -1119,7 +1119,7 @@ makeContext.marquee_grob <- function(x) {
         ### Math extends below the reserved box. Push the lines below down
         shift <- depth + descender
         below <- shape$shape$metric_id == block & shape$shape$y_offset < y0
-        shape$shape$y_offset[below] <- shape$shape$y_offset[below] - shift
+        shape$shape[below, ] <- shift_shape(shape$shape[below, ], dy = -shift)
         shape$metrics$height[block] <- shape$metrics$height[block] + shift
         bottom_shift[block] <- bottom_shift[block] + shift
         descender <- -depth
@@ -1190,12 +1190,16 @@ makeContext.marquee_grob <- function(x) {
 
   # make rtl bullets left-justified
   bltr <- bshape$metrics$ltr[bshape$shape$metric_id]
-  bshape$shape$x_offset[!bltr] <- bshape$shape$x_offset[!bltr] +
-    bshape$metrics$width[bshape$shape$metric_id[!bltr]]
+  bshape$shape[!bltr, ] <- shift_shape(
+    bshape$shape[!bltr, ],
+    dx = bshape$metrics$width[bshape$shape$metric_id[!bltr]]
+  )
 
   # Add sizebased offset
-  bshape$shape$x_offset <- bshape$shape$x_offset +
-    ifelse(bltr, -1, 1) * bshape$shape$font_size / 4
+  bshape$shape <- shift_shape(
+    bshape$shape,
+    dx = ifelse(bltr, -1, 1) * bshape$shape$font_size / 4
+  )
 
   if (has_vertical_flow) {
     ## Children of each block
@@ -1207,8 +1211,8 @@ makeContext.marquee_grob <- function(x) {
     }
     ## Own content size of each block, from the final shape (the
     ## nested-fit loop may have reshaped since fill_widths was defined)
-    own_h <- ifelse(has_content, shape$metrics$height, 0)
-    own_w <- ifelse(has_content, shape$metrics$width, 0)
+    own_h <- shape$metrics$height
+    own_w <- shape$metrics$width
     ## Full box sizes (content + padding + margin), compounded bottom-up
     full_h <- rep(NA, n_blocks)
     full_w <- rep(NA, n_blocks)
@@ -1425,15 +1429,16 @@ makeContext.marquee_grob <- function(x) {
         edge - marT - padT
       }
       ## Own content sits at the flow-start side of the content box, anchored
-      ## by the block's own direction (not the parent's flow): ttb glyphs sit
-      ## right of the shaping origin, ttb-ltr glyphs sit left of it and must
-      ## be shifted by their width, horizontal glyphs sit right of it
+      ## by the block's own direction (not the parent's flow). textshaping
+      ## anchors the shaped box at its flow-start corner for all directions,
+      ## so the box origin goes at content_left; for ttb the box is placed
+      ## against the right (flow-start) edge of the content box
       glyph_x_base[i] <<- if (!x$blocks$vertical[i]) {
         content_left
       } else if (x$blocks$direction[i] == "ttb") {
         content_right - own_w[i]
       } else {
-        content_left + own_w[i]
+        content_left
       }
       heights[i] <<- full_h[i]
       ks <- kids[[i]]
@@ -1514,30 +1519,34 @@ makeContext.marquee_grob <- function(x) {
       ifelse(
         x$blocks$direction[iter_vertical] == "ttb",
         widths[iter_vertical] - own_w[iter_vertical],
-        own_w[iter_vertical]
+        0
       )
   } else {
     glyph_x_base <- left_offset
   }
 
   # Update offsets based on calculated width and heights
-  shape$shape$x_offset <- shape$shape$x_offset +
-    glyph_x_base[shape$shape$metric_id]
-  shape$shape$y_offset <- shape$shape$y_offset +
-    top_offset[shape$shape$metric_id] -
-    y_adjustment[shape$shape$metric_id]
+  shape$shape <- shift_shape(
+    shape$shape,
+    dx = glyph_x_base[shape$shape$metric_id],
+    dy = top_offset[shape$shape$metric_id] -
+      y_adjustment[shape$shape$metric_id]
+  )
 
   # Apply baseline shift
-  shape$shape$y_offset <- shape$shape$y_offset +
-    x$text$baseline[shape$shape$string_id]
+  shape$shape <- shift_shape(
+    shape$shape,
+    dy = x$text$baseline[shape$shape$string_id]
+  )
 
   ## Do the same for bullets
-  bshape$shape$x_offset <- bshape$shape$x_offset +
-    left_offset[bullet_blocks[bshape$shape$metric_id]] +
-    x_bullet_adjustment[bshape$shape$metric_id]
-  bshape$shape$y_offset <- bshape$shape$y_offset +
-    top_offset[bullet_blocks[bshape$shape$metric_id]] -
-    y_bullet_adjustment[bshape$shape$metric_id]
+  bshape$shape <- shift_shape(
+    bshape$shape,
+    dx = left_offset[bullet_blocks[bshape$shape$metric_id]] +
+      x_bullet_adjustment[bshape$shape$metric_id],
+    dy = top_offset[bullet_blocks[bshape$shape$metric_id]] -
+      y_bullet_adjustment[bshape$shape$metric_id]
+  )
 
   ## Bullets in vertical flow occupy the first character cell of the
   ## indentation at the inline start (top) of the first column — the
@@ -1552,20 +1561,20 @@ makeContext.marquee_grob <- function(x) {
       }
       ttb <- x$blocks$flow[i] == "ttb"
       ### First column is right-most for ttb, left-most for ttb-ltr
+      ### (identified by cell edges: rotated runs sit off the pen line, so
+      ### x_offset is not a reliable column key)
       first_col <- gl[
         if (ttb) {
-          which.max(shape$shape$x_offset[gl])
+          which.max(shape$shape$cell_x1[gl])
         } else {
-          which.min(shape$shape$x_offset[gl])
+          which.min(shape$shape$cell_x0[gl])
         }
       ]
       bgl <- which(bshape$shape$metric_id == b)
-      ### Centre the marker run on the text column. x_offset is the pen
-      ### origin at the left edge of the em box, so the column centre is
-      ### half an em box (ascender - descender) to its right
-      text_center <- shape$shape$x_offset[first_col] +
-        (shape$shape$ascender[first_col] - shape$shape$descender[first_col]) /
-          2
+      ### Centre the marker run on the text column
+      text_center <- (shape$shape$cell_x0[first_col] +
+        shape$shape$cell_x1[first_col]) /
+        2
       bullet_w <- max(
         bshape$shape$x_offset[bgl] + bshape$shape$advance[bgl]
       ) -
@@ -1573,12 +1582,16 @@ makeContext.marquee_grob <- function(x) {
       target_x <- text_center - bullet_w / 2
       ## The marker hangs at the column head, in the space vacated by the
       ## first-column indent (at least one cell above the first glyph)
-      target_y <- shape$shape$y_offset[first_col] +
-        max(x$text$indent[x$blocks$start[i]], shape$shape$advance[first_col])
-      bshape$shape$x_offset[bgl] <- bshape$shape$x_offset[bgl] +
-        (target_x - bshape$shape$x_offset[bgl[1]])
-      bshape$shape$y_offset[bgl] <- bshape$shape$y_offset[bgl] +
-        (target_y - bshape$shape$y_offset[bgl[1]])
+      target_y <- shape$shape$cell_y1[first_col] +
+        max(
+          x$text$indent[x$blocks$start[i]] - shape$shape$advance[first_col],
+          0
+        )
+      bshape$shape[bgl, ] <- shift_shape(
+        bshape$shape[bgl, ],
+        dx = target_x - bshape$shape$x_offset[bgl[1]],
+        dy = target_y - bshape$shape$y_offset[bgl[1]]
+      )
     }
   }
 
@@ -1610,11 +1623,13 @@ makeContext.marquee_grob <- function(x) {
   }
   x$clip <- constrained & x$clip == "on"
   ## Adjust y so it is zero-justified
-  x$shape$y_offset <- x$shape$y_offset + x$heights[x$shape$id]
-  bshape$shape$y_offset <- bshape$shape$y_offset + x$heights[bshape$shape$id]
+  x$shape <- shift_shape(x$shape, dy = x$heights[x$shape$id])
+  bshape$shape <- shift_shape(bshape$shape, dy = x$heights[bshape$shape$id])
   top_offset <- top_offset + x$heights[x$text$id[x$blocks$start]]
-  ## ttb trees are laid out to the left of the origin. Shift them so the
-  ## left-most edge is at zero (ttb-ltr trees are laid out right of the origin)
+  ## ttb trees are laid out to the left of the origin by place_block
+  ## (content flows right-to-left into negative x). Shift them so the
+  ## left-most edge is at zero — justification then works from a
+  ## [0, widths] box (ttb-ltr trees already extend right of the origin)
   if (has_vertical_flow) {
     ttb_root <- x$blocks$indent == 1 & x$blocks$flow == "ttb"
     if (any(ttb_root)) {
@@ -1622,8 +1637,8 @@ makeContext.marquee_grob <- function(x) {
       ttb_blocks <- x$text$id[x$blocks$start] %in% ttb_texts
       x_shift <- rep(0, length(x$x))
       x_shift[ttb_texts] <- x$widths[ttb_texts]
-      x$shape$x_offset <- x$shape$x_offset + x_shift[x$shape$id]
-      bshape$shape$x_offset <- bshape$shape$x_offset + x_shift[bshape$shape$id]
+      x$shape <- shift_shape(x$shape, dx = x_shift[x$shape$id])
+      bshape$shape <- shift_shape(bshape$shape, dx = x_shift[bshape$shape$id])
       left_offset[ttb_blocks] <- left_offset[ttb_blocks] +
         x_shift[x$text$id[x$blocks$start[ttb_blocks]]]
       ink_left[ttb_texts] <- ink_left[ttb_texts] + x_shift[ttb_texts]
@@ -1694,8 +1709,11 @@ makeContext.marquee_grob <- function(x) {
   }
 
   # Perform justification
-  x$shape$x_offset <- x$shape$x_offset - (x$widths * x$hjust)[x$shape$id]
-  x$shape$y_offset <- x$shape$y_offset - (x$heights * x$vjust)[x$shape$id]
+  x$shape <- shift_shape(
+    x$shape,
+    dx = -(x$widths * x$hjust)[x$shape$id],
+    dy = -(x$heights * x$vjust)[x$shape$id]
+  )
   left_offset <- left_offset - (x$widths * x$hjust)[x$text$id[x$blocks$start]]
   top_offset <- top_offset - (x$heights * x$vjust)[x$text$id[x$blocks$start]]
 
@@ -1781,91 +1799,22 @@ makeContext.marquee_grob <- function(x) {
     }
   }
 
-  ## Cross-axis span of rotated runs in vertical text. Rotated runs sit
-  ## with their baseline on the column's baseline (the t-space baseline in
-  ## textshaping), so their cross-axis extent follows directly from the
-  ## origin: -90 runs span [x+desc, x+asc], +90 runs [x-asc, x-desc].
-  ## Spacer (padding) glyphs have unreliable cross-axis origins; anchor
-  ## them to the column box, derived from the em box of the nearest
-  ## upright glyph in the same block, with the origin formulas as fallback
-  ## (spacers must share the surrounding run's anchoring, so the fallback
-  ## for rotation 0 follows the block's direction)
-  rotated_span <- function(j) {
-    rot <- x$shape$rotation[j] != 0
-    ccw <- x$shape$rotation[j] > 0 |
-      (x$shape$rotation[j] == 0 &
-        x$blocks$direction[x$shape$metric_id[j]] == "ttb-ltr")
-    left <- ifelse(
-      ccw,
-      x$shape$x_offset[j] - x$shape$ascender[j],
-      x$shape$x_offset[j] + x$shape$descender[j]
-    )
-    right <- ifelse(
-      ccw,
-      x$shape$x_offset[j] - x$shape$descender[j],
-      x$shape$x_offset[j] + x$shape$ascender[j]
-    )
-    if (any(!rot)) {
-      ### Spacers inherit the em box of the nearest upright glyph in the
-      ### same block (their own font metrics may be a rotated run's)
-      for (k in which(!rot)) {
-        g <- j[k]
-        up_g <- which(
-          x$shape$metric_id == x$shape$metric_id[g] &
-            x$shape$rotation == 0 &
-            x$shape$font_path != ""
-        )
-        if (length(up_g) == 0) {
-          next
-        }
-        near <- up_g[which.min(abs(
-          x$shape$x_offset[up_g] - x$shape$x_offset[g]
-        ))]
-        left[k] <- x$shape$x_offset[near]
-        right[k] <- x$shape$x_offset[near] +
-          x$shape$ascender[near] -
-          x$shape$descender[near]
-      }
-    }
-    list(left = left, right = right)
-  }
-
+  ## Glyph cells (cell_x0..cell_y1 from textshaping) give the em box across
+  ## the main axis and the advance slot along it, tiling seamlessly across
+  ## glyph types and rotations — decorations are anchored to them directly
   span_rects <- lapply(span_bg, function(i) {
     ### Find the glyphs related to the span
     span_ind <- which(x$shape$string_id %in% i)
     if (x$text$text_direction[i[1]] %in% c("ttb", "ttb-ltr")) {
-      ### Vertical text: split up by column and make a rect for each.
-      ### Anchoring depends on rotation: upright glyphs have their pen
-      ### origin at the left edge of the em box with cells extending up
-      ### from y_offset, while rotated glyphs have cells extending down
-      ### from y_offset and span [descender, ascender] across the origin
-      lapply(split(span_ind, x$shape$x_offset[span_ind]), function(j) {
-        up <- x$shape$rotation[j] == 0
-        ### Spacer (padding) glyphs have unreliable cross-axis positions;
-        ### treat them like rotated runs and use the column span
-        solid <- x$shape$font_path[j] != ""
-        span_lr <- rotated_span(j)
-        left <- min(ifelse(up & solid, x$shape$x_offset[j], span_lr$left))
-        right <- max(ifelse(
-          up & solid,
-          x$shape$x_offset[j] + x$shape$ascender[j] - x$shape$descender[j],
-          span_lr$right
-        ))
-        ### Cells extend up from y_offset for upright glyphs and +90 runs
-        ### (ttb-ltr), down for -90 runs (ttb). Spacer glyphs (padding)
-        ### are anchored at their cell top in both directions (down-cells)
-        upcell <- x$shape$rotation[j] > 0 |
-          (x$shape$rotation[j] == 0 & solid)
-        top <- max(ifelse(
-          upcell,
-          x$shape$y_offset[j] + x$shape$advance[j],
-          x$shape$y_offset[j]
-        ))
-        bottom <- min(ifelse(
-          upcell,
-          x$shape$y_offset[j],
-          x$shape$y_offset[j] - x$shape$advance[j]
-        ))
+      ### Vertical text: split up by column and make a rect for each. All
+      ### glyphs in a column share the cell's cross-axis span regardless of
+      ### type (upright, rotated, spacer), so it identifies the column
+      col_id <- round(x$shape$cell_x0[span_ind], 6)
+      lapply(split(span_ind, col_id), function(j) {
+        left <- min(x$shape$cell_x0[j])
+        right <- max(x$shape$cell_x1[j])
+        top <- max(x$shape$cell_y1[j])
+        bottom <- min(x$shape$cell_y0[j])
         c(i[1], left, top, right - left, top - bottom)
       })
     } else {
@@ -1931,39 +1880,24 @@ makeContext.marquee_grob <- function(x) {
   lines <- lapply(which(x$text$underline | x$text$strikethrough), function(i) {
     span_ind <- which(x$shape$string_id == i)
     vertical <- x$text$text_direction[i] %in% c("ttb", "ttb-ltr")
-    ### Like span rects we split by line (column for vertical text)
+    ### Like span rects we split by line (column for vertical text,
+    ### identified by the column box left edge so all glyph types group
+    ### together)
     lapply(
       split(
         span_ind,
-        if (vertical) x$shape$x_offset[span_ind] else x$shape$y_offset[span_ind]
+        if (vertical) {
+          round(x$shape$cell_x0[span_ind], 6)
+        } else {
+          x$shape$y_offset[span_ind]
+        }
       ),
       function(j) {
-        ### Line width and position is relative to size. Take the font
-        ### from the nearest non-spacer glyph — spacer (padding) glyphs
-        ### have no font of their own, and a padded span can consist
-        ### solely of spacers; these inherit the font of the span they
-        ### pad, so match on the token's family
-        ref <- which(x$shape$font_path[j] != "")[1]
-        ref <- if (is.na(ref)) {
-          blk <- which(
-            x$shape$metric_id == x$shape$metric_id[j[1]] &
-              x$shape$font_path != ""
-          )
-          if (length(blk) == 0) {
-            j[1]
-          } else {
-            tok_font <- systemfonts::match_fonts(
-              x$text$family[i],
-              italic = x$text$italic[i],
-              weight = x$text$weight[i]
-            )$path
-            same <- blk[x$shape$font_path[blk] == tok_font]
-            cand <- if (length(same) == 0) blk else same
-            cand[which.min(abs(cand - j[1]))]
-          }
-        } else {
-          j[ref]
-        }
+        ### Line width and position is relative to size. Spacer (null)
+        ### glyphs carry their span's resolved font since textshaping
+        ### 1.0.5.9000, so any glyph — even in a padding-only span —
+        ### provides valid font metrics
+        ref <- j[1]
         size <- x$shape$font_size[ref]
         info <- systemfonts::font_info(
           path = x$shape$font_path[ref],
@@ -1982,37 +1916,22 @@ makeContext.marquee_grob <- function(x) {
           ### within a column when the glyph rotation changes
           ttb <- x$text$text_direction[i] == "ttb"
           up <- x$shape$rotation[j] == 0
-          solid <- x$shape$font_path[j] != ""
-          span_lr <- rotated_span(j)
-          glyph_left <- ifelse(up & solid, x$shape$x_offset[j], span_lr$left)
-          glyph_right <- ifelse(
-            up & solid,
-            x$shape$x_offset[j] + x$shape$ascender[j] - x$shape$descender[j],
-            span_lr$right
-          )
+          solid <- !x$shape$spacer[j]
+          glyph_left <- x$shape$cell_x0[j]
+          glyph_right <- x$shape$cell_x1[j]
           ### Anchor the line ends to the glyph extents along the column:
-          ### the em box (upright) or the advance cell (rotated). Cells
-          ### extend up from y_offset for upright glyphs and +90 runs
-          ### (ttb-ltr), down for -90 runs (ttb) and for spacer (padding)
-          ### glyphs
-          upcell <- x$shape$rotation[j] > 0 | (up & solid)
+          ### the ink box (upright, solid) or the advance cell (rotated and
+          ### spacer glyphs)
+          ink <- up & solid
           y_top <- ifelse(
-            up & solid,
+            ink,
             x$shape$y_offset[j] + x$shape$ascender[j],
-            ifelse(
-              upcell,
-              x$shape$y_offset[j] + x$shape$advance[j],
-              x$shape$y_offset[j]
-            )
+            x$shape$cell_y1[j]
           )
           y_bot <- ifelse(
-            up & solid,
+            ink,
             x$shape$y_offset[j] + x$shape$descender[j],
-            ifelse(
-              upcell,
-              x$shape$y_offset[j],
-              x$shape$y_offset[j] - x$shape$advance[j]
-            )
+            x$shape$cell_y0[j]
           )
           ### Split the column into contiguous upright/rotated segments;
           ### spacers join the segment of their nearest solid glyph. A
@@ -2025,9 +1944,31 @@ makeContext.marquee_grob <- function(x) {
               rotated_seg[k] <- if (k == 1L) first_type else rotated_seg[k - 1L]
             }
           }
+          ### Reference glyph for an all-spacer segment's decoration: the
+          ### nearest solid glyph of the span the padding belongs to,
+          ### identified by its identical background (padding spacers are
+          ### duplicates of the span token). Its own rotation is always 0,
+          ### so a spacer can't speak for the segment
+          seg_ref <- if (!any(solid)) {
+            blk <- which(
+              x$shape$metric_id == x$shape$metric_id[j[1]] & !x$shape$spacer
+            )
+            same_bg <- blk[vapply(
+              x$shape$string_id[blk],
+              function(s) has_identical_background(i, s, x$text),
+              logical(1)
+            )]
+            cand <- if (length(same_bg) == 0) blk else same_bg
+            if (length(cand) == 0) {
+              ref
+            } else {
+              cand[which.min(abs(cand - j[1]))]
+            }
+          } else {
+            ref
+          }
           if (!any(solid)) {
-            ### ref is the family-matched glyph of the padded span
-            rotated_seg[] <- x$shape$rotation[ref] != 0
+            rotated_seg[] <- x$shape$rotation[seg_ref] != 0
           }
           seg_id <- cumsum(c(
             TRUE,
@@ -2051,11 +1992,10 @@ makeContext.marquee_grob <- function(x) {
             if (rotated_seg[sg[1]]) {
               ### As if unrotated: positions relative to the run's baseline
               rot_g <- j[sg[!up[sg]][1]]
-              ### All-spacer segment: ref is the family-matched glyph of
-              ### the padded span, rotated whenever the segment was
-              ### classified as rotated
+              ### All-spacer segment: use the nearest solid glyph of the
+              ### block (classified as rotated above)
               if (is.na(rot_g)) {
-                rot_g <- ref
+                rot_g <- seg_ref
               }
               base <- x$shape$x_offset[rot_g]
               ccw <- x$shape$rotation[rot_g] > 0
@@ -2117,7 +2057,7 @@ makeContext.marquee_grob <- function(x) {
   em_tokens <- which(!is.na(x$text$emphasis))
   if (length(em_tokens) != 0) {
     em_glyphs <- lapply(em_tokens, function(i) {
-      ind <- which(x$shape$string_id == i & x$shape$font_path != "")
+      ind <- which(x$shape$string_id == i & !x$shape$spacer)
       if (length(ind) == 0) {
         return(NULL)
       }
@@ -2125,7 +2065,6 @@ makeContext.marquee_grob <- function(x) {
       ### x_offset is the pen origin at the left edge of the em box; the
       ### ink edge is near x_offset + ascender - descender, so anchor the
       ### marks to the em-box edge, not the ascender
-      em_w <- x$shape$ascender[ind] - x$shape$descender[ind]
       size <- x$text$size[i]
       mark <- textshaping::shape_text(
         x$text$emphasis[i],
@@ -2140,25 +2079,13 @@ makeContext.marquee_grob <- function(x) {
       mark_h <- mark$metrics$height[1]
       gap <- size / 10
       if (vertical) {
-        ### Upright cells extend up from y_offset, rotated cells down, so
-        ### the cell centre is half an advance either way. Cross-axis the
-        ### em-box edge is ascender - descender out from the pen origin
-        ### for upright glyphs and ascender/descender for rotated ones
-        up <- x$shape$rotation[ind] == 0
-        upcell <- x$shape$rotation[ind] >= 0
-        span_lr <- rotated_span(ind)
-        center_y <- x$shape$y_offset[ind] +
-          ifelse(upcell, 1, -1) * x$shape$advance[ind] / 2
-        right_edge <- ifelse(
-          up,
-          x$shape$x_offset[ind] + em_w,
-          span_lr$right
-        )
-        left_edge <- ifelse(up, x$shape$x_offset[ind], span_lr$left)
+        ### Center the mark on the glyph's cell and place it beside the
+        ### em-box edge (right for ttb, left for ttb-ltr)
+        center_y <- (x$shape$cell_y0[ind] + x$shape$cell_y1[ind]) / 2
         if (x$text$text_direction[i] == "ttb") {
-          center_x <- right_edge + gap + mark_w / 2
+          center_x <- x$shape$cell_x1[ind] + gap + mark_w / 2
         } else {
-          center_x <- left_edge - gap - mark_w / 2
+          center_x <- x$shape$cell_x0[ind] - gap - mark_w / 2
         }
       } else {
         center_x <- x$shape$x_offset[ind] + x$shape$advance[ind] / 2
@@ -2182,6 +2109,11 @@ makeContext.marquee_grob <- function(x) {
         ascender = mark$shape$ascender[1],
         descender = mark$shape$descender[1],
         rotation = 0,
+        spacer = FALSE,
+        cell_x0 = center_x - mark_w / 2,
+        cell_x1 = center_x + mark_w / 2,
+        cell_y0 = center_y - mark_h / 2,
+        cell_y1 = center_y + mark_h / 2,
         col = x$shape$col[ind],
         id = x$shape$id[ind],
         outline = x$shape$outline[ind],
@@ -2232,6 +2164,11 @@ makeContext.marquee_grob <- function(x) {
         ascender = math_metrics$height[i],
         descender = -math_metrics$depth[i],
         rotation = 0,
+        spacer = FALSE,
+        cell_x0 = x0 + glyphs$x_offset,
+        cell_x1 = x0 + glyphs$x_offset + glyphs$advance,
+        cell_y0 = y0 + glyphs$y_offset - math_metrics$depth[i],
+        cell_y1 = y0 + glyphs$y_offset + math_metrics$height[i],
         col = glyphs$color,
         id = x$shape$id[placeholder],
         outline = x$shape$outline[placeholder],
@@ -2276,28 +2213,14 @@ makeContext.marquee_grob <- function(x) {
         ## For +90 (ttb-ltr) the math start sits at the bottom of the
         ## reserved slot, like rotated Latin runs whose reading order is
         ## bottom-to-top; for -90 (ttb) it sits at the top. The cross-axis
-        ## anchor is the column centreline (derived from the block's upright
-        ## glyphs — the placeholder's own origin is unreliable), offset so
-        ## the math's vertical midline lands on it
+        ## anchor is the column centreline, offset so the math's vertical
+        ## midline lands on it
         math_w <- math_metrics$width[i]
         rot_x <- if (ccw) {
-          ## The math placeholder sits at the run pen of its column (the
-          ## em-box left edge plus the column font's ascender), so the
-          ## column centreline is x0 - (asc + desc)/2. The column font
-          ## metrics are uniform across the block; take them from an
-          ## upright glyph (the placeholder's own metrics are math metrics)
-          blk <- which(
-            x$shape$metric_id == x$shape$metric_id[placeholder] &
-              x$shape$rotation == 0 &
-              x$shape$font_path != ""
-          )
-          col_c <- if (length(blk) > 0) {
-            x0 - (x$shape$ascender[blk[1]] + x$shape$descender[blk[1]]) / 2
-          } else {
-            x0 -
-              (x$shape$ascender[placeholder] + x$shape$descender[placeholder]) /
-                2
-          }
+          ## The column centreline is the centre of the placeholder's cell
+          col_c <- (x$shape$cell_x0[placeholder] +
+            x$shape$cell_x1[placeholder]) /
+            2
           x_anchor <- col_c +
             (math_metrics$height[i] - math_metrics$depth[i]) / 2
           function(x, y) x_anchor - (y - y0)
@@ -2313,6 +2236,15 @@ makeContext.marquee_grob <- function(x) {
         x_rot <- rot_x(g$x_offset, g$y_offset)
         g$y_offset <- rot_y(g$x_offset, g$y_offset)
         g$x_offset <- x_rot
+        ## Rotate the cell boxes along with the glyphs
+        cx0 <- rot_x(g$cell_x0, g$cell_y0)
+        cy0 <- rot_y(g$cell_x0, g$cell_y0)
+        cx1 <- rot_x(g$cell_x1, g$cell_y1)
+        cy1 <- rot_y(g$cell_x1, g$cell_y1)
+        g$cell_x0 <- pmin(cx0, cx1)
+        g$cell_x1 <- pmax(cx0, cx1)
+        g$cell_y0 <- pmin(cy0, cy1)
+        g$cell_y1 <- pmax(cy0, cy1)
         g$rotation <- if (ccw) 90 else -90
         math_glyphs[[i]] <- g
         if (!is.null(math_lines[[i]])) {
@@ -2356,22 +2288,9 @@ makeContext.marquee_grob <- function(x) {
     grob <- images$grobs[[i]]
     descend <- x$shape$descender[glyph]
     if (x$text$text_direction[images$index[i]] %in% c("ttb", "ttb-ltr")) {
-      ## In vertical text the placeholder slot extends downward from the
-      ## glyph origin. The placeholder's own cross-axis origin is not the
-      ## column edge (spacers are positioned differently), so the image is
-      ## centered on the column spine: the em-box centre of the surrounding
-      ## upright glyphs in the same column (nearest x_offset in the block)
-      blk <- x$shape$metric_id[glyph]
-      cand <- which(
-        x$shape$metric_id == blk &
-          x$shape$font_path != "" &
-          x$shape$rotation == 0
-      )
-      nearest <- cand[
-        which.min(abs(x$shape$x_offset[cand] - x$shape$x_offset[glyph]))
-      ]
-      spine <- x$shape$x_offset[nearest] +
-        (x$shape$ascender[nearest] - x$shape$descender[nearest]) / 2
+      ## In vertical text the image is centered on the column spine: the
+      ## centre of the placeholder's cell across the main axis
+      spine <- (x$shape$cell_x0[glyph] + x$shape$cell_x1[glyph]) / 2
       grob$vp$x <- unit(spine - as_bigpts(grob$vp$width) / 2, "bigpts")
       grob$vp$y <- unit(
         x$shape$y_offset[glyph] - as_bigpts(grob$vp$height),
@@ -2387,7 +2306,7 @@ makeContext.marquee_grob <- function(x) {
     grob
   })
   ## Remove the null-glyphs from the shape
-  x$shape <- x$shape[x$shape$font_path != "", ]
+  x$shape <- x$shape[!x$shape$spacer, ]
   x$images <- list(
     id = x$text$id[images$index],
     grobs = image_grobs
@@ -3006,6 +2925,18 @@ outline_glyphs <- function(glyph_info, shape) {
     outlines[[idx]] <- outline
   }
   outlines
+}
+
+# Shift a shape data frame (as returned by textshaping::shape_text()) along
+# with its glyph cell boxes, so the two never go out of sync
+shift_shape <- function(shape, dx = 0, dy = 0) {
+  shape$x_offset <- shape$x_offset + dx
+  shape$cell_x0 <- shape$cell_x0 + dx
+  shape$cell_x1 <- shape$cell_x1 + dx
+  shape$y_offset <- shape$y_offset + dy
+  shape$cell_y0 <- shape$cell_y0 + dy
+  shape$cell_y1 <- shape$cell_y1 + dy
+  shape
 }
 
 # Rotate a bitmap glyph (nativeRaster from systemfonts::glyph_raster()) in

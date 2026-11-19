@@ -69,7 +69,7 @@
       
       $shape
       $shape$shape
-      # A tibble: 13 x 15
+      # A tibble: 13 x 20
          glyph index metric_id string_id x_offset y_offset font_path        font_index
          <int> <int>     <int>     <int>    <dbl>    <dbl> <chr>                 <int>
        1     1    20         1         1   -10.0     -9.24 /System/Library~          0
@@ -85,8 +85,9 @@
       11     1   135         6         6    -4.20    -9.24 /System/Library~          0
       12     1    20         7         7   -10.0     -9.24 /System/Library~          0
       13     2    17         7         7    -3.33    -9.24 /System/Library~          0
-      # i 7 more variables: font_size <dbl>, advance <dbl>, ascender <dbl>,
-      #   descender <dbl>, rotation <dbl>, col <chr>, id <int>
+      # i 12 more variables: font_size <dbl>, advance <dbl>, ascender <dbl>,
+      #   descender <dbl>, rotation <dbl>, spacer <lgl>, cell_x0 <dbl>,
+      #   cell_y0 <dbl>, cell_x1 <dbl>, cell_y1 <dbl>, col <chr>, id <int>
       
       $shape$metrics
       # A tibble: 7 x 13
