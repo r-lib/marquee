@@ -152,6 +152,15 @@ parent hanging, <code><a href="style_helpers.html">em()</a></code> in which case
 style, or <code><a href="style_helpers.html">rem()</a></code> in which case it is based on the font size of the body
 element.</p></dd>
 
+    <dt><code>marker_width</code></dt>
+<dd><p>How much space to reserve for list markers so they
+never overlap the first line: <code>"auto"</code> (the default) reserves the width of
+the widest marker in the list uniformly for all items, <code>"natural"</code>
+reserves each item's own marker width (ragged first lines), and a number
+or <code><a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit()</a></code> reserves that fixed width uniformly (like a label
+length). The reservation raises <code>indent</code> and <code>hanging</code> as needed, so all
+lines stay aligned.</p></dd>
+
     <dt><code>margin</code></dt>
 <dd><p>The margin around the element, given as a call to <code><a href="style_helpers.html">trbl()</a></code>.
 Margin refers to the area outside the box that text is placed in. If the
@@ -213,6 +222,15 @@ outer corner at a join) if <code>outline_join = "mitre"</code>.</p></dd>
     <dt><code>strikethrough</code></dt>
 <dd><p>Should text be strikethrough</p></dd>
 
+    <dt><code>emphasis</code></dt>
+<dd><p>A single character used as an emphasis mark (kenten/boten),
+drawn beside every glyph in the span (to the right of the column in
+vertical text, above the line in horizontal text), or <code>NA</code> for no mark.
+Traditional Japanese typesetting uses emphasis marks instead of italics.
+Common marks to copy-paste: <code>"●"</code> (the most common), <code>"○"</code>, <code>"◎"</code>, <code>"▲"</code>,
+<code>"△"</code>, <code>"■"</code>, <code>"□"</code>, <code>"★"</code>, <code>"☆"</code>, <code>"・"</code>, <code>"﹅"</code> (sesame dot), and <code>"※"</code>
+(common in Korean texts)</p></dd>
+
     <dt><code>baseline</code></dt>
 <dd><p>The baseline shift to apply to the text</p></dd>
 
@@ -223,11 +241,37 @@ provided by the image itself</p></dd>
     <dt><code>text_direction</code></dt>
 <dd><p>The directional flow of the text. Either <code>"auto"</code> to
 let it be determined by the content of the text, or <code>"ltr"</code>/<code>"rtl"</code> to
-hard-code it to either left-to-right or right-to-left. This setting will not
-change the order of glyphs within a span of text, but rather whether
-consequtive blocks of text are laid out left-to-right or right-to-left. It
-also affects to which side indentation is applied as well as the meaning of
-<code>"auto"</code>, and <code>"justified-auto"</code> aligment.</p></dd>
+hard-code it to either left-to-right or right-to-left. Vertical text is
+requested with <code>"ttb"</code> (top-to-bottom columns, as used in e.g. Japanese and
+traditional Chinese typesetting) or <code>"ttb-ltr"</code> (top-to-bottom columns with
+left-to-right column and block order, as used in traditional Mongolian
+typesetting). This
+setting will not change the order of glyphs within a span of text, but
+rather how consequtive lines/columns of text are laid out. It also affects
+to which side indentation is applied as well as the meaning of <code>"auto"</code>,
+and <code>"justified-auto"</code> aligment.</p></dd>
+
+    <dt><code>mixed</code></dt>
+<dd><p>How horizontal-only runs (e.g. Latin script or digits) are set
+inside vertical text. One of <code>"rotate"</code> (set horizontally and rotate the run
+90 degrees), <code>"upright"</code> (set upright using the font's <code>vert</code>/<code>vrt2</code> glyph
+substitutions, falling back to <code>"rotate"</code>), <code>"tate"</code> (tate-chu-yoko: digit
+runs of up to 4 digits are set horizontally within the column), <code>"tate2"</code>
+or <code>"tate3"</code> (like <code>"tate"</code> but capping digit runs at 2 or 3 digits,
+respectively), <code>"combine"</code> (generalised tate-chu-yoko for any run of up to
+4 characters), <code>"combine2"</code> or <code>"combine3"</code> (like <code>"combine"</code> but capping
+runs at 2 or 3 characters), or <code>"sideways"</code> (set the whole string
+horizontally and rotate it). Ignored for horizontal text.</p></dd>
+
+    <dt><code>kinsoku</code></dt>
+<dd><p>The strictness of CJK line break prohibition rules. One of
+<code>"strict"</code>, <code>"loose"</code>, or <code>"none"</code>.</p></dd>
+
+    <dt><code>kinsoku_style</code></dt>
+<dd><p>How kinsoku violations are resolved when a line is
+forced past the last valid break point. One of <code>"hang"</code> (offending
+punctuation hangs past the line end), <code>"push-out"</code> (move to next line and
+expand spacing), or <code>"push-in"</code> (compress spacing to fit it on the line).</p></dd>
 
     <dt><code>border_size</code></dt>
 <dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>border_width</code>

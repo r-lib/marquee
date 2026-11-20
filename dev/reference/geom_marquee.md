@@ -191,7 +191,8 @@ content disappears. In that case, you must provide a width.
 Labels can contain math expressions written with standard markdown math
 syntax (`$expression$` for inline math and `$$expression$$` for display
 math). It requires a version of textshaping that provides
-`textshaping::shape_math()`. See
+[`textshaping::shape_math()`](https://rdrr.io/pkg/textshaping/man/shape_math.html).
+See
 [`marquee_grob()`](https://marquee.r-lib.org/dev/reference/marquee_grob.md)
 for more information on math rendering.
 

@@ -15,11 +15,13 @@ marquee_grob(
   style = classic_style(),
   ignore_html = TRUE,
   force_body_margin = FALSE,
-  x = 0,
+  clip = "off",
+  x = NULL,
   y = 1,
-  width = NULL,
+  width = "auto",
+  height = "auto",
   default.units = "npc",
-  hjust = "left",
+  hjust = NULL,
   vjust = "top",
   angle = 0,
   vp = NULL,
@@ -49,17 +51,41 @@ marquee_grob(
   Should the body margin override margin collapsing calculations. See
   Details.
 
+- clip:
+
+  Should content that overflows a `width`/`height` constraint be clipped
+  at the constraint box? Either `"off"` (never clip, the default),
+  `"on"` (clip), or `"inherit"` (defer to the clipping state of the
+  drawing context). Note that clipping also cuts intentional overflow
+  such as emphasis marks and hanging punctuation.
+
 - x, y:
 
   The location of the markdown text in the graphics. If numeric it will
-  be converted to units using `default.units`
+  be converted to units using `default.units`. The default is the
+  flow-start corner: `x = 0` for horizontal and ttb-ltr text, `x = 1`
+  for ttb text, `y = 1` always.
 
-- width:
+- width, height:
 
-  The width of each markdown text. If numeric it will be converted to
-  units using `default.units`. `NULL` is equivalent to the width of the
-  parent container. `NA` uses the width of the text as the full width of
-  the grob and will thus avoid any soft breaking of lines.
+  The width and height of each markdown text. If numeric they are
+  converted to units using `default.units`. Both accept the same three
+  kinds of values:
+
+  - `"auto"` (the default): resolve per writing direction. The
+    constraint axis (width for horizontal text, height for vertical
+    text) takes the extent of the parent container; the block axis
+    (height for horizontal, width for vertical) is sized by the content.
+    This makes vertical text work out of the box, wrapping columns at
+    the container height.
+
+  - `NULL`: the extent of the parent container — a hard constraint.
+
+  - `NA`: derive the size from the content (for width this avoids soft
+    breaking of lines).
+
+  Setting both to `NULL` thus constrains the content to the available
+  space (clipping it if `clip = "on"`).
 
 - default.units:
 
@@ -205,12 +231,14 @@ syntax.
 ## Math rendering
 
 Math expressions written with standard markdown math syntax are rendered
-using the math shaper in textshaping (`textshaping::shape_math()`). This
-functionality is only available if the installed version of textshaping
-provides `shape_math()`; if the text contains math expressions and
-textshaping is too old, an error is raised informing you of this. Both
-LaTeX and Typst math syntax are supported (see
-`textshaping::shape_math()` for the full specification).
+using the math shaper in textshaping
+([`textshaping::shape_math()`](https://rdrr.io/pkg/textshaping/man/shape_math.html)).
+This functionality is only available if the installed version of
+textshaping provides `shape_math()`; if the text contains math
+expressions and textshaping is too old, an error is raised informing you
+of this. Both LaTeX and Typst math syntax are supported (see
+[`textshaping::shape_math()`](https://rdrr.io/pkg/textshaping/man/shape_math.html)
+for the full specification).
 
 Inline math (`$expression$`) flows with the surrounding text, while
 display math (`$$expression$$`) is typeset in display style. A display
@@ -225,6 +253,46 @@ family of the `eq`/`eqd` styles (e.g.
 for best results use a font with an OpenType MATH table. Elements within
 an expression can be colored individually with e.g.
 `\textcolor{color}{content}`.
+
+## Vertical typesetting
+
+marquee supports vertical writing modes through the `text_direction`
+style property: `"ttb"` sets text in top-to-bottom columns that progress
+right-to-left (as in Japanese and traditional Chinese typesetting), and
+`"ttb-ltr"` sets the same columns with left-to-right progression (the
+Mongolian convention). The root writing mode is taken from the base
+style; any tag can override it, and the resolved value cascades down the
+block tree. A block whose direction differs from its parent's is laid
+out in its own transposed coordinate system and positioned as a box in
+the parent's flow, which makes it possible to mix directions freely —
+e.g. a tategaki quotation in a horizontal document, or a yokogaki code
+block inside vertical text.
+
+In vertical mode both axes transpose: the constraint axis is the height
+(columns wrap when they reach it) and the block axis runs horizontally.
+Margins and padding remain physical
+([`trbl()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)),
+so in ttb mode margin collapsing happens between the right margin of the
+left block and the left margin of the right block. Decorations follow
+the conventions of vertical typesetting: bullets hang at the column
+head, underlines are drawn as bōsen to the right of the column in ttb
+(left in ttb-ltr), and emphasis marks (see the `emphasis` argument of
+[`style()`](https://marquee.r-lib.org/dev/reference/style.md)) sit to
+the right of each character. Horizontal-only runs (Latin script, digits)
+inside vertical text are handled according to the `mixed` style
+property, and CJK line breaking follows the `kinsoku`/`kinsoku_style`
+properties.
+
+The
+[`vertical_style()`](https://marquee.r-lib.org/dev/reference/vertical_style.md)
+constructor provides a ready-made style set with traditional defaults
+(kenten emphasis, kanji list numbering, hanging bullets, horizontal code
+blocks) for both directions.
+
+A few limitations apply: stroked text (the `outline_*` style properties)
+does not account for glyph rotation, bitmap glyphs (color emoji) are not
+rotated in the fallback rendering path, and the `"first-line"`/
+`"last-line"` justification anchors remain y-based for vertical text.
 
 ## Textbox justification
 

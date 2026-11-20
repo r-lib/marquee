@@ -27,7 +27,7 @@ at home.
 ### Styles
 
 In marquee, a style defines the full specification for how an element
-(block or span) should visually appear. It holds 31 different settings
+(block or span) should visually appear. It holds 36 different settings
 concerning everything from font rendering, to spacing, coloring, and
 alignment. Rather than going through all here, I’ll point towards the
 documentation for the

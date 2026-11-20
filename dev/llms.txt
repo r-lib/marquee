@@ -92,6 +92,8 @@ These functions helps you specify the visual style used during rendering
   : Create or modify a style set that describes a full markdown text
 - [`classic_style()`](https://marquee.r-lib.org/dev/reference/classic_style.md)
   : Classic styling for markdown
+- [`vertical_style()`](https://marquee.r-lib.org/dev/reference/vertical_style.md)
+  : Vertical (tategaki) styling for markdown
 - [`relative()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
   [`em()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
   [`rem()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)

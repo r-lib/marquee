@@ -117,6 +117,17 @@ classic_style(
       [`rem()`](https://marquee.r-lib.org/dev/reference/style_helpers.md)
       in which case it is based on the font size of the body element.
 
+  `marker_width`
+
+  :   How much space to reserve for list markers so they never overlap
+      the first line: `"auto"` (the default) reserves the width of the
+      widest marker in the list uniformly for all items, `"natural"`
+      reserves each item's own marker width (ragged first lines), and a
+      number or [`grid::unit()`](https://rdrr.io/r/grid/unit.html)
+      reserves that fixed width uniformly (like a label length). The
+      reservation raises `indent` and `hanging` as needed, so all lines
+      stay aligned.
+
   `margin`
 
   :   The margin around the element, given as a call to
@@ -197,6 +208,16 @@ classic_style(
 
   :   Should text be strikethrough
 
+  `emphasis`
+
+  :   A single character used as an emphasis mark (kenten/boten), drawn
+      beside every glyph in the span (to the right of the column in
+      vertical text, above the line in horizontal text), or `NA` for no
+      mark. Traditional Japanese typesetting uses emphasis marks instead
+      of italics. Common marks to copy-paste: `"●"` (the most common),
+      `"○"`, `"◎"`, `"▲"`, `"△"`, `"■"`, `"□"`, `"★"`, `"☆"`, `"・"`,
+      `"﹅"` (sesame dot), and `"※"` (common in Korean texts)
+
   `baseline`
 
   :   The baseline shift to apply to the text
@@ -210,12 +231,43 @@ classic_style(
 
   :   The directional flow of the text. Either `"auto"` to let it be
       determined by the content of the text, or `"ltr"`/`"rtl"` to
-      hard-code it to either left-to-right or right-to-left. This
-      setting will not change the order of glyphs within a span of text,
-      but rather whether consequtive blocks of text are laid out
-      left-to-right or right-to-left. It also affects to which side
-      indentation is applied as well as the meaning of `"auto"`, and
-      `"justified-auto"` aligment.
+      hard-code it to either left-to-right or right-to-left. Vertical
+      text is requested with `"ttb"` (top-to-bottom columns, as used in
+      e.g. Japanese and traditional Chinese typesetting) or `"ttb-ltr"`
+      (top-to-bottom columns with left-to-right column and block order,
+      as used in traditional Mongolian typesetting). This setting will
+      not change the order of glyphs within a span of text, but rather
+      how consequtive lines/columns of text are laid out. It also
+      affects to which side indentation is applied as well as the
+      meaning of `"auto"`, and `"justified-auto"` aligment.
+
+  `mixed`
+
+  :   How horizontal-only runs (e.g. Latin script or digits) are set
+      inside vertical text. One of `"rotate"` (set horizontally and
+      rotate the run 90 degrees), `"upright"` (set upright using the
+      font's `vert`/`vrt2` glyph substitutions, falling back to
+      `"rotate"`), `"tate"` (tate-chu-yoko: digit runs of up to 4 digits
+      are set horizontally within the column), `"tate2"` or `"tate3"`
+      (like `"tate"` but capping digit runs at 2 or 3 digits,
+      respectively), `"combine"` (generalised tate-chu-yoko for any run
+      of up to 4 characters), `"combine2"` or `"combine3"` (like
+      `"combine"` but capping runs at 2 or 3 characters), or
+      `"sideways"` (set the whole string horizontally and rotate it).
+      Ignored for horizontal text.
+
+  `kinsoku`
+
+  :   The strictness of CJK line break prohibition rules. One of
+      `"strict"`, `"loose"`, or `"none"`.
+
+  `kinsoku_style`
+
+  :   How kinsoku violations are resolved when a line is forced past the
+      last valid break point. One of `"hang"` (offending punctuation
+      hangs past the line end), `"push-out"` (move to next line and
+      expand spacing), or `"push-in"` (compress spacing to fit it on the
+      line).
 
   `border_size`
 

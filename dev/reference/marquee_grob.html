@@ -67,11 +67,13 @@ further information on how rendering proceeds.</p>
 <span>  style <span class="op">=</span> <span class="fu"><a href="classic_style.html">classic_style</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  ignore_html <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  force_body_margin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  x <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  clip <span class="op">=</span> <span class="st">"off"</span>,</span>
+<span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  width <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  height <span class="op">=</span> <span class="st">"auto"</span>,</span>
 <span>  default.units <span class="op">=</span> <span class="st">"npc"</span>,</span>
-<span>  hjust <span class="op">=</span> <span class="st">"left"</span>,</span>
+<span>  hjust <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  vjust <span class="op">=</span> <span class="st">"top"</span>,</span>
 <span>  angle <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  vp <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -102,16 +104,34 @@ should be rendered</p></dd>
 calculations. See Details.</p></dd>
 
 
+<dt id="arg-clip">clip<a class="anchor" aria-label="anchor" href="#arg-clip"></a></dt>
+<dd><p>Should content that overflows a <code>width</code>/<code>height</code> constraint be
+clipped at the constraint box? Either <code>"off"</code> (never clip, the default),
+<code>"on"</code> (clip), or <code>"inherit"</code> (defer to the clipping state of the drawing
+context). Note that clipping also cuts intentional overflow such as
+emphasis marks and hanging punctuation.</p></dd>
+
+
 <dt id="arg-x-y">x, y<a class="anchor" aria-label="anchor" href="#arg-x-y"></a></dt>
 <dd><p>The location of the markdown text in the graphics. If numeric it
-will be converted to units using <code>default.units</code></p></dd>
+will be converted to units using <code>default.units</code>. The default is the
+flow-start corner: <code>x = 0</code> for horizontal and ttb-ltr text, <code>x = 1</code> for ttb
+text, <code>y = 1</code> always.</p></dd>
 
 
-<dt id="arg-width">width<a class="anchor" aria-label="anchor" href="#arg-width"></a></dt>
-<dd><p>The width of each markdown text. If numeric it will be converted
-to units using <code>default.units</code>. <code>NULL</code> is equivalent to the width of the
-parent container. <code>NA</code> uses the width of the text as the full width of the
-grob and will thus avoid any soft breaking of lines.</p></dd>
+<dt id="arg-width-height">width, height<a class="anchor" aria-label="anchor" href="#arg-width-height"></a></dt>
+<dd><p>The width and height of each markdown text. If numeric
+they are converted to units using <code>default.units</code>. Both accept the same
+three kinds of values:</p><ul><li><p><code>"auto"</code> (the default): resolve per writing direction. The constraint
+axis (width for horizontal text, height for vertical text) takes the
+extent of the parent container; the block axis (height for horizontal,
+width for vertical) is sized by the content. This makes vertical text
+work out of the box, wrapping columns at the container height.</p></li>
+<li><p><code>NULL</code>: the extent of the parent container — a hard constraint.</p></li>
+<li><p><code>NA</code>: derive the size from the content (for width this avoids soft
+breaking of lines).</p></li>
+</ul><p>Setting both to <code>NULL</code> thus constrains the content to the available space
+(clipping it if <code>clip = "on"</code>).</p></dd>
 
 
 <dt id="arg-default-units">default.units<a class="anchor" aria-label="anchor" href="#arg-default-units"></a></dt>
@@ -234,11 +254,11 @@ power of gt, which is much more flexible than the markdown table syntax.</p>
     <div class="section level2">
     <h2 id="math-rendering">Math rendering<a class="anchor" aria-label="anchor" href="#math-rendering"></a></h2>
     <p>Math expressions written with standard markdown math syntax are rendered
-using the math shaper in textshaping (<code>textshaping::shape_math()</code>). This
+using the math shaper in textshaping (<code><a href="https://rdrr.io/pkg/textshaping/man/shape_math.html" class="external-link">textshaping::shape_math()</a></code>). This
 functionality is only available if the installed version of textshaping
 provides <code>shape_math()</code>; if the text contains math expressions and
 textshaping is too old, an error is raised informing you of this. Both
-LaTeX and Typst math syntax are supported (see <code>textshaping::shape_math()</code>
+LaTeX and Typst math syntax are supported (see <code><a href="https://rdrr.io/pkg/textshaping/man/shape_math.html" class="external-link">textshaping::shape_math()</a></code>
 for the full specification).</p>
 <p>Inline math (<code>$expression$</code>) flows with the surrounding text, while display
 math (<code>$$expression$$</code>) is typeset in display style. A display math
@@ -251,6 +271,38 @@ setting the family of the <code>eq</code>/<code>eqd</code> styles (e.g.
 best results use a font with an OpenType MATH table. Elements within an
 expression can be colored individually with e.g.
 <code>\textcolor{color}{content}</code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="vertical-typesetting">Vertical typesetting<a class="anchor" aria-label="anchor" href="#vertical-typesetting"></a></h2>
+    <p>marquee supports vertical writing modes through the <code>text_direction</code> style
+property: <code>"ttb"</code> sets text in top-to-bottom columns that progress
+right-to-left (as in Japanese and traditional Chinese typesetting), and
+<code>"ttb-ltr"</code> sets the same columns with left-to-right progression (the
+Mongolian convention). The root writing mode is taken from the base style;
+any tag can override it, and the resolved value cascades down the block
+tree. A block whose direction differs from its parent's is laid out in its
+own transposed coordinate system and positioned as a box in the parent's
+flow, which makes it possible to mix directions freely — e.g. a tategaki
+quotation in a horizontal document, or a yokogaki code block inside
+vertical text.</p>
+<p>In vertical mode both axes transpose: the constraint axis is the height
+(columns wrap when they reach it) and the block axis runs horizontally.
+Margins and padding remain physical (<code><a href="style_helpers.html">trbl()</a></code>), so in ttb mode margin
+collapsing happens between the right margin of the left block and the left
+margin of the right block. Decorations follow the conventions of vertical
+typesetting: bullets hang at the column head, underlines are drawn as
+bōsen to the right of the column in ttb (left in ttb-ltr), and emphasis
+marks (see the <code>emphasis</code> argument of <code><a href="style.html">style()</a></code>) sit to the right
+of each character. Horizontal-only runs (Latin script, digits) inside
+vertical text are handled according to the <code>mixed</code> style property, and CJK
+line breaking follows the <code>kinsoku</code>/<code>kinsoku_style</code> properties.</p>
+<p>The <code><a href="vertical_style.html">vertical_style()</a></code> constructor provides a ready-made style set with
+traditional defaults (kenten emphasis, kanji list numbering, hanging
+bullets, horizontal code blocks) for both directions.</p>
+<p>A few limitations apply: stroked text (the <code>outline_*</code> style properties)
+does not account for glyph rotation, bitmap glyphs (color emoji) are not
+rotated in the fallback rendering path, and the <code>"first-line"</code>/
+<code>"last-line"</code> justification anchors remain y-based for vertical text.</p>
     </div>
     <div class="section level2">
     <h2 id="textbox-justification">Textbox justification<a class="anchor" aria-label="anchor" href="#textbox-justification"></a></h2>

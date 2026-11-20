@@ -32,10 +32,6 @@ skip_inherit(x)
 marquee_bullets
 ```
 
-## Format
-
-An object of class `character` of length 6.
-
 ## Arguments
 
 - x:

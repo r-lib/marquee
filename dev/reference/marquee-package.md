@@ -20,6 +20,9 @@ Useful links:
 
 Authors:
 
+- Thomas Lin Pedersen <thomas.pedersen@posit.co>
+  ([ORCID](https://orcid.org/0000-0002-5147-4711))
+
 - Martin Mitáš (Author of MD4C)
 
 Other contributors:

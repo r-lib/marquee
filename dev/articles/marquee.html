@@ -403,6 +403,53 @@ will end up looking weird, but standard table inclusion works as
 expected.</p>
 </div>
 <div class="section level2">
+<h2 id="vertical-typesetting">Vertical typesetting<a class="anchor" aria-label="anchor" href="#vertical-typesetting"></a>
+</h2>
+<p>marquee supports vertical writing modes, as used in Japanese,
+traditional Chinese, and Mongolian typesetting. The writing direction is
+part of the style: set <code>text_direction</code> to <code>"ttb"</code>
+on the base style to typeset the document in top-to-bottom columns
+progressing right-to-left, or to <code>"ttb-ltr"</code> for the
+Mongolian convention of left-to-right column progression. Any tag can
+override the direction, so horizontal and vertical text can be mixed
+freely — a code block inside vertical text can stay horizontal, and a
+vertical quotation can sit inside a horizontal document.</p>
+<p>The easiest way to get started is the <code><a href="../reference/vertical_style.html">vertical_style()</a></code>
+constructor, which encodes traditional tategaki conventions: emphasis is
+set with kenten marks rather than italics, ordered lists are numbered
+with kanji numerals, bullets hang at the head of each column, and code
+blocks remain horizontal (yokogaki).</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">md_vertical</span> <span class="op">&lt;-</span></span>
+<span><span class="st">"# 縦書き</span></span>
+<span><span class="st">縦書きの*本文*です。句読点や「かぎかっこ」の向きは自動で変わります。</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">- 項目一</span></span>
+<span><span class="st">- 項目二</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">1. 最初</span></span>
+<span><span class="st">2. 次</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">横書きのコードも混ぜられます。</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">    y &lt;- 1</span></span>
+<span><span class="st">"</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/marquee_grob.html">marquee_grob</a></span><span class="op">(</span><span class="va">md_vertical</span>, <span class="fu"><a href="../reference/vertical_style.html">vertical_style</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="marquee_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="98%" style="display: block; margin: auto;"></p>
+<p>In vertical mode the constraint axis transposes to the height:
+columns wrap when they reach it and new columns are added right-to-left
+(or left-to-right for <code>"ttb-ltr"</code>). With the default
+<code>width = "auto"</code>, <code>height = "auto"</code> this means
+vertical text wraps at the available height and derives its width from
+the content, so it works out of the box. How horizontal-only runs (Latin
+script, digits) are set inside vertical text is controlled by the
+<code>mixed</code> style property, and CJK line breaking follows the
+<code>kinsoku</code> and <code>kinsoku_style</code> properties — see
+<code><a href="../reference/style.html">style()</a></code> and the vertical typesetting section of
+<code><a href="../reference/marquee_grob.html">?marquee_grob</a></code> for details.</p>
+</div>
+<div class="section level2">
 <h2 id="wrapping-up">Wrapping up<a class="anchor" aria-label="anchor" href="#wrapping-up"></a>
 </h2>
 <p>This should give you enough of an overview to get started. The
