@@ -511,7 +511,9 @@ cpp11::writable::list marquee_c(cpp11::strings text, cpp11::list_of<cpp11::list>
     } else if (Rf_isString(doc_style[i])) {
       cpp11::writable::strings col;
       for (R_xlen_t j = 0; j < userdata.style.size(); ++j) {
-        col.push_back(STRING_ELT(VECTOR_ELT(userdata.style[j], i), 0));
+        // Style sets built before a property existed may hold NULL for it
+        SEXP elem = VECTOR_ELT(userdata.style[j], i);
+        col.push_back(Rf_isNull(elem) || XLENGTH(elem) == 0 ? NA_STRING : STRING_ELT(elem, 0));
       }
       res.push_back(col);
     } else {

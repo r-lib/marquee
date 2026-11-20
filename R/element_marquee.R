@@ -165,8 +165,21 @@ make_element_marquee_s7 <- function() {
           {.fn margin} function."
         )
       }
+      # S7 1.0 requires the parent argument to be an instance of the parent
+      # class, so we construct a proper element_text first
+      parent <- ggplot2::element_text(
+        family = family,
+        colour = colour,
+        size = size,
+        hjust = hjust,
+        vjust = vjust,
+        angle = angle,
+        lineheight = lineheight,
+        margin = margin,
+        inherit.blank = inherit.blank
+      )
       obj <- S7::new_object(
-        S7::S7_object(),
+        parent,
         family = family,
         face = NULL,
         colour = colour,
