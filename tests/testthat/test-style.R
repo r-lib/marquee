@@ -179,6 +179,53 @@ test_that("style checks it's inputs", {
   expect_snapshot_error(style(strikethrough = "A"))
   expect_snapshot_error(style(strikethrough = 1))
 
+  # Emphasis mark
+  expect_silent(s <- style(emphasis = "●"))
+  expect_equal(s$emphasis, "●")
+  expect_silent(s <- style(emphasis = NA))
+  expect_equal(s$emphasis, NA_character_)
+  expect_snapshot_error(style(emphasis = 1))
+  expect_snapshot_error(style(emphasis = TRUE))
+
+  # Text direction
+  for (dir in c("auto", "ltr", "rtl", "ttb", "ttb-ltr")) {
+    expect_silent(s <- style(text_direction = dir))
+    expect_equal(s$text_direction, dir)
+  }
+  expect_snapshot_error(style(text_direction = "btt"))
+  expect_snapshot_error(style(text_direction = 1))
+
+  # Mixed script orientation
+  for (m in c(
+    "rotate",
+    "upright",
+    "tate",
+    "tate2",
+    "tate3",
+    "combine",
+    "combine2",
+    "combine3",
+    "sideways"
+  )) {
+    expect_silent(s <- style(mixed = m))
+    expect_equal(s$mixed, m)
+  }
+  expect_snapshot_error(style(mixed = "rotated"))
+  expect_snapshot_error(style(mixed = 1))
+
+  # Kinsoku
+  for (k in c("strict", "loose", "none")) {
+    expect_silent(s <- style(kinsoku = k))
+    expect_equal(s$kinsoku, k)
+  }
+  expect_snapshot_error(style(kinsoku = "strict-ish"))
+
+  for (k in c("hang", "push-out", "push-in")) {
+    expect_silent(s <- style(kinsoku_style = k))
+    expect_equal(s$kinsoku_style, k)
+  }
+  expect_snapshot_error(style(kinsoku_style = "shove"))
+
   # Baseline
   expect_silent(s <- style(baseline = 9))
   expect_equal(s$baseline, 9)

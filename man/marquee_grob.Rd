@@ -9,11 +9,13 @@ marquee_grob(
   style = classic_style(),
   ignore_html = TRUE,
   force_body_margin = FALSE,
-  x = 0,
+  clip = "off",
+  x = NULL,
   y = 1,
-  width = NULL,
+  width = "auto",
+  height = "auto",
   default.units = "npc",
-  hjust = "left",
+  hjust = NULL,
   vjust = "top",
   angle = 0,
   vp = NULL,
@@ -32,13 +34,33 @@ should be rendered}
 \item{force_body_margin}{Should the body margin override margin collapsing
 calculations. See Details.}
 
-\item{x, y}{The location of the markdown text in the graphics. If numeric it
-will be converted to units using \code{default.units}}
+\item{clip}{Should content that overflows a \code{width}/\code{height} constraint be
+clipped at the constraint box? Either \code{"off"} (never clip, the default),
+\code{"on"} (clip), or \code{"inherit"} (defer to the clipping state of the drawing
+context). Note that clipping also cuts intentional overflow such as
+emphasis marks and hanging punctuation.}
 
-\item{width}{The width of each markdown text. If numeric it will be converted
-to units using \code{default.units}. \code{NULL} is equivalent to the width of the
-parent container. \code{NA} uses the width of the text as the full width of the
-grob and will thus avoid any soft breaking of lines.}
+\item{x, y}{The location of the markdown text in the graphics. If numeric it
+will be converted to units using \code{default.units}. The default is the
+flow-start corner: \code{x = 0} for horizontal and ttb-ltr text, \code{x = 1} for ttb
+text, \code{y = 1} always.}
+
+\item{width, height}{The width and height of each markdown text. If numeric
+they are converted to units using \code{default.units}. Both accept the same
+three kinds of values:
+\itemize{
+\item \code{"auto"} (the default): resolve per writing direction. The constraint
+axis (width for horizontal text, height for vertical text) takes the
+extent of the parent container; the block axis (height for horizontal,
+width for vertical) is sized by the content. This makes vertical text
+work out of the box, wrapping columns at the container height.
+\item \code{NULL}: the extent of the parent container — a hard constraint.
+\item \code{NA}: derive the size from the content (for width this avoids soft
+breaking of lines).
+}
+
+Setting both to \code{NULL} thus constrains the content to the available space
+(clipping it if \code{clip = "on"}).}
 
 \item{default.units}{A string giving the default units to apply to \code{x}, \code{y},
 and \code{width}}
@@ -190,6 +212,41 @@ setting the family of the \code{eq}/\code{eqd} styles (e.g.
 best results use a font with an OpenType MATH table. Elements within an
 expression can be colored individually with e.g.
 \verb{\\textcolor\{color\}\{content\}}.
+}
+
+\section{Vertical typesetting}{
+marquee supports vertical writing modes through the \code{text_direction} style
+property: \code{"ttb"} sets text in top-to-bottom columns that progress
+right-to-left (as in Japanese and traditional Chinese typesetting), and
+\code{"ttb-ltr"} sets the same columns with left-to-right progression (the
+Mongolian convention). The root writing mode is taken from the base style;
+any tag can override it, and the resolved value cascades down the block
+tree. A block whose direction differs from its parent's is laid out in its
+own transposed coordinate system and positioned as a box in the parent's
+flow, which makes it possible to mix directions freely — e.g. a tategaki
+quotation in a horizontal document, or a yokogaki code block inside
+vertical text.
+
+In vertical mode both axes transpose: the constraint axis is the height
+(columns wrap when they reach it) and the block axis runs horizontally.
+Margins and padding remain physical (\code{\link[=trbl]{trbl()}}), so in ttb mode margin
+collapsing happens between the right margin of the left block and the left
+margin of the right block. Decorations follow the conventions of vertical
+typesetting: bullets hang at the column head, underlines are drawn as
+bōsen to the right of the column in ttb (left in ttb-ltr), and emphasis
+marks (see the \code{emphasis} argument of \code{\link[=style]{style()}}) sit to the right
+of each character. Horizontal-only runs (Latin script, digits) inside
+vertical text are handled according to the \code{mixed} style property, and CJK
+line breaking follows the \code{kinsoku}/\code{kinsoku_style} properties.
+
+The \code{\link[=vertical_style]{vertical_style()}} constructor provides a ready-made style set with
+traditional defaults (kenten emphasis, kanji list numbering, hanging
+bullets, horizontal code blocks) for both directions.
+
+A few limitations apply: stroked text (the \verb{outline_*} style properties)
+does not account for glyph rotation, bitmap glyphs (color emoji) are not
+rotated in the fallback rendering path, and the \code{"first-line"}/
+\code{"last-line"} justification anchors remain y-based for vertical text.
 }
 
 \section{Textbox justification}{

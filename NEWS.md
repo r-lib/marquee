@@ -1,5 +1,40 @@
 # marquee (development version)
 
+* Added support for vertical typesetting (tategaki). The `text_direction` style
+  property now accepts `"ttb"` (top-to-bottom columns progressing
+  right-to-left, as in Japanese and traditional Chinese typesetting) and
+  `"ttb-ltr"` (top-to-bottom columns progressing left-to-right, the Mongolian
+  convention). Blocks whose direction differs from their parent's are laid out
+  in their own transposed coordinate system, so horizontal and vertical text
+  can be mixed at any nesting level. Vertical text requires a version of
+  textshaping with vertical shaping support
+* New `mixed`, `kinsoku`, and `kinsoku_style` style properties control how
+  horizontal-only runs are set inside vertical text (rotation, upright
+  substitution, tate-chu-yoko, etc.) and how CJK line-break prohibitions are
+  applied and resolved
+* New `emphasis` style property sets an emphasis mark (kenten/boten) placed
+  next to each character of a span — right of the column in ttb, left in
+  ttb-ltr, above in horizontal text
+* New `vertical_style()` constructor provides a style set with traditional
+  tategaki defaults (kenten emphasis, kanji list numbering, hanging bullets,
+  centered headings, horizontal code blocks)
+* Ordered list bullets are now templates: the digit character selects the
+  numbering system (arabic, Han, Roman, circled, parenthesized, and other
+  Unicode digit systems), and `"_"` auto-detects a script-appropriate system
+  from the list content. The default `"_."` keeps the previous behavior for
+  Latin content
+* `marquee_grob()` gains symmetric `width`/`height` semantics (`"auto"`,
+  `NULL`, or `NA`) and a `clip` argument. The default `"auto"` resolves per
+  writing direction so vertical text wraps at the available height and sizes
+  itself horizontally from the content. The default `x`/`hjust` anchor at the
+  flow-start corner (top-right for ttb)
+* In vertical text, underlines are drawn as bōsen (right of the column in ttb,
+  left in ttb-ltr), bullets hang at the column head, span backgrounds split
+  per column, and inline math is rotated to match `mixed = "rotate"`
+* `marquee_parse()` no longer crashes on style sets serialized by an older
+  version of marquee that lack newer style properties; missing properties are
+  treated as unset
+
 # marquee 1.3.0
 
 * Added support for math expressions written with standard markdown

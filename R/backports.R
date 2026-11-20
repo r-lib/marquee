@@ -37,6 +37,12 @@ on_load({
   }
   if ("glyphInfo" %in% getNamespaceExports("grDevices")) {
     glyphInfo <- grDevices::glyphInfo
+    # The `rot` argument was added to glyphInfo() after R 4.4; drop it on
+    # older versions (rotated glyphs are simply not supported there)
+    if (!"rot" %in% names(formals(glyphInfo))) {
+      glyphInfo_no_rot <- glyphInfo
+      glyphInfo <- function(..., rot = 0) glyphInfo_no_rot(...)
+    }
   }
   if ("glyphAnchor" %in% getNamespaceExports("grDevices")) {
     glyphAnchor <- grDevices::glyphAnchor

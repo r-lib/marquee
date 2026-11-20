@@ -38,7 +38,11 @@ test_that("math grobs place glyphs, lines, and boxes", {
     grob$shape$string_id == grob$maths$index,
   ]
   expect_gt(nrow(math_glyphs), 0)
-  expect_true(all(grepl("Math", math_glyphs$font_path)))
+  # Font file names don't reliably contain "Math" (e.g. Cambria Math lives in
+  # cambria.ttc on Windows), so compare against the resolved math font path
+  expect_true(all(
+    math_glyphs$font_path %in% systemfonts::match_fonts("math")$path
+  ))
 
   # Display math gets lines (fraction bar) and is centered by default
   grob <- marquee_grob(
