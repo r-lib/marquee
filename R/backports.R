@@ -7,6 +7,7 @@ version_unavailable <- function(min_version) {
 }
 
 glyphFont <- version_unavailable("4.3.0")
+glyphFontVariation <- version_unavailable("4.6.0")
 glyphFontList <- version_unavailable("4.3.0")
 glyphInfo <- version_unavailable("4.3.0")
 glyphAnchor <- version_unavailable("4.3.0")
@@ -34,6 +35,9 @@ on_load({
   }
   if ("glyphFontList" %in% getNamespaceExports("grDevices")) {
     glyphFontList <- grDevices::glyphFontList
+  }
+  if ("glyphFontVariation" %in% getNamespaceExports("grDevices")) {
+    glyphFontVariation <- grDevices::glyphFontVariation
   }
   if ("glyphInfo" %in% getNamespaceExports("grDevices")) {
     glyphInfo <- grDevices::glyphInfo

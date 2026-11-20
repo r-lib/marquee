@@ -3077,7 +3077,7 @@ variation_to_font_variation <- function(v) {
   )
   values <- .subset2(v, "value") / 65536
   do.call(
-    grDevices::glyphFontVariation,
+    glyphFontVariation,
     as.list(stats::setNames(values, axes))
   )
 }
