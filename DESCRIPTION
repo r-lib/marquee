@@ -51,6 +51,5 @@ Config/usethis/last-upkeep: 2025-04-23
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Remotes:
-    r-lib/systemfonts,
     r-lib/textshaping
 Config/roxygen2/version: 8.1.1

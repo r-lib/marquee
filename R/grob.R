@@ -3051,7 +3051,9 @@ outline_polygon <- function(polygon, shape) {
 
 # Whether the running R supports variations in glyphFont() (R >= 4.6.0)
 glyph_supports_variation <- function() {
-  "variations" %in% names(formals(grDevices::glyphFont))
+  # Uses the backported binding, which is a stub on R < 4.3 (no `variations`
+  # formal, so this returns FALSE there)
+  "variations" %in% names(formals(glyphFont))
 }
 
 # Convert a systemfonts::font_variation object to the FontVariation objects
