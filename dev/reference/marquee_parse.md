@@ -189,16 +189,16 @@ the row indicated by the value in this column).
 
 ``` r
 marquee_parse("# Header of the example\nSome body text", classic_style())
-#> # A tibble: 3 × 52
+#> # A tibble: 3 × 53
 #>   text            id block type  indentation ol_index tight  ends  size
 #>   <chr>        <int> <int> <chr>       <int>    <int> <lgl> <int> <dbl>
 #> 1 ""               1     1 body            1        0 FALSE     3    12
 #> 2 "Header of …     1     2 h1              2        0 FALSE     2    27
 #> 3 "Some body …     1     3 p               2        0 FALSE     3    12
-#> # ℹ 43 more variables: background <list>, color <chr>, family <chr>,
+#> # ℹ 44 more variables: background <list>, color <chr>, family <chr>,
 #> #   weight <int>, italic <lgl>, width <int>, features <list>,
-#> #   lineheight <dbl>, align <chr>, tracking <dbl>, indent <dbl>,
-#> #   hanging <dbl>, marker_width <chr>, margin_top <dbl>,
+#> #   variation <list>, lineheight <dbl>, align <chr>, tracking <dbl>,
+#> #   indent <dbl>, hanging <dbl>, marker_width <chr>, margin_top <dbl>,
 #> #   margin_right <dbl>, margin_bottom <dbl>, margin_left <dbl>,
 #> #   padding_top <dbl>, padding_right <dbl>, padding_bottom <dbl>,
 #> #   padding_left <dbl>, border <chr>, border_width_top <dbl>, …

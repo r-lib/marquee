@@ -72,6 +72,15 @@ classic_style(
       [font_feature](https://systemfonts.r-lib.org/reference/font_feature.html)
       object specifying any OpenType font features to apply to the font
 
+  `variation`
+
+  :   A
+      [font_variation](https://systemfonts.r-lib.org/reference/font_variation.html)
+      object specifying the coordinates on the variable font axes to
+      use. Settings here take precedence over the corresponding
+      `weight`, `italic`, and `width` settings during shaping and
+      rendering
+
   `color`
 
   :   Is the color of the font

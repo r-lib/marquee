@@ -16,6 +16,7 @@ style(
   italic = NULL,
   width = NULL,
   features = NULL,
+  variation = NULL,
   size = NULL,
   color = NULL,
   lineheight = NULL,
@@ -55,6 +56,7 @@ base_style(
   italic = FALSE,
   width = "normal",
   features = systemfonts::font_feature(),
+  variation = systemfonts::font_variation(),
   size = 12,
   color = "black",
   lineheight = 1.6,
@@ -120,6 +122,14 @@ base_style(
   A
   [font_feature](https://systemfonts.r-lib.org/reference/font_feature.html)
   object specifying any OpenType font features to apply to the font
+
+- variation:
+
+  A
+  [font_variation](https://systemfonts.r-lib.org/reference/font_variation.html)
+  object specifying the coordinates on the variable font axes to use.
+  Settings here take precedence over the corresponding `weight`,
+  `italic`, and `width` settings during shaping and rendering
 
 - size:
 
@@ -342,7 +352,7 @@ style(color = "red", underline = TRUE)
 
 # Full style
 base_style()
-#> <marquee_style[44]>
+#> <marquee_style[45]>
 #>                size: 12
 #>          background: NA
 #>               color: black
@@ -351,6 +361,7 @@ base_style()
 #>              italic: FALSE
 #>               width: 5
 #>            features: <empty>
+#>           variation: <empty>
 #>          lineheight: 1.6
 #>               align: auto
 #>            tracking: 0
