@@ -38,6 +38,10 @@ on this}
 `"ultraexpanded"`)}
     \item{\code{features}}{A \link[systemfonts:font_feature]{font_feature} object specifying
 any OpenType font features to apply to the font}
+    \item{\code{variation}}{A \link[systemfonts:font_variation]{font_variation} object
+specifying the coordinates on the variable font axes to use. Settings here
+take precedence over the corresponding \code{weight}, \code{italic}, and \code{width}
+settings during shaping and rendering}
     \item{\code{color}}{Is the color of the font}
     \item{\code{lineheight}}{The spacing between subsequent lines relative to the font
 size. Can be \code{\link[=relative]{relative()}} in which case it is based on the parent lineheight.}
