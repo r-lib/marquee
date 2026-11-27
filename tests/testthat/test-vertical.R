@@ -378,6 +378,17 @@ test_that("emphasis marks work in horizontal text (above)", {
   expect_gt(mark$y_offset, char$y_offset)
 })
 
+test_that("vertical_style(emphasis = NA) uses italics for em spans", {
+  style <- vertical_style(emphasis = NA)
+  expect_true(style[[1]]$em$italic)
+  expect_identical(style[[1]]$em$emphasis, NA_character_)
+
+  parsed <- marquee_parse("*強調*テスト", style)
+  em <- parsed[parsed$text == "強調", ]
+  expect_true(em$italic)
+  expect_identical(em$emphasis, NA_character_)
+})
+
 test_that("horizontal blocks nest inside vertical flow", {
   g <- v_grob(
     "縦書きの段落。\n\n    code line\n\n再び縦書き。",
