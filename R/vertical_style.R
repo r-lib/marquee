@@ -121,8 +121,15 @@ vertical_style <- function(
   if (!is.null(strong_font)) {
     style <- modify_style(style, "str", family = strong_font, weight = "normal")
   }
-  ## Emphasis uses kenten rather than italics
-  style <- modify_style(style, "em", italic = FALSE, emphasis = emphasis)
+  ## Emphasis uses kenten rather than italics unless emphasis is NA
+  if (!is.null(emphasis)) {
+    style <- modify_style(
+      style,
+      "em",
+      italic = is.na(emphasis),
+      emphasis = emphasis
+    )
+  }
   ## Code spans rotate, code blocks are set horizontally (yokogaki)
   style <- modify_style(style, "code", mixed = "rotate")
   style <- modify_style(style, "cb", text_direction = "ltr", align = "left")
